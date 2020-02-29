@@ -1,4 +1,4 @@
-package com.example.a2;
+package com.example.rebunu;
 
 public class Request extends Record {
     private int status;
