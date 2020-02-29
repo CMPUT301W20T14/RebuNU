@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "259163061928",
+    "firebase_url": "https://rebunu-88977.firebaseio.com",
+    "project_id": "rebunu-88977",
+    "storage_bucket": "rebunu-88977.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259163061928:android:487982b592f10f1e564c9d",
+        "android_client_info": {
+          "package_name": "com.example.rebunu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "259163061928-diqcfuf9fm1brlg6ssmrf75i3er2gvch.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGVBX5Zzvt_fYg6rVVab-hdH-fLYhflXc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "259163061928-diqcfuf9fm1brlg6ssmrf75i3er2gvch.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
