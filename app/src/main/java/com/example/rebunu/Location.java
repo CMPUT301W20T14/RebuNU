@@ -1,27 +1,73 @@
-package com.example.rebunu;
+package com.example.a2;
+
+/**
+ * Location class
+ * @author Lefan Wang
+ */
 
 public class Location {
-    private double longitude;
-    private double latitude;
+    private Double longitude;
+    private Double latitude;
 
-    Location(double longitude , double latitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
+    /**
+     *
+     * @param longitude a double，with the range (0,90)
+     * @param latitude a double, with the range (0,180)
+     * @throws Exception null or empty or invalid number exceptions
+     */
+
+    public Location(Double longitude , Double latitude) throws Exception {
+        setLongitude(longitude);
+        setLatitude(latitude);
     }
 
-    void setLongitude(double longitude){
-        this.longitude = longitude;
+    /**
+     * Getters for all the params
+     */
+
+    public double getLongitude() {
+        return longitude;
     }
 
-    void setLatitude(double latitude){
-        this.latitude = latitude;
+    public double getLatitude() {
+        return latitude;
     }
 
-    double getLongitude() {
-        return this.longitude;
+    /**
+     * setter for setLongtitude
+     * @param longitude a double >= 0 and <= 180
+     */
+    public void setLongitude(Double longitude) throws Exception{
+        if (longitude == null){
+            throw new NullPointerException("Longitude is null"); 
+        }
+        else{
+            if (longitude >= 0 & longitude <= 180){
+                this.longitude = longitude;
+            }
+        else{
+            throw new Exception("Invalid longitude");
+            }
+        }
+        
     }
 
-    double getLatitude() {
-        return this.latitude;
+    /**
+     * setter for setLongtitude
+     * @param latitude a double >= 0 and <= 90
+     */
+    public void setLatitude(Double latitude) throws Exception{
+        if (latitude == null){
+            throw new NullPointerException("Latitude is null");
+        }
+        else{
+            if (latitude >= 0 & latitude <= 90){
+                this.latitude = latitude;
+            }
+            else{
+                throw new Exception("Invalid latitude");
+            }
+        }
+
     }
 }
