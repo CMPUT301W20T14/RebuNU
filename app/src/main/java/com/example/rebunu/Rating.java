@@ -16,12 +16,12 @@ public class Rating {
      * @throws Exception null or invalid value exceptions
      * @see Profile
      */
-    Rating(Integer thumbsUp, Integer thumbsDown) throws Exception {
+    public Rating(Integer thumbsUp, Integer thumbsDown) throws Exception {
         setThumbsUp(thumbsUp);
         setThumbsDown(thumbsDown);
     }
     /**
-     * getter for thumbsDown
+     * Getter for thumbsDown
      * @return thumbsDown
      */
     public Integer getThumbsDown() {
@@ -29,7 +29,7 @@ public class Rating {
     }
 
     /**
-     * getter for thumbsUp
+     * Getter for thumbsUp
      * @return thumbsUp
      */
     public Integer getThumbsUp() {
@@ -37,11 +37,11 @@ public class Rating {
     }
 
     /**
-     * setter for thumbsDown
+     * Setter for thumbsDown
      * @param thumbsDown a positive Integer
      * @throws Exception a positive Integer
      */
-    void setThumbsDown(Integer thumbsDown) throws Exception{
+    public void setThumbsDown(Integer thumbsDown) throws Exception{
         if(thumbsDown == null) {
             throw new NullPointerException("ThumbsDown is null.");
         } else {
@@ -54,11 +54,11 @@ public class Rating {
     }
 
     /**
-     * setter for thumbsUp
+     * Setter for thumbsUp
      * @param thumbsUp a positive Integer
      * @throws Exception a positive Integer
      */
-    void setThumbsUp(Integer thumbsUp) throws Exception {
+    public void setThumbsUp(Integer thumbsUp) throws Exception {
         if(thumbsUp == null) {
             throw new NullPointerException("ThumbsUp is null.");
         } else {
@@ -71,14 +71,14 @@ public class Rating {
     }
 
     /**
-     * setter for making thumbsUp + 1
+     * Setter for making thumbsUp + 1
      */
     public void thumbsUpPlus(){
         this.thumbsUp += 1;
     }
 
     /**
-     * setter for making thumbsDown + 1
+     * Setter for making thumbsDown + 1
      */
     public void thumbsDownPlus() {
         this.thumbsDown += 1;

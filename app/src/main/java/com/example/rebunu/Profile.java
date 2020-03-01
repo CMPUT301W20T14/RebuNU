@@ -23,7 +23,7 @@ public class Profile {
      * @throws Exception null or empty value or invalid number exceptions
      * @see Rating
      */
-    Profile(
+    public Profile(
             String phone, String email, String username, Double balance, String role, Rating rating
     ) throws Exception{
         setPhone(phone);
@@ -35,7 +35,7 @@ public class Profile {
     }
 
     /**
-     * getter for phone
+     * Getter for phone
      * @return phone
      */
     public String getPhone() {
@@ -43,7 +43,7 @@ public class Profile {
     }
 
     /**
-     * getter for email
+     * Getter for email
      * @return email
      */
     public String getEmail() {
@@ -51,7 +51,7 @@ public class Profile {
     }
 
     /**
-     * getter for username
+     * Getter for username
      * @return username
      */
     public String getUsername() {
@@ -59,7 +59,7 @@ public class Profile {
     }
 
     /**
-     * getter for balance
+     * Getter for balance
      * @return balance
      */
     public Double getBalance() {
@@ -67,7 +67,7 @@ public class Profile {
     }
 
     /**
-     * getter for role
+     * Getter for role
      * @return role
      */
     public String getRole() {
@@ -75,7 +75,7 @@ public class Profile {
     }
 
     /**
-     * getter for rating
+     * Getter for rating
      * @return a Rating object
      */
     public Rating getRating() {
@@ -83,11 +83,11 @@ public class Profile {
     }
 
     /**
-     * setter for phone
+     * Setter for phone
      * @param phone a String but only consists of numbers
      * @throws Exception null or empty or invalid number exceptions
      */
-    void setPhone(String phone) throws  Exception{
+    public void setPhone(String phone) throws  Exception{
         if(phone == null) {
             throw new NullPointerException("Phone is null.");
         } else {
@@ -104,28 +104,32 @@ public class Profile {
     }
 
     /**
-     * setter for email
+     * Setter for email
      * @param email a String
      * @throws Exception null or empty exceptions
      */
-    void setEmail(String email) throws Exception{
+    public void setEmail(String email) throws Exception{
         if(email == null) {
             throw new NullPointerException("Email is null.");
         } else {
             if(email.isEmpty()) {
                 throw new Exception("Email is empty.");
             } else {
-                this.email = email;
+                if(email.matches("^[\\w-+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$")) {
+                    this.email = email;
+                } else {
+                    throw new Exception(email + "is not a valid email address");
+                }
             }
         }
     }
 
     /**
-     * setter for username
+     * Setter for username
      * @param username a String
      * @throws Exception null or empty exceptions
      */
-    void setUsername(String username) throws Exception {
+    public void setUsername(String username) throws Exception {
         if(username == null) {
             throw new NullPointerException("Username is null.");
         } else {
@@ -138,11 +142,11 @@ public class Profile {
     }
 
     /**
-     * setter for balance
+     * Setter for balance
      * @param balance a Double
      * @throws Exception null or NaN or Inf exceptions
      */
-    void setBalance(Double balance) throws Exception{
+    public void setBalance(Double balance) throws Exception{
         if(balance == null) {
             throw new NullPointerException("Balance is null.");
         } else {
@@ -156,11 +160,11 @@ public class Profile {
     }
 
     /**
-     * setter for role
+     * Setter for role
      * @param role a String
      * @throws Exception null or empty exceptions
      */
-    void setRole(String role) throws Exception{
+    public void setRole(String role) throws Exception{
         if(role == null) {
             throw new NullPointerException("Role is null.");
         } else {
@@ -173,11 +177,11 @@ public class Profile {
     }
 
     /**
-     * setter for rating
+     * Setter for rating
      * @param rating a Rating object
      * @throws NullPointerException null exception
      */
-    void setRating(Rating rating) throws NullPointerException{
+    public void setRating(Rating rating) throws NullPointerException{
         if(rating != null) {
             this.rating = rating;
             return;
