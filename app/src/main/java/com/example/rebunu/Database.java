@@ -11,6 +11,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.Transaction;
 
 import java.util.HashMap;
@@ -70,11 +71,12 @@ public class Database {
 
                 //create a document for this profile
                 HashMap<String, Object> profile = new HashMap<>();
-                profile.put("phone", record.getPhone);
-                profile.put("email", record.getEmail);
-                profile.put("username", record.getUsername);
-                profile.put("balance", record.getBalance);
-                profile.put("role", record.getRole);
+                profile.put("id", record.getId());
+                profile.put("phone", record.getPhone());
+                profile.put("email", record.getEmail());
+                profile.put("username", record.getUsername());
+                profile.put("balance", record.getBalance());
+                profile.put("role", record.getRole());
                 profiles
                     .document(record.getId().toString())
                     .set(profile);
@@ -84,17 +86,15 @@ public class Database {
                 rating.put("thumbsUp", record.getRating().getThumbsUp());
                 rating.put("thumbsDown", record.getRating().getThumbsDown());
                 profileSubDoc.set(rating);
-//                profiles
-//                    .document(profileSubDoc.getPath())
-//                    .set(rating);
 
                 break;
             case 2:
                 //create a document for this request
                 HashMap<String, Object> request = new HashMap<>();
-                request.put("status", record.getStatus);
-                request.put("price", record.getPrice);
-                request.put("rideId", record.getRideId);
+                request.put("id", record.getId());
+                request.put("status", record.getStatus());
+                request.put("price", record.getPrice());
+                request.put("rideId", record.getRideId());
                 requests
                         .document(record.getId().toString())
                         .set(request);
@@ -104,26 +104,22 @@ public class Database {
                 start.put("longitude",record.getStart().getLongitude());
                 start.put("latitude", record.getStart().getLatitude());
                 requestStartLocation.set(start);
-//                requests
-//                        .document(requestStartLocation.getPath())
-//                        .set(start);
+
                 DocumentReference requestEndLocation = requests.document(record.getId().toString()).collection("locations").document("end");
                 HashMap<String, Double> end = new HashMap<>();
                 end.put("longitude",record.getEnd().getLongitude());
                 end.put("latitude", record.getEnd().getLatitude());
                 requestEndLocation.set(end);
-//                requests
-//                        .document(requestEndLocation.getPath())
-//                        .set(end);
 
                 break;
 
             case 3:
                 //create a document for this order
                 HashMap<String, Object> order = new HashMap<>();
-                order.put("status", record.getStatus);
-                order.put("price", record.getPrice);
-                order.put("rideId", record.getRideId);
+                order.put("id", record.getId());
+                order.put("status", record.getStatus());
+                order.put("price", record.getPrice());
+                order.put("rideId", record.getRideId());
                 order.put("driverId", record.getDriverId());
                 orders
                         .document(record.getId().toString())
@@ -134,17 +130,12 @@ public class Database {
                 orderStart.put("longitude",record.getStart().getLongitude());
                 orderStart.put("latitude", record.getStart().getLatitude());
                 orderStartLocation.set(orderStart);
-//                orders
-//                        .document(orderStartLocation.getPath())
-//                        .set(orderStart);
+
                 DocumentReference orderEndLocation = db.collection("Records").document(record.getId().toString()).collection("locations").document("end");
                 HashMap<String, Double> orderEnd = new HashMap<>();
                 orderEnd.put("longitude",record.getEnd().getLongitude());
                 orderEnd.put("latitude", record.getEnd().getLatitude());
                 orderEndLocation.set(orderEnd);
-//                orders
-//                        .document(orderEndLocation.getPath())
-//                        .set(orderEnd);
 
 
                 //create subDocument for qr under this order
@@ -152,9 +143,7 @@ public class Database {
                 HashMap<String, Object> qr = new HashMap<>();
                     //qr.put(key,value);
                 orderSubDocQr.set(qr);
-//                orders
-//                        .document(orderSubDocQr.getPath())
-//                        .set(qr);
+
                 //create subDocument for rating under this order
                 DocumentReference orderSubDocRating = db.collection("Records").document(record.getId().toString()).collection("other").document("rating");
                 HashMap<String, Object> orderRating = new HashMap<>();
@@ -424,6 +413,35 @@ public class Database {
         }catch (Exception e){throw new IllegalArgumentException();}
 
     }
+
+    /**
+     * generate a unique id for recoed
+     * @return id
+     */
+
+    public Integer generateUniqueId(){
+        Integer id = 1;
+        Query queryPro = profiles.orderBy("id").limit(1);
+        Query queryReq = requests.orderBy("id").limit(1);
+        Query queryOrd = orders.orderBy("id").limit(1);
+
+        if(!(queryPro.get().getResult().isEmpty())){
+            Integer id1  = Integer.parseInt(queryPro.get().getResult().getDocuments().get(0).getId()) + 1;
+            if(id1 > id){id = id1;}
+        }
+        if(!(queryReq.get().getResult().isEmpty())){
+            Integer id2 = Integer.parseInt(queryReq.get().getResult().getDocuments().get(0).getId()) + 1;
+            if(id2 > id){id = id2;}
+        }
+        if(!(queryOrd.get().getResult().isEmpty())){
+            Integer id3 = Integer.parseInt(queryOrd.get().getResult().getDocuments().get(0).getId()) + 1;
+            if(id3 > id){id = id3;}
+        }
+
+        return id;
+    }
+
+
 
 
 }
