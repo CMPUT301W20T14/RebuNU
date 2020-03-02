@@ -1,8 +1,9 @@
-package com.example.a2;
+package com.example.rebunu;
 
 /**
  * Location class
  * @author Lefan Wang
+ * @see Request
  */
 
 public class Location {
@@ -14,6 +15,7 @@ public class Location {
      * @param longitude a double，with the range (0,90)
      * @param latitude a double, with the range (0,180)
      * @throws Exception null or empty or invalid number exceptions
+     * @see Request
      */
 
     public Location(Double longitude , Double latitude) throws Exception {
@@ -25,36 +27,38 @@ public class Location {
      * Getters for all the params
      */
 
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
     /**
      * setter for setLongtitude
      * @param longitude a double >= 0 and <= 180
+     * @throws Exception a double >= 0 and <= 180
      */
     public void setLongitude(Double longitude) throws Exception{
         if (longitude == null){
-            throw new NullPointerException("Longitude is null"); 
+            throw new NullPointerException("Longitude is null");
         }
         else{
             if (longitude >= 0 & longitude <= 180){
                 this.longitude = longitude;
             }
-        else{
-            throw new Exception("Invalid longitude");
+            else{
+                throw new Exception("Invalid longitude");
             }
         }
-        
+
     }
 
     /**
      * setter for setLongtitude
      * @param latitude a double >= 0 and <= 90
+     * @throws Exception a double >= 0 and <= 90
      */
     public void setLatitude(Double latitude) throws Exception{
         if (latitude == null){
