@@ -97,9 +97,5 @@ public class Order {
         }
     }
 
-    /**
-     * Setter for pay
-     */
-    public void pay() { }
-    }
+
 }
