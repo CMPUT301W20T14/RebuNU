@@ -11,7 +11,7 @@ public class Order {
 
     /**
      * Constructor for Order
-     * @param qr      a QRcode object
+     * @param qr      a QRCode object
      * @param rating  a Rating object
      * @param driveId a integer
      * @throws Exception null or empty value or invalid number exceptions
