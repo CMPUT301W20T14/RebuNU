@@ -20,7 +20,7 @@ public class Order {
      */
 
     public Order(
-            QRcode qr, Rating rating, int driveId)
+            QRCode qr, Rating rating, int driveId)
             throws Exception {
         setQRCode(qr);
         setRating(rating);
