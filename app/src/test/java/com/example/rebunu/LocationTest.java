@@ -56,7 +56,7 @@ class LocationTest {
         Double negDouble = -1.0;
         Double outofrangeDouble = 181.0;
 
-        assertThrows(Exception.class,()->{
+        assertThrows(NullPointerException.class,()->{
             new Location(nullDouble,nullDouble);
         });
         assertThrows(Exception.class,()->{
