@@ -4,6 +4,8 @@ import android.location.Location;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -101,12 +103,14 @@ public class Database {
                 //create subDocument for locations under this request
                 DocumentReference requestStartLocation = requests.document(record.getId().toString()).collection("locations").document("start");
                 HashMap<String, Double> start = new HashMap<>();
+                start.put("name", record.getStart().getProvider());
                 start.put("longitude",record.getStart().getLongitude());
                 start.put("latitude", record.getStart().getLatitude());
                 requestStartLocation.set(start);
 
                 DocumentReference requestEndLocation = requests.document(record.getId().toString()).collection("locations").document("end");
                 HashMap<String, Double> end = new HashMap<>();
+                end.put("name", record.getStart().getProvider());
                 end.put("longitude",record.getEnd().getLongitude());
                 end.put("latitude", record.getEnd().getLatitude());
                 requestEndLocation.set(end);
@@ -127,22 +131,24 @@ public class Database {
                 //create subDocument for locations under this order
                 DocumentReference orderStartLocation = orders.document(record.getId().toString()).collection("locations").document("start");
                 HashMap<String, Double> orderStart = new HashMap<>();
+                orderStart.put("name", record.getStart().getProvider());
                 orderStart.put("longitude",record.getStart().getLongitude());
                 orderStart.put("latitude", record.getStart().getLatitude());
                 orderStartLocation.set(orderStart);
 
                 DocumentReference orderEndLocation = db.collection("Records").document(record.getId().toString()).collection("locations").document("end");
                 HashMap<String, Double> orderEnd = new HashMap<>();
+                orderEnd.put("name", record.getStart().getProvider());
                 orderEnd.put("longitude",record.getEnd().getLongitude());
                 orderEnd.put("latitude", record.getEnd().getLatitude());
                 orderEndLocation.set(orderEnd);
 
 
-                //create subDocument for qr under this order
-                DocumentReference orderSubDocQr = orders.document(record.getId().toString()).collection("other").document("qr");
-                HashMap<String, Object> qr = new HashMap<>();
-                    //qr.put(key,value);
-                orderSubDocQr.set(qr);
+//                //create subDocument for qr under this order
+//                DocumentReference orderSubDocQr = orders.document(record.getId().toString()).collection("other").document("qr");
+//                HashMap<String, Object> qr = new HashMap<>();
+//                    //qr.put(key,value);
+//                orderSubDocQr.set(qr);
 
                 //create subDocument for rating under this order
                 DocumentReference orderSubDocRating = db.collection("Records").document(record.getId().toString()).collection("other").document("rating");
@@ -258,12 +264,14 @@ public class Database {
                         transaction.update(reqDocRef, "rideId", record.getRideId());
 
                         HashMap<String, Double> start = new HashMap<>();
+                        start.put("name",record.getStart().getProvider());
                         start.put("longitude",record.getStart().getLongitude());
                         start.put("latitude", record.getStart().getLatitude());
                         reqDocRef.collection("locations").document("start").set(start);
                         HashMap<String, Double> end = new HashMap<>();
-                        start.put("longitude",record.getEnd().getLongitude());
-                        start.put("latitude", record.getEnd().getLatitude());
+                        end.put("name",record.getEnd().getProvider());
+                        end.put("longitude",record.getEnd().getLongitude());
+                        end.put("latitude", record.getEnd().getLatitude());
                         reqDocRef.collection("locations").document("end").set(end);
 
                         // Success
@@ -334,21 +342,18 @@ public class Database {
         try {
 
             if (type == 1) {
-                Profile profile = new Profile();
                 DocumentSnapshot docPro = profiles.document(id.toString()).get().getResult();
                 DocumentSnapshot docRating = profiles.document(id.toString()).collection("ratings").document("rating").get().getResult();
 
-                profile.setPhone((String) docPro.getData().get("phone"));
-                profile.setEmail((String) docPro.getData().get("email"));
-                profile.setUsername((String) docPro.getData().get("username"));
-                profile.setBalance((Double) docPro.getData().get("balance"));
-                profile.setRole((String) docPro.getData().get("role"));
+                String phone = (String) docPro.getData().get("phone");
+                String email = (String) docPro.getData().get("email");
+                String username = (String) docPro.getData().get("username");
+                Double balance = (Double) docPro.getData().get("balance");
+                String role = (String) docPro.getData().get("role");
                 Integer thumbsUp = (Integer) docRating.getData().get("thumbsUp");
                 Integer thumbsDown = (Integer) docRating.getData().get("thumbsDown");
-                Rating rating = new Rating();
-                rating.setThumbsUp(thumbsUp);
-                rating.setThumbsDown(thumbsDown);
-                profile.setRating(rating);
+                Rating rating = new Rating(thumbsUp, thumbsDown);
+                Profile profile = new Profile(phone, email, username, balance, role, rating);
                 profile.setId(id);
                 profile.setType(type);
 
@@ -356,52 +361,58 @@ public class Database {
             } else {
 
                 if (type == 2) {
-                    Request request = new Request();
                     DocumentSnapshot docReq = requests.document(id.toString()).get().getResult();
                     DocumentSnapshot docStart = requests.document(id.toString()).collection("locations").document("start").get().getResult();
                     DocumentSnapshot docEnd = requests.document(id.toString()).collection("locations").document("end").get().getResult();
 
-                    request.setStatus((Integer) docReq.getData().get("status"));
-                    request.setPrice((Integer) docReq.getData().get("price"));
-                    request.setRiderId((Integer) docReq.getData().get("riderId"));
-                    Location start = new Location();
+                    Integer status = (Integer) docReq.getData().get("status");
+                    Integer price = (Integer) docReq.getData().get("price");
+                    Integer riderId = (Integer) docReq.getData().get("riderId");
+                    String startProvider = (String) docStart.getData().get("name");
+                    Location start = new Location(startProvider);
                     start.setLongitude((Double) docStart.getData().get("longitude"));
                     start.setLatitude((Double) docStart.getData().get("latitude"));
-                    Location end = new Location();
+                    String endProvider = (String) docEnd.getData().get("name");
+                    Location end = new Location(endProvider);
                     end.setLongitude((Double) docEnd.getData().get("longitude"));
                     end.setLatitude((Double) docEnd.getData().get("latitude"));
-                    request.setStart(start);
-                    request.setEnd(end);
+
+                    Request request = new Request(status, start, end, price, riderId);
+
                     request.setId(id);
                     request.setType(type);
 
                     return request;
                 } else {
-                    Order order = new Order();
+
                     DocumentSnapshot docOrd = orders.document(id.toString()).get().getResult();
                     DocumentSnapshot docQr = orders.document(id.toString()).collection("other").document("qr").get().getResult();
                     DocumentSnapshot docRating1 = orders.document(id.toString()).collection("other").document("rating").get().getResult();
-                    order.setDriverId((Integer) docOrd.getData().get("driverId"));
-                    QRCode qr = new QRCode();
-                    //set QRCode attributes
-                    order.setQRCode(qr);
-                    Rating rating1 = new Rating();
-                    rate.setThumbsUp((Integer) docRating1.getData().get("thumbsUp"));
-                    rate.setThumbsDown((Integer) docRating1.getData().get("thumbsDown"));
-                    order.setRating(rating1);
+                    Integer driveId = (Integer) docOrd.getData().get("driverId");
+
+
+                    Integer thumbsUp = (Integer) docRating1.getData().get("thumbsUp");
+                    Integer thumbsDown = (Integer) docRating1.getData().get("thumbsDown");
+                    Rating rating1 = new Rating(thumbsUp, thumbsDown);
+
 
                     DocumentSnapshot docStart = orders.document(id.toString()).collection("locations").document("start").get().getResult();
                     DocumentSnapshot docEnd = orders.document(id.toString()).collection("locations").document("end").get().getResult();
 
+                    String startProvider = (String)docStart.getData().get("name");
+                    Location start = new Location(startProvider);
+                    start.setLongitude((Double) docStart.getData().get("longitude"));
+                    start.setLatitude((Double) docStart.getData().get("latitude"));
+
+                    String endProvider = (String)docEnd.getData().get("name");
+                    Location end = new Location(endProvider);
+                    end.setLongitude((Double) docEnd.getData().get("longitude"));
+                    end.setLatitude((Double) docEnd.getData().get("latitude"));
+
+                    Order order = new Order(NULL, rating1, driveId);
                     order.setStatus((Integer) docOrd.getData().get("status"));
                     order.setPrice((Integer) docOrd.getData().get("price"));
                     order.setRiderId((Integer) docOrd.getData().get("riderId"));
-                    Location start = new Location();
-                    start.setLongitude((Double) docStart.getData().get("longitude"));
-                    start.setLatitude((Double) docStart.getData().get("latitude"));
-                    Location end = new Location();
-                    end.setLongitude((Double) docEnd.getData().get("longitude"));
-                    end.setLatitude((Double) docEnd.getData().get("latitude"));
                     order.setStart(start);
                     order.setEnd(end);
                     order.setId(id);
