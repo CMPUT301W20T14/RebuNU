@@ -32,6 +32,9 @@ public class Record {
     }
 
     public void setType(Integer type){
+        if(!(type == 1 || type == 2 || type == 3)){
+            throw new IllegalArgumentException();
+        }
         this.type = type;
     }
 }
