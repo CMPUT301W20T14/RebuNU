@@ -17,7 +17,7 @@ public class RequestTest {
     @Test
     void fakeRequest(){
         try{
-            request = new Request(1,new Location(120.0,60.0),new Location(125.0,65.0),20,11111111);
+            request = new Request(new Location(120.0,60.0),new Location(125.0,65.0),20,11111111);
         }catch (Exception ignored){}
     }
 
@@ -27,7 +27,6 @@ public class RequestTest {
     @Test
     public void testGetters(){
         fakeRequest();
-        assertEquals((Integer) 1,request.getStatus());
         assertEquals((Double)120.0,request.getStart().getLongitude());
         assertEquals((Double)60.0,request.getStart().getLatitude());
         assertEquals((Double)125.0,request.getEnd().getLongitude());
@@ -40,8 +39,6 @@ public class RequestTest {
     public void testSetters(){
         fakeRequest();
         try{
-            request.setStatus(2);
-            assertEquals((Integer)2,request.getStatus());
             assertEquals((Double)120.0,request.getStart().getLongitude());
             assertEquals((Double)60.0,request.getStart().getLatitude());
             assertEquals((Double)125.0,request.getEnd().getLongitude());
@@ -50,7 +47,6 @@ public class RequestTest {
             assertEquals((Integer)11111111,request.getRiderId());
 
             request.setStart(new Location(100.0,40.0));
-            assertEquals((Integer)2,request.getStatus());
             assertEquals((Double)100.0,request.getStart().getLongitude());
             assertEquals((Double)40.0,request.getStart().getLatitude());
             assertEquals((Double)125.0,request.getEnd().getLongitude());
@@ -59,7 +55,6 @@ public class RequestTest {
             assertEquals((Integer)11111111,request.getRiderId());
 
             request.setEnd(new Location(105.0,45.0));
-            assertEquals((Integer)2,request.getStatus());
             assertEquals((Double)100.0,request.getStart().getLongitude());
             assertEquals((Double)40.0,request.getStart().getLatitude());
             assertEquals((Double)105.0,request.getEnd().getLongitude());
@@ -68,7 +63,6 @@ public class RequestTest {
             assertEquals((Integer)11111111,request.getRiderId());
 
             request.setPrice(25);
-            assertEquals((Integer)2,request.getStatus());
             assertEquals((Double)100.0,request.getStart().getLongitude());
             assertEquals((Double)40.0,request.getStart().getLatitude());
             assertEquals((Double)105.0,request.getEnd().getLongitude());
@@ -77,7 +71,6 @@ public class RequestTest {
             assertEquals((Integer)11111111,request.getRiderId());
 
             request.setRiderId(22222222);
-            assertEquals((Integer)2,request.getStatus());
             assertEquals((Double)100.0,request.getStart().getLongitude());
             assertEquals((Double)40.0,request.getStart().getLatitude());
             assertEquals((Double)105.0,request.getEnd().getLongitude());
@@ -100,12 +93,6 @@ public class RequestTest {
         Integer nullRiderId = null;
         Integer invalidRiderId = -10;
 
-        assertThrows(NullPointerException.class,()->{
-            request.setStatus(nullStatus);
-        });
-        assertThrows(Exception.class,()->{
-            request.setStatus(invalidStatus);
-        });
         assertThrows(NullPointerException.class,()->{
             request.setPrice(nullPrice);
         });
