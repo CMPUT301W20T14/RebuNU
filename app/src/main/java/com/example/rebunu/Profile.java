@@ -4,7 +4,7 @@ package com.example.rebunu;
  * This is the Profile class implementation.
  * @author Zijian Xi
  */
-public class Profile {
+public class Profile extends Record{
     private String phone;
     private String email;
     private String username;
