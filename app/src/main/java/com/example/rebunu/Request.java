@@ -7,7 +7,6 @@ package com.example.rebunu;
  */
 
 public class Request extends Record {
-    private Integer status;
     private Location start;
     private Location end;
     private Integer price;
@@ -15,7 +14,6 @@ public class Request extends Record {
 
     /**
      *
-     * @param status a integer with the value 1, 2 or 3
      * @param start a Location object
      * @param end a Location object
      * @param price a positive integer
@@ -23,13 +21,11 @@ public class Request extends Record {
      * @throws Exception null, empty or invalid number exceptions
      */
 
-    public Request(Integer status, Location start, Location end, Integer price, Integer riderId) throws Exception{
+    public Request(Location start, Location end, Integer price, Integer riderId) throws Exception{
         setStart(start);
         setEnd(end);
         setPrice(price);
         setRiderId(riderId);
-        setStatus(status);
-
     }
 
     /**
@@ -51,18 +47,15 @@ public class Request extends Record {
         return riderId;
     }
 
-    public Integer getStatus(){
-        return status;
-    }
-
     /**
      * setter for setStart
      * @param start a Location object
      * @throws NullPointerException null exception
      */
     public void setStart(Location start) throws NullPointerException{
-        if (start.getLatitude() != null & start.getLongitude() != null){
+        if (start != null){
             this.start = start;
+            return;
         }
         throw new NullPointerException("Invalid start");
 
@@ -74,7 +67,7 @@ public class Request extends Record {
      * @throws NullPointerException null exception
      */
     public void setEnd(Location end) throws NullPointerException{
-        if (end.getLatitude() != null & end.getLongitude() != null){
+        if (end != null){
             this.end = end;
             return;
         }
@@ -115,25 +108,6 @@ public class Request extends Record {
             }
             else{
                 throw  new Exception("Invalid riderId");
-            }
-        }
-    }
-
-    /**
-     * setter for status
-     * @param status a integer with the value 1, 2 or 3
-     * @throws Exception null or not from (1,2,3) exceptions
-     */
-    public void setStatus(Integer status) throws Exception{
-        if(status == null){
-            throw new NullPointerException("Status is null");
-        }
-        else{
-            if(status == 1 || status == 2 || status ==3){
-                this.status = status;
-            }
-            else{
-                throw new Exception("Invalid status");
             }
         }
     }
