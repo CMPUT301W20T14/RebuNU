@@ -1,5 +1,7 @@
 package com.example.rebunu;
 
+import android.location.Location;
+
 /**
  * Request class
  * @author Lefan Wang
@@ -22,10 +24,10 @@ public class Request extends Record {
      */
 
     public Request(Location start, Location end, Integer price, Integer riderId) throws Exception{
-        setStart(start);
-        setEnd(end);
-        setPrice(price);
-        setRiderId(riderId);
+        this.setStart(start);
+        this.setEnd(end);
+        this.setPrice(price);
+        this.setRiderId(riderId);
     }
 
     /**
@@ -58,7 +60,6 @@ public class Request extends Record {
             return;
         }
         throw new NullPointerException("Invalid start");
-
     }
 
     /**
