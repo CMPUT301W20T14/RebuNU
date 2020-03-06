@@ -11,9 +11,8 @@ public class ProfileTest {
     private Profile profile;
 
     /**
-     * Test for Profile constructor
+     * generate a fake profile
      */
-    @Test
     void fakeProfile() {
         try {
             profile = new Profile("1111111111", "fake@fake.fake", "fakeusername", 100d, "driver", new Rating(10, 20));
@@ -21,10 +20,10 @@ public class ProfileTest {
     }
 
     /**
-     * Test for all getters
+     * Test for constructor and all getters
      */
     @Test
-    public void testGetters() {
+    public void testConstructorAndGetters() {
         fakeProfile();
         assertEquals("1111111111", profile.getPhone());
         assertEquals("fake@fake.fake", profile.getEmail());
