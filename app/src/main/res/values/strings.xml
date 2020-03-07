@@ -45,4 +45,10 @@
     <string name="from">FROM WHERE</string>
     <string name="to">TO</string>
     <string name="estimated_rate">ESTIMATED RATE</string>
+
+    <!-- Error -->
+    <string name="password_empty">PASSWORD CANNOT BE EMPTY</string>
+    <string name="password_wrong">WRONG PASSWORD</string>
+    <string name="email_or_phone_empty">EMAIL/PHONE CANNOT BE EMPTY</string>
+    <string name="email_or_phone_wrong">WRONG EMAIL/PHONE</string>
 </resources>

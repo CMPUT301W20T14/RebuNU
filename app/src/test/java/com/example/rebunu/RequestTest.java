@@ -109,6 +109,8 @@ public class RequestTest {
         Integer invalidPrice = -10;
         Integer nullRiderId = null;
         Integer invalidRiderId = -10;
+        Location nullStart = null;
+        Location nullEnd = null;
 
         assertThrows(NullPointerException.class,()->{
             request.setPrice(nullPrice);
@@ -121,6 +123,14 @@ public class RequestTest {
         });
         assertThrows(Exception.class,()->{
             request.setRiderId(invalidRiderId);
+        });
+
+        assertThrows(Exception.class, ()->{
+            request.setStart(nullStart);
+        });
+
+        assertThrows(Exception.class, ()->{
+            request.setEnd(nullEnd);
         });
     }
 }
