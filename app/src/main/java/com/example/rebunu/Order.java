@@ -4,7 +4,7 @@ package com.example.rebunu;
  * This is the Order class implementation.
  * @author Bofeng Chen
  */
-public class Order {
+public class Order extends Request{
     private QRCode qr;
     private Rating rating;
     private Integer driveId;
