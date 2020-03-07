@@ -28,6 +28,7 @@ public class Request extends Record {
         this.setEnd(end);
         this.setPrice(price);
         this.setRiderId(riderId);
+        setType(2);
     }
 
     /**
