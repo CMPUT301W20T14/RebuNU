@@ -11,9 +11,8 @@ class RatingTest {
     private Rating rating;
 
     /**
-     * Test for Rating constructor
+     * generates a fake rating
      */
-    @Test
     void fakeRating() {
         try {
             this.rating = new Rating(1,2);
@@ -24,7 +23,7 @@ class RatingTest {
      * Test for all getters
      */
     @Test
-    public void testGetters() {
+    public void testConstructorAndGetters() {
         fakeRating();
         assertEquals(1, (int)rating.getThumbsUp());
         assertEquals(2, (int)rating.getThumbsDown());
