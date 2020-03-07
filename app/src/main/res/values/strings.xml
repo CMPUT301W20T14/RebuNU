@@ -1,3 +1,48 @@
 <resources>
     <string name="app_name">RebuNU</string>
+
+    <!-- Button related -->
+    <string name="login">LOG IN</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="finish">FINISH</string>
+    <string name="post_request">POST REQUEST</string>
+
+    <!-- Image Description -->
+    <string name="logo_description">This is the logo of RebuNe.</string>
+
+    <!-- Greetings -->
+    <string name="welcome_back">WELCOME BACK!</string>
+    <string name="where_to_go">WHERE TO GO?</string>
+
+
+    <!-- Sign Up Form -->
+    <string name="name">NAME</string>
+    <string name="phone">PHONE</string>
+    <string name="email">EMAIL</string>
+    <string name="password">PASSWORD</string>
+    <string name="confirm_password">CONFIRM PASSWORD</string>
+    <string name="rider">RIDER</string>
+    <string name="driver">DRIVER</string>
+    <string name="user_select">I AM A</string>
+
+    <!-- Login Form -->
+    <string name="email_or_phone">EMAIL / PHONE</string>
+    <string name="forget_password">FORGET MY PASSWORD?</string>
+
+    <!-- User Information (This is temporarily used for ui only. Information should be updated based on different users.) -->
+    <string name="user_name">USERNAME</string>
+    <string name="user_email">USERNAME@REBUNU.COM</string>
+    <string name="user_phone">REB-UNU-2020</string>
+    <string name="user_balance_numeric">2020</string>
+    <!-- Update is not needed for the followings -->
+    <string name="user_balance_qr">QRs</string>
+    <string name="user_balance">BALANCE</string>
+    <string name="user_role">ROLE</string> <!-- Update is not needed -->
+    <string name="user_role_rider">RIDER</string>
+    <string name="user_role_driver">DRIVER</string>
+
+    <!-- Post Request -->
+    <string name="from">FROM WHERE</string>
+    <string name="to">TO</string>
+    <string name="estimated_rate">ESTIMATED RATE</string>
 </resources>

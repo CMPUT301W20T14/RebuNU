@@ -3,4 +3,7 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="background_dark">#1F241F</color>
+    <color name="rebunu_green">#87E69A</color>
+    <color name="rebunu_grey">#7A8B7D</color>
 </resources>
