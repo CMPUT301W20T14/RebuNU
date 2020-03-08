@@ -2,6 +2,8 @@ package com.example.rebunu;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 
 /**
  * Unit test for Profile
@@ -15,7 +17,7 @@ public class ProfileTest {
      */
     void fakeProfile() {
         try {
-            profile = new Profile("1111111111", "fake@fake.fake", "fakeusername", 100d, "driver", new Rating(10, 20));
+            profile = new Profile("1111111111", "fake@fake.fake", "fakeusername", 100d, "driver", new Rating(10, 20), true);
         } catch (Exception ignored){}
     }
 

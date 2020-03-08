@@ -180,42 +180,25 @@ tools:context=".SignUpActivity">
 
             </TextView>
 
-            <com.google.android.material.chip.ChipGroup
+            <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:checkedChip="@id/chip1"
-                app:singleSelection="true">
+                android:orientation="horizontal">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip1"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
+                <RadioButton
+                    android:id="@+id/radioButton"
+                    android:layout_width="122dp"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/chip_dark"
-                    android:fontFamily="@font/yahei"
-                    android:text="@string/rider"
-                    android:textColor="@color/rebunu_green"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    app:checkedIcon="@drawable/chip_light"
-                    app:chipIcon="@drawable/chip_light"
-                    app:chipIconTint="@color/rebunu_green"
-                    app:closeIcon="@drawable/chip_dark" />
+                    android:background="@drawable/button_long_green"
+                    android:text="RadioButton" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip2"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
+                <RadioButton
+                    android:id="@+id/radioButton2"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/chip_dark"
-                    android:fontFamily="@font/yahei"
-                    android:text="@string/driver"
-                    android:textColor="@color/rebunu_green"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-
-            </com.google.android.material.chip.ChipGroup>
+                    android:background="@drawable/chip_light"
+                    android:text="RadioButton" />
+            </RadioGroup>
 
         </LinearLayout>
 

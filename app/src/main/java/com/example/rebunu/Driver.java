@@ -13,14 +13,12 @@ import java.util.Set;
 public class Driver extends User {
     public Driver() throws Exception {}
 
-    public ArrayList<Integer> getNearAvailableRequest(){
+    public ArrayList<Integer> getNearAvailableRequest() throws Exception{
         Database db = new Database();
         HashMap<Integer, ArrayList<Double>> queryResult;
         ArrayList<Integer> filteredResult = new ArrayList<>();
         float[] distance = new float[1];
         ArrayList<Double> coords;
-
-//Whether the db.getAllRequestLocation() return null
 
         queryResult = db.getAllRequestLocation();
         for(Integer s: queryResult.keySet()) {

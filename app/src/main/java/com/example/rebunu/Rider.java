@@ -11,19 +11,16 @@ public class Rider extends User{
 
     public Integer CreateRequest (Location start, Location end, Integer price, Integer riderId) throws
             Exception {
-        try {
-            Request newRequest = new Request(start, end, price, riderId);
-            Database db = new Database();
-            db.add(newRequest);
-            return newRequest.getId();
-        } catch (Exception e) {throw e;}
+        Request newRequest = new Request(start, end, price, riderId);
+        Database db = new Database();
+        db.add(newRequest);
+        return newRequest.getId();
     }
 
     public Request FetchRequest(){
         Database db = new Database();
         Integer requestId = db.getRequestIdByRiderId(getUserId());
-        Request fetchRequest = (Request) db.queryById(requestId, 2);
-        return fetchRequest;
+        return (Request) db.queryById(requestId, 2);
     }
 
     public void cancelRequest() throws Exception{
@@ -31,11 +28,10 @@ public class Rider extends User{
         Order order = new Order();
         Request request = FetchRequest();
         if(request != null) {
-            Request r = (Request)request;
-            order.setStart(r.getStart());
-            order.setEnd(r.getEnd());
-            order.setPrice(r.getPrice());
-            order.setRiderId(r.getRiderId());
+            order.setStart(request.getStart());
+            order.setEnd(request.getEnd());
+            order.setPrice(request.getPrice());
+            order.setRiderId(request.getRiderId());
             order.setStatus(1);
             db.add((Record) order);
             db.delete(request);
