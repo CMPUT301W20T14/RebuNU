@@ -23,6 +23,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -86,6 +87,7 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
                     button_postRequest_floating.setVisibility(Button.VISIBLE);
                     floatingButtonStatus = "VISIBLE";
                 }
+                ArrayList<Location> l = Utility.mockSurrounding();
             }
         });
 
@@ -173,7 +175,6 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
         double lat = currentLocation.getLatitude();
         double lon = currentLocation.getLongitude();
         LatLng cur = new LatLng(lat, lon);
-
         gmap.moveCamera(CameraUpdateFactory.newLatLng(cur));
     }
 }

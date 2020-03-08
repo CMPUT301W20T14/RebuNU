@@ -31,6 +31,15 @@ public class Request extends Record {
         setType(2);
     }
 
+    public Request(Location start, Location end, Integer price, Integer riderId, Boolean noId) throws Exception{
+        super(noId);
+        this.setStart(start);
+        this.setEnd(end);
+        this.setPrice(price);
+        this.setRiderId(riderId);
+        setType(2);
+    }
+
     /**
      * Getters for all the params
      */

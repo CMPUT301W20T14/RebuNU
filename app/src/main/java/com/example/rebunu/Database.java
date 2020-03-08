@@ -42,7 +42,6 @@ public class Database {
      * @param record
      * @return true/false
      */
-
     public boolean contain(Record record){
         if(record.getType() == 1){
             try{

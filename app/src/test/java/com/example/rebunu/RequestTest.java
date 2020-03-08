@@ -40,9 +40,9 @@ public class RequestTest {
      * @param price an Integer
      * @param riderId an Integer
      */
-    void fakeRequest(Location start, Location end, Integer price, Integer riderId){
+    void fakeRequest(Location start, Location end, Integer price, Integer riderId, Boolean noId){
         try{
-            request = new Request(start, end, price, riderId);
+            request = new Request(start, end, price, riderId, noId);
         } catch (Exception ignored){}
     }
 
@@ -51,7 +51,7 @@ public class RequestTest {
      */
     @Test
     public void testConstructorAndGetters(){
-        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, 11111111);
+        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, 11111111, true);
         assertTrue( request.getStart().getLongitude()==10.0 && request.getStart().getLatitude()==20.0);
         assertTrue(request.getEnd().getLongitude()==30.0 && request.getEnd().getLatitude()==40.0);
         assertEquals((Integer)20, request.getPrice());
@@ -60,7 +60,7 @@ public class RequestTest {
 
     @Test
     public void testSetters(){
-        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, 11111111);
+        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, 11111111, true);
         try{
             assertTrue( request.getStart().getLongitude()==10.0 && request.getStart().getLatitude()==20.0);
             assertTrue(request.getEnd().getLongitude()==30.0 && request.getEnd().getLatitude()==40.0);
@@ -102,7 +102,7 @@ public class RequestTest {
      */
     @Test
     public void testExceptions(){
-        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, 11111111);
+        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, 11111111, true);
         Integer nullStatus = null;
         Integer invalidStatus = 4;
         Integer nullPrice = null;

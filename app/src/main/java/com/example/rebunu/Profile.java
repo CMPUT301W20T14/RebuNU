@@ -32,6 +32,18 @@ public class Profile extends Record{
         setBalance(balance);
         setRole(role);
         setRating(rating);
+        setType(1);
+    }
+
+    public Profile(String phone, String email, String username, Double balance, String role, Rating rating, Boolean noId) throws Exception {
+        super(noId);
+        setPhone(phone);
+        setEmail(email);
+        setUsername(username);
+        setBalance(balance);
+        setRole(role);
+        setRating(rating);
+        setType(1);
     }
 
     /**
