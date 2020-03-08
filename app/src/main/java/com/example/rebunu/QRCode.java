@@ -1,75 +1,118 @@
 package com.example.rebunu;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
+
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.BarcodeFormat;
+
+
 /**
  * This is the QRCode class implementation.
  * @author Bofeng Chen
  */
 public class QRCode {
-    private Integer width;
-    private Integer height;
+    private Integer driverId;
+    private Integer riderId;
+    private Integer price;
     private String content;
 
     /**
-     * Constructor for Rating
-     * @param width a positive Integer
-     * @param height a positive Integer
-     * @param content a Sting
-     * @throws Exception null or empty string
+     * Constructor for QRCode
+     * @param content a string
      */
-    public QRCode(int width, int height, String content) throws Exception {
-        setWidth(width);
-        setHeight(height);
-        setContent(content);
+    public Bitmap QRCode(String content){
+
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+
+
+        try {
+            BitMatrix bitMatrix = qrCodeWriter.encode(this.content, BarcodeFormat.QR_CODE, 200, 200);
+            Bitmap bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565);
+
+            for (int x = 0; x < 200; x++){
+                for (int y = 0; y < 200; y++){
+                    bitmap.setPixel(x,y,bitMatrix.get(x,y)? Color.BLACK : Color.WHITE);
+                }
+            }
+
+            return bitmap;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     /**
-     * Getter for width
-     * @return width
+     * Getter for driverId
+     * @return driverId
      */
-    public Integer getWidth(){
-        return width;
+    public Integer getDriverId(){
+        return driverId;
     }
 
     /**
-     * Getter for height
-     * @return height
+     * Getter for riderId
+     * @return riderId
      */
-    public Integer getHeight(){
-        return height;
+    public Integer getRiderId(){
+        return riderId;
+    }
+
+    /**
+     * Getter for price
+     * @return price
+     */
+    public Integer getPrice(){
+        return price;
     }
 
     /**
      * Getter for content
      * @return content
      */
-    public String getContent(){
-        return content;
-    }
+    public String getContent(){ return content; }
+
 
     /**
-     * Setter for width
-     * @param width a positive Integer
+     * Setter for driverId
+     * @param driverId a positive Integer
      * @throws Exception invalid number
      */
-    public void setWidth(Integer width)throws Exception{
-        if (width >= 0){
-            this.width = width;
+    public void setDriverId(Integer driverId)throws Exception{
+        if (driverId >= 0){
+            this.driverId = driverId;
         } else {
-            throw new Exception("Invalid width.");
+            throw new Exception("Invalid driverId.");
         }
     }
 
-
     /**
-     * Setter for height
-     * @param height a positive Integer
+     * Setter for riderId
+     * @param riderId a positive Integer
      * @throws Exception invalid number
      */
-    public void setHeight(Integer height)throws Exception{
-        if (height >= 0){
-            this.height = height;
+    public void setRiderId(Integer riderId)throws Exception{
+        if (riderId >= 0){
+            this.riderId = riderId;
         } else {
-            throw new Exception("Invalid height.");
+            throw new Exception("Invalid riderId.");
+        }
+    }
+
+    /**
+     * Setter for price
+     * @param price a String
+     * @throws NullPointerException null exception or empty exception
+     */
+    public void setPrice(Integer price)throws Exception{
+        if (price >= 0){
+            this.price = price;
+        } else {
+            throw new Exception("Invalid price.");
         }
     }
 
@@ -78,15 +121,9 @@ public class QRCode {
      * @param content a String
      * @throws NullPointerException null exception or empty exception
      */
-    public void setContent(String content)throws Exception{
-        if(content == null) {
-            throw new NullPointerException("Content is null.");
-        } else {
-            if(content.isEmpty()) {
-                throw new Exception("Role is empty");
-            } else {
-                this.content = content;
-            }
-        }
+    public void setContent(String content){
+        this.content = this.driverId + " "
+                     + this.riderId + " "
+                     + this.price + "";
     }
 }
