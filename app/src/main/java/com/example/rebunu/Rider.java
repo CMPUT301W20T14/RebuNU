@@ -21,7 +21,8 @@ public class Rider extends User{
 
     public Request FetchRequest(){
         Database db = new Database();
-        Request fetchRequest = db.getRequestIdByRiderId(getUserId());
+        Integer requestId = db.getRequestIdByRiderId(getUserId());
+        Request fetchRequest = (Request) db.queryById(requestId, 2);
         return fetchRequest;
     }
 

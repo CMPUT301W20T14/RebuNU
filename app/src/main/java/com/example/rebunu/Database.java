@@ -29,6 +29,8 @@ import java.util.HashMap;
 public class Database {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    CollectionReference signUps = db.collection("SignUps");
+
     CollectionReference profiles = db.collection("Records").document("1").collection("profiles");
     CollectionReference requests = db.collection("Records").document("2").collection("requests");
     CollectionReference orders = db.collection("Records").document("3").collection("orders");
@@ -61,6 +63,51 @@ public class Database {
     }
 
     /**
+     * add signUp to database
+     * @param id
+     * @param username
+     * @param password
+     *
+     */
+
+    public void addSignUp(Integer id, String username, String password){
+        HashMap<String, Object> signUp = new HashMap<>();
+        signUp.put("id",id);
+        signUp.put("username",username);
+        signUp.put("password",password);
+        signUps
+                .document(username)
+                .set(signUp);
+
+    }
+
+    /**
+     *
+     * @param username
+     * @param password
+     * @return true(username password match), false (otherwise)
+     */
+
+    public Boolean auth(String username, String password){
+        Integer result; // if 0, then no username found; if 1, password true; if -1, password wrong;
+        try{
+            DocumentReference doc = signUps.document(username);
+            if (doc.get().getResult().get("password").equals(password)){
+                result = 1;
+                return true;
+            }else{
+                result = -1;
+                return false;
+            }
+        }catch (Exception e){
+            result = 0;
+            return false;
+        }
+
+
+    }
+
+    /**
      * Adds a record to the database
      * @param record
      * @throws IllegalArgumentException
@@ -86,12 +133,17 @@ public class Database {
                     profiles
                             .document(p.getId().toString())
                             .set(profile);
-                    //create subDocument for rating under this profile
-                    DocumentReference profileSubDoc = profiles.document(p.getId().toString()).collection("ratings").document("rating");
-                    HashMap<String, Integer> rating = new HashMap<>();
-                    rating.put("thumbsUp", p.getRating().getThumbsUp());
-                    rating.put("thumbsDown", p.getRating().getThumbsDown());
-                    profileSubDoc.set(rating);
+
+                    if(p.getRating() != null){
+                        //create subDocument for rating under this profile
+                        DocumentReference profileSubDoc = profiles.document(p.getId().toString()).collection("ratings").document("rating");
+                        HashMap<String, Integer> rating = new HashMap<>();
+                        rating.put("thumbsUp", p.getRating().getThumbsUp());
+                        rating.put("thumbsDown", p.getRating().getThumbsDown());
+                        profileSubDoc.set(rating);
+
+                    }
+
                     break;
                 case 2:
                     Request r = (Request) record;
@@ -125,32 +177,29 @@ public class Database {
                     order.put("id", o.getId());
                     order.put("status", o.getStatus());
                     order.put("price", o.getPrice());
-                    order.put("rideId", o.getRideId());
-                    order.put("driverId", o.getDriverId());
+                    order.put("riderId", o.getRiderId());
+                    if(o.getRating() != null){
+                        order.put("ratingOfThisOrder", o.getRating());
+                    }
+                    if(o.getDriverId() != null){
+                        order.put("driverId", o.getDriverId());
+                    }
+
                     orders
                             .document(o.getId().toString())
                             .set(order);
                     //create subDocument for locations under this order
                     DocumentReference orderStartLocation = orders.document(o.getId().toString()).collection("locations").document("start");
                     HashMap<String, Double> orderStart = new HashMap<>();
-                    orderStart.put("name", o.getStart().getProvider());
                     orderStart.put("longitude",o.getStart().getLongitude());
                     orderStart.put("latitude", o.getStart().getLatitude());
                     orderStartLocation.set(orderStart);
 
                     DocumentReference orderEndLocation = db.collection("Records").document(o.getId().toString()).collection("locations").document("end");
                     HashMap<String, Double> orderEnd = new HashMap<>();
-                    orderEnd.put("name", o.getStart().getProvider());
                     orderEnd.put("longitude",o.getEnd().getLongitude());
                     orderEnd.put("latitude", o.getEnd().getLatitude());
                     orderEndLocation.set(orderEnd);
-
-                    //create subDocument for rating under this order
-                    DocumentReference orderSubDocRating = db.collection("Records").document(o.getId().toString()).collection("other").document("rating");
-                    HashMap<String, Object> orderRating = new HashMap<>();
-                    orderRating.put("thumbsUp", o.getRating().getThumbsUp());
-                    orderRating.put("thumbsDown", o.getRating().getThumbsDown());
-                    orderSubDocRating.set(orderRating);
 
                     break;
 
@@ -211,7 +260,7 @@ public class Database {
 
     public void modify(final Record record){
         if(!(this.contain(record))){
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("No such record");
         }else{
 
             switch(record.getType()) {
@@ -224,16 +273,19 @@ public class Database {
                         public Void apply(Transaction transaction) throws FirebaseFirestoreException {
                             DocumentSnapshot snapshot = transaction.get(proDocRef);
 
-                            transaction.update(proDocRef, "phone", record.getPhone());
-                            transaction.update(proDocRef, "email", record.getEmail());
-                            transaction.update(proDocRef, "username", record.getUsername());
-                            transaction.update(proDocRef, "balance", record.getBalance());
-                            transaction.update(proDocRef, "role", record.getRole());
+                            transaction.update(proDocRef, "phone", p.getPhone());
+                            transaction.update(proDocRef, "email", p.getEmail());
+                            transaction.update(proDocRef, "username", p.getUsername());
+                            transaction.update(proDocRef, "balance", p.getBalance());
+                            transaction.update(proDocRef, "role", p.getRole());
 
-                            HashMap<String, Integer> rating = new HashMap<>();
-                            rating.put("thumbsUp", record.getRating().getThumbsUp());
-                            rating.put("thumbsDown", record.getRating().getThumbsDown());
-                            proDocRef.collection("ratings").document("rating").set(rating);
+                            if(p.getRating() != null){
+                                HashMap<String, Integer> rating = new HashMap<>();
+                                rating.put("thumbsUp", p.getRating().getThumbsUp());
+                                rating.put("thumbsDown", p.getRating().getThumbsDown());
+                                proDocRef.collection("ratings").document("rating").set(rating);
+
+                            }
 
                             // Success
                             return null;
@@ -255,24 +307,22 @@ public class Database {
 
                 case 2:
                     final DocumentReference reqDocRef = requests.document(record.getId().toString());
+                    Request r = (Request)record;
 
                     db.runTransaction(new Transaction.Function<Void>() {
                         @Override
                         public Void apply(Transaction transaction) throws FirebaseFirestoreException {
                             DocumentSnapshot snapshot = transaction.get(reqDocRef);
-                            transaction.update(reqDocRef, "status", record.getStatus());
-                            transaction.update(reqDocRef, "price", record.getPrice());
-                            transaction.update(reqDocRef, "rideId", record.getRideId());
+                            transaction.update(reqDocRef, "price", r.getPrice());
+                            transaction.update(reqDocRef, "rideId", r.getRiderId());
 
                             HashMap<String, Double> start = new HashMap<>();
-                            start.put("name",record.getStart().getProvider());
-                            start.put("longitude",record.getStart().getLongitude());
-                            start.put("latitude", record.getStart().getLatitude());
+                            start.put("longitude",r.getStart().getLongitude());
+                            start.put("latitude", r.getStart().getLatitude());
                             reqDocRef.collection("locations").document("start").set(start);
                             HashMap<String, Double> end = new HashMap<>();
-                            end.put("name",record.getEnd().getProvider());
-                            end.put("longitude",record.getEnd().getLongitude());
-                            end.put("latitude", record.getEnd().getLatitude());
+                            end.put("longitude",r.getEnd().getLongitude());
+                            end.put("latitude", r.getEnd().getLatitude());
                             reqDocRef.collection("locations").document("end").set(end);
 
                             // Success
@@ -293,41 +343,45 @@ public class Database {
 
                     break;
 
+//                case 3:
+//                    final DocumentReference ordDocRef = orders.document(record.getId().toString());
+//
+//                    db.runTransaction(new Transaction.Function<Void>() {
+//                        @Override
+//                        public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+//                            DocumentSnapshot snapshot = transaction.get(ordDocRef);
+//                            transaction.update(ordDocRef, "driverId", record.getDriverId());
+//
+//                            HashMap<String, Object> qr = new HashMap<>();
+//                            //qr.put(key,value);
+//                            ordDocRef.collection("other").document("qr").set(qr);
+//
+//                            HashMap<String, Object> orderRating = new HashMap<>();
+//                            orderRating.put("thumbsUp", record.getRating().getThumbsUp());
+//                            orderRating.put("thumbsDown", record.getRating().getThumbsDown());
+//                            ordDocRef.collection("other").document("rating").set(orderRating);
+//
+//                            // Success
+//                            return null;
+//                        }
+//                    }).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                        @Override
+//                        public void onSuccess(Void aVoid) {
+//                            Log.d(TAG, "Transaction success!");
+//                        }
+//                    })
+//                            .addOnFailureListener(new OnFailureListener() {
+//                                @Override
+//                                public void onFailure(@NonNull Exception e) {
+//                                    Log.w(TAG, "Transaction failure.", e);
+//                                }
+//                            });
+//
+//                    break;
+
                 case 3:
-                    final DocumentReference ordDocRef = orders.document(record.getId().toString());
+                    throw new IllegalArgumentException("Order cannot be modified");
 
-                    db.runTransaction(new Transaction.Function<Void>() {
-                        @Override
-                        public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-                            DocumentSnapshot snapshot = transaction.get(ordDocRef);
-                            transaction.update(ordDocRef, "driverId", record.getDriverId());
-
-                            HashMap<String, Object> qr = new HashMap<>();
-                            //qr.put(key,value);
-                            ordDocRef.collection("other").document("qr").set(qr);
-
-                            HashMap<String, Object> orderRating = new HashMap<>();
-                            orderRating.put("thumbsUp", record.getRating().getThumbsUp());
-                            orderRating.put("thumbsDown", record.getRating().getThumbsDown());
-                            ordDocRef.collection("other").document("rating").set(orderRating);
-
-                            // Success
-                            return null;
-                        }
-                    }).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "Transaction success!");
-                        }
-                    })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.w(TAG, "Transaction failure.", e);
-                                }
-                            });
-
-                    break;
             }
 
         }
@@ -340,6 +394,7 @@ public class Database {
      * @param id
      * @param type
      * @throws IllegalArgumentException
+     * @return record
      */
 
     public Record queryById(Integer id, Integer type){
@@ -347,21 +402,30 @@ public class Database {
 
             if (type == 1) {
                 DocumentSnapshot docPro = profiles.document(id.toString()).get().getResult();
-                DocumentSnapshot docRating = profiles.document(id.toString()).collection("ratings").document("rating").get().getResult();
 
                 String phone = (String) docPro.getData().get("phone");
                 String email = (String) docPro.getData().get("email");
                 String username = (String) docPro.getData().get("username");
                 Double balance = (Double) docPro.getData().get("balance");
                 String role = (String) docPro.getData().get("role");
-                Integer thumbsUp = (Integer) docRating.getData().get("thumbsUp");
-                Integer thumbsDown = (Integer) docRating.getData().get("thumbsDown");
-                Rating rating = new Rating(thumbsUp, thumbsDown);
-                Profile profile = new Profile(phone, email, username, balance, role, rating);
-                profile.setId(id);
-                profile.setType(type);
 
-                return profile;
+                try{
+                    DocumentSnapshot docRating = profiles.document(id.toString()).collection("ratings").document("rating").get().getResult();
+                    Integer thumbsUp = (Integer) docRating.getData().get("thumbsUp");
+                    Integer thumbsDown = (Integer) docRating.getData().get("thumbsDown");
+                    Rating rating = new Rating(thumbsUp, thumbsDown);
+                    Profile profile = new Profile(phone, email, username, balance, role, rating);
+                    profile.setId(id);
+                    profile.setType(type);
+                    return profile;
+
+                }catch (Exception e){
+                    Profile profile = new Profile(phone, email, username, balance, role, null);
+                    profile.setId(id);
+                    profile.setType(type);
+                    return profile;
+                }
+
             } else {
 
                 if (type == 2) {
@@ -371,12 +435,10 @@ public class Database {
 
                     Integer price = (Integer) docReq.getData().get("price");
                     Integer riderId = (Integer) docReq.getData().get("riderId");
-                    String startProvider = (String) docStart.getData().get("name");
-                    Location start = new Location(startProvider);
+                    Location start = new Location("");
                     start.setLongitude((Double) docStart.getData().get("longitude"));
                     start.setLatitude((Double) docStart.getData().get("latitude"));
-                    String endProvider = (String) docEnd.getData().get("name");
-                    Location end = new Location(endProvider);
+                    Location end = new Location("");
                     end.setLongitude((Double) docEnd.getData().get("longitude"));
                     end.setLatitude((Double) docEnd.getData().get("latitude"));
 
@@ -389,30 +451,18 @@ public class Database {
                 } else {
 
                     DocumentSnapshot docOrd = orders.document(id.toString()).get().getResult();
-                    DocumentSnapshot docQr = orders.document(id.toString()).collection("other").document("qr").get().getResult();
-                    DocumentSnapshot docRating1 = orders.document(id.toString()).collection("other").document("rating").get().getResult();
-                    Integer driveId = (Integer) docOrd.getData().get("driverId");
-
-
-                    Integer thumbsUp = (Integer) docRating1.getData().get("thumbsUp");
-                    Integer thumbsDown = (Integer) docRating1.getData().get("thumbsDown");
-                    Rating rating1 = new Rating(thumbsUp, thumbsDown);
-
-
                     DocumentSnapshot docStart = orders.document(id.toString()).collection("locations").document("start").get().getResult();
                     DocumentSnapshot docEnd = orders.document(id.toString()).collection("locations").document("end").get().getResult();
 
-                    String startProvider = (String)docStart.getData().get("name");
-                    Location start = new Location(startProvider);
+                    Location start = new Location("");
                     start.setLongitude((Double) docStart.getData().get("longitude"));
                     start.setLatitude((Double) docStart.getData().get("latitude"));
 
-                    String endProvider = (String)docEnd.getData().get("name");
-                    Location end = new Location(endProvider);
+                    Location end = new Location("");
                     end.setLongitude((Double) docEnd.getData().get("longitude"));
                     end.setLatitude((Double) docEnd.getData().get("latitude"));
 
-                    Order order = new Order(NULL, rating1, driveId);
+                    Order order = new Order();
                     order.setStatus((Integer) docOrd.getData().get("status"));
                     order.setPrice((Integer) docOrd.getData().get("price"));
                     order.setRiderId((Integer) docOrd.getData().get("riderId"));
@@ -420,6 +470,13 @@ public class Database {
                     order.setEnd(end);
                     order.setId(id);
                     order.setType(type);
+                    try{
+                        Integer driveId = (Integer) docOrd.getData().get("driverId");
+                        order.setDriverId(driveId);
+                    }catch (Exception e){}
+                    try{
+                        order.setRating(docOrd.getBoolean("ratingOfThisOrder"));
+                    }catch (Exception e){}
 
                     return order;
                 }
@@ -429,33 +486,36 @@ public class Database {
     }
 
     /**
-     * generate a unique id for recoed
+     * generate a unique id for record
      * @return id
      */
 
     public Integer generateUniqueId(){
         Integer id = 1;
-        Query queryPro = profiles.orderBy("id").limit(1);
-        Query queryReq = requests.orderBy("id").limit(1);
-        Query queryOrd = orders.orderBy("id").limit(1);
 
-        if(queryPro.get().getResult() == null || queryReq.get().getResult() == null || queryOrd.get().getResult() == null){
-            throw new NullPointerException();
-        }else{
-            if(!(queryPro.get().getResult().isEmpty())){
+        try{
+            Query queryPro = profiles.orderBy("id").limit(1);
+            if((queryPro.get().getResult() != null) && (!(queryPro.get().getResult().isEmpty()))){
                 Integer id1  = Integer.parseInt(queryPro.get().getResult().getDocuments().get(0).getId()) + 1;
                 if(id1 > id){id = id1;}
             }
-            if(!(queryReq.get().getResult().isEmpty())){
+        }catch (Exception e){}
+
+        try{
+            Query queryReq = requests.orderBy("id").limit(1);
+            if((queryReq.get().getResult() != null) && (!(queryReq.get().getResult().isEmpty()))){
                 Integer id2 = Integer.parseInt(queryReq.get().getResult().getDocuments().get(0).getId()) + 1;
                 if(id2 > id){id = id2;}
             }
-            if(!(queryOrd.get().getResult().isEmpty())){
+        }catch (Exception e){}
+
+        try{
+            Query queryOrd = orders.orderBy("id").limit(1);
+            if((queryOrd.get().getResult() != null) && (!(queryOrd.get().getResult().isEmpty()))){
                 Integer id3 = Integer.parseInt(queryOrd.get().getResult().getDocuments().get(0).getId()) + 1;
                 if(id3 > id){id = id3;}
             }
-
-        }
+        }catch (Exception e){}
 
         return id;
     }
@@ -465,11 +525,12 @@ public class Database {
      * @return Hashmap: key is request id, value is an ArrayList of Double: {startLat, startLon, endLat, endLon}
      */
 
-    public HashMap<Integer, ArrayList<Double>> getAllRequstLocation(){
+    public HashMap<Integer, ArrayList<Double>> getAllRequestLocation(){
         HashMap<Integer, ArrayList<Double>> allLocations = new HashMap<>();
 
         if(requests.get().getResult() == null){
-            throw new NullPointerException();
+            return null;
+
         }else{
             for (DocumentSnapshot ds: requests.get().getResult().getDocuments()){
                 ArrayList<Double> location = new ArrayList<>();
@@ -494,11 +555,28 @@ public class Database {
         }
 
 
+    }
 
+    /**
+     * get request id by given rider id
+     * @param id
+     * @return requestId
+     */
 
+    public Integer getRequestIdByRiderId(Integer id){
+        Query query = requests.whereEqualTo("riderId", id);
+        if(query.get().getResult() == null){
+            return null;
+        }
+        Integer requestId = Integer.parseInt(query.get().getResult().getDocuments().get(0).getId());
 
+        return requestId;
 
     }
+
+
+
+
 
 
 

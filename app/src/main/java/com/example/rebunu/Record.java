@@ -8,11 +8,11 @@ package com.example.rebunu;
 public class Record {
     private Integer id;
     private Integer type;//1 for profile; 2 for request; 3 for order;
-//    Database db = new Database();
-//
-//    public Record(){
-//        this.id = db.generateUniqueId();
-//    }
+    Database db = new Database();
+
+    public Record(){
+        this.id = db.generateUniqueId();
+    }
 
     /**
      * setters and getters
