@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.common.collect.Maps;
+
 /**
  * Login screen
  * @author Zijian Xi

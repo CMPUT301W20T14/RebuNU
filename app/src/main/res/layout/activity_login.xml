@@ -29,32 +29,11 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
-            android:id="@+id/login_edittext_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/rebunu_green"
-            android:ems="10"
-            android:inputType="textPassword" />
-
-        <TextView
-            android:id="@+id/login_textview_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:fontFamily="@font/yahei"
-            android:text="@string/password"
-            android:textColor="@color/rebunu_green"
-            android:textStyle="bold" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="24dp" />
-
-        <EditText
             android:id="@+id/login_edittext_emailOrPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/rebunu_green">
+            android:backgroundTint="@color/rebunu_green"
+            android:textColor="@color/rebunu_green">
 
         </EditText>
 
@@ -67,6 +46,29 @@
             android:text="@string/email_or_phone"
             android:textColor="@color/rebunu_green"
             android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
+
+        <EditText
+            android:id="@+id/login_edittext_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/rebunu_green"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:textColor="@color/rebunu_green" />
+
+        <TextView
+            android:id="@+id/login_textview_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:fontFamily="@font/yahei"
+            android:text="@string/password"
+            android:textColor="@color/rebunu_green"
             android:textStyle="bold" />
 
         <Space
