@@ -216,6 +216,7 @@ public class Database {
 
             switch(record.getType()) {
                 case 1:
+                    Profile p = (Profile) record;
                     final DocumentReference proDocRef = profiles.document(record.getId().toString());
 
                     db.runTransaction(new Transaction.Function<Void>() {
@@ -368,7 +369,6 @@ public class Database {
                     DocumentSnapshot docStart = requests.document(id.toString()).collection("locations").document("start").get().getResult();
                     DocumentSnapshot docEnd = requests.document(id.toString()).collection("locations").document("end").get().getResult();
 
-                    Integer status = (Integer) docReq.getData().get("status");
                     Integer price = (Integer) docReq.getData().get("price");
                     Integer riderId = (Integer) docReq.getData().get("riderId");
                     String startProvider = (String) docStart.getData().get("name");
@@ -380,7 +380,7 @@ public class Database {
                     end.setLongitude((Double) docEnd.getData().get("longitude"));
                     end.setLatitude((Double) docEnd.getData().get("latitude"));
 
-                    Request request = new Request(status, start, end, price, riderId);
+                    Request request = new Request(start, end, price, riderId);
 
                     request.setId(id);
                     request.setType(type);
@@ -424,7 +424,7 @@ public class Database {
                     return order;
                 }
             }
-        }catch (Exception e){throw new IllegalArgumentException();}
+        }catch (Exception e){return null;}
 
     }
 
@@ -459,6 +459,11 @@ public class Database {
 
         return id;
     }
+
+    /**
+     * get all request
+     * @return Hashmap: key is request id, value is an ArrayList of Double: {startLat, startLon, endLat, endLon}
+     */
 
     public HashMap<Integer, ArrayList<Double>> getAllRequstLocation(){
         HashMap<Integer, ArrayList<Double>> allLocations = new HashMap<>();
