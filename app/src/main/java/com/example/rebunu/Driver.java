@@ -20,7 +20,9 @@ public class Driver extends User {
         float[] distance = new float[1];
         ArrayList<Double> coords;
 
-        queryResult = db.getAllRequstLocation();
+//Whether the db.getAllRequestLocation() return null
+
+        queryResult = db.getAllRequestLocation();
         for(Integer s: queryResult.keySet()) {
             coords = queryResult.get(s);
             try {
@@ -45,13 +47,12 @@ public class Driver extends User {
             order.setPrice(r.getPrice());
             order.setRiderId(r.getRiderId());
             order.setDriverId(getUserId());
-            db.add((Record) order);
+            db.add((order));
             db.delete(queryResult);
             return order;
         } else {
             throw new Exception("Request not exist");
         }
-        return null;
     }
 }
 

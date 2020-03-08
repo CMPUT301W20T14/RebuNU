@@ -9,7 +9,7 @@ import android.location.Location;
 public class Order extends Record{
     private QRCode qr;
     private Boolean ratingOfThisOrder; //True for thumbsUp, False for thumbsDown
-    private Integer driveId;
+    private Integer driverId;
     private Location start;
     private Location end;
     private Integer price;
@@ -25,12 +25,13 @@ public class Order extends Record{
     public Order(){
         this.qr = null;
         this.ratingOfThisOrder = null;
-        this.driveId = -1;
+        this.driverId = -1;
         this.riderId = -1;
         this.start = null;
         this.end = null;
         this.price = -1;
         this.status = -1;
+        this.setType(3);
     }
 
     /**
@@ -62,8 +63,8 @@ public class Order extends Record{
         return ratingOfThisOrder;
     }
 
-    public Integer getDriveId() {
-        return driveId;
+    public Integer getDriverId() {
+        return driverId;
     }
 
 
@@ -87,7 +88,7 @@ public class Order extends Record{
      */
     public void setRating(Boolean ratingOfThisOrder){
         this.ratingOfThisOrder = ratingOfThisOrder;
-        Profile driverProfile = (Profile) db.queryById(driveId, 1);
+        Profile driverProfile = (Profile) db.queryById(driverId, 1);
         Rating rating = driverProfile.getRating();
         if(ratingOfThisOrder == null){
             return;
@@ -107,18 +108,18 @@ public class Order extends Record{
     }
 
     /**
-     * Setter for driveId
-     * @param driveId a positive integer
+     * Setter for driverId
+     * @param driverId a positive integer
      * @throws NullPointerException null exception
      */
-    public void setDriveId(Integer driveId) throws Exception {
-        if (driveId == null) {
-            throw new NullPointerException("driveId is null.");
+    public void setDriverId(Integer driverId) throws Exception {
+        if (driverId == null) {
+            throw new NullPointerException("driverId is null.");
         } else {
-            if (driveId < 0) {
-                throw new Exception("Invalid driveId.");
+            if (driverId < 0) {
+                throw new Exception("Invalid driverId.");
             } else {
-                this.driveId = driveId;
+                this.driverId = driverId;
             }
         }
     }
