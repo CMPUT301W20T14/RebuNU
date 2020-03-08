@@ -6,6 +6,27 @@
     android:layout_height="match_parent"
     tools:context=".PostRequestActivity">
 
+    <Button
+        android:id="@+id/postRequest_button_postRequest_floating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginEnd="86dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="56dp"
+        android:background="@drawable/button_long_green"
+        android:fontFamily="@font/yahei"
+        android:text="@string/post_request"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/postRequest_mapView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <com.google.android.gms.maps.MapView
         android:id="@+id/postRequest_mapView"
         android:layout_width="355dp"
@@ -29,7 +50,17 @@
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:background="#D11F241F"
-        android:visibility="visible">
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/postRequest_button_hide"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/button_hide"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:layout_width="280dp"
@@ -37,7 +68,12 @@
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="48dp" />
 
             <EditText
                 android:id="@+id/postRequest_edittext_from"
@@ -69,7 +105,8 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/rebunu_green"
                 android:ems="10"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:textColor="@color/rebunu_green" />
 
             <TextView
                 android:id="@+id/postRequest_textview_to"
