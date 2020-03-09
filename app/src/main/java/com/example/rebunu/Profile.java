@@ -7,7 +7,7 @@ package com.example.rebunu;
 public class Profile extends Record{
     private String phone;
     private String email;
-    private String username;
+    private String name;
     private Double balance;
     private Boolean role;
     private Rating rating;
@@ -16,7 +16,7 @@ public class Profile extends Record{
      * Constructor for Profile
       * @param phone a String, but only consists of numbers
      * @param email a String
-     * @param username a String
+     * @param name a String
      * @param balance a Double, cannot be NaN or Inf
      * @param role a String
      * @param rating a Rating object
@@ -24,22 +24,22 @@ public class Profile extends Record{
      * @see Rating
      */
     public Profile(
-            String phone, String email, String username, Double balance, Boolean role, Rating rating
+            String phone, String email, String name, Double balance, Boolean role, Rating rating
     ) throws Exception{
         setPhone(phone);
         setEmail(email);
-        setUsername(username);
+        setName(name);
         setBalance(balance);
         setRole(role);
         setRating(rating);
         setType(1);
     }
 
-    public Profile(String phone, String email, String username, Double balance, Boolean role, Rating rating, Boolean noId) throws Exception {
+    public Profile(String phone, String email, String name, Double balance, Boolean role, Rating rating, Boolean noId) throws Exception {
         super(noId);
         setPhone(phone);
         setEmail(email);
-        setUsername(username);
+        setName(name);
         setBalance(balance);
         setRole(role);
         setRating(rating);
@@ -63,11 +63,11 @@ public class Profile extends Record{
     }
 
     /**
-     * Getter for username
-     * @return username
+     * Getter for name
+     * @return name
      */
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
     /**
@@ -137,18 +137,18 @@ public class Profile extends Record{
     }
 
     /**
-     * Setter for username
-     * @param username a String
+     * Setter for name
+     * @param name a String
      * @throws Exception null or empty exceptions
      */
-    public void setUsername(String username) throws Exception {
-        if(username == null) {
-            throw new NullPointerException("Username is null.");
+    public void setName(String name) throws Exception {
+        if(name == null) {
+            throw new NullPointerException("name is null.");
         } else {
-            if(username.isEmpty()) {
-                throw new Exception("Username is empty.");
+            if(name.isEmpty()) {
+                throw new Exception("name is empty.");
             } else {
-                this.username = username;
+                this.name = name;
             }
         }
     }
