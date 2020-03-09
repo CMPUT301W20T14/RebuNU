@@ -13,6 +13,11 @@ import java.util.Set;
 public class Driver extends User {
     public Driver() throws Exception {}
 
+    /**
+     * get near available request
+     * @throws Exception null exception
+     */
+
     public ArrayList<Integer> getNearAvailableRequest() throws Exception{
         Database db = new Database();
         HashMap<Integer, ArrayList<Double>> queryResult;
@@ -34,6 +39,10 @@ public class Driver extends User {
         return filteredResult;
     }
 
+    /**
+     * @param idx positive integers
+     * @throws Exception null exception
+     */
     public Order acceptRequest(Integer idx) throws Exception{
         Database db = new Database();
         Record queryResult = db.queryById(idx, 2);

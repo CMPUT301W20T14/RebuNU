@@ -9,6 +9,14 @@ public class Rider extends User{
 
     public Rider() throws Exception {}
 
+    /**
+     *
+     * @param start initial location
+     * @param end destination
+     * @param price positive integer
+     * @param riderId Id for riders
+     * @throws Exception null exception
+     */
     public Integer CreateRequest (Location start, Location end, Integer price, Integer riderId) throws
             Exception {
         Request newRequest = new Request(start, end, price, riderId);
@@ -17,12 +25,17 @@ public class Rider extends User{
         return newRequest.getId();
     }
 
+
     public Request FetchRequest(){
         Database db = new Database();
         Integer requestId = db.getRequestIdByRiderId(getUserId());
         return (Request) db.queryById(requestId, 2);
     }
 
+    /**
+     * cancel order, delete request and add to order
+     * @throws Exception null exception
+     */
     public void cancelRequest() throws Exception{
         Database db = new Database();
         Order order = new Order();
@@ -40,6 +53,10 @@ public class Rider extends User{
         }
     }
 
+    /**
+     * confirm order
+     * @throws Exception null exception
+     */
     public void confirm(Order order) throws Exception{
         if(order != null) {
             Database db = new Database();
