@@ -9,7 +9,7 @@ public class Profile extends Record{
     private String email;
     private String username;
     private Double balance;
-    private String role;
+    private Boolean role;
     private Rating rating;
 
     /**
@@ -24,7 +24,7 @@ public class Profile extends Record{
      * @see Rating
      */
     public Profile(
-            String phone, String email, String username, Double balance, String role, Rating rating
+            String phone, String email, String username, Double balance, Boolean role, Rating rating
     ) throws Exception{
         setPhone(phone);
         setEmail(email);
@@ -35,7 +35,7 @@ public class Profile extends Record{
         setType(1);
     }
 
-    public Profile(String phone, String email, String username, Double balance, String role, Rating rating, Boolean noId) throws Exception {
+    public Profile(String phone, String email, String username, Double balance, Boolean role, Rating rating, Boolean noId) throws Exception {
         super(noId);
         setPhone(phone);
         setEmail(email);
@@ -82,7 +82,7 @@ public class Profile extends Record{
      * Getter for role
      * @return role
      */
-    public String getRole() {
+    public Boolean getRole() {
         return role;
     }
 
@@ -176,15 +176,16 @@ public class Profile extends Record{
      * @param role a String
      * @throws Exception null or empty exceptions
      */
-    public void setRole(String role) throws Exception{
+    public void setRole(Boolean role) throws Exception{
         if(role == null) {
             throw new NullPointerException("Role is null.");
         } else {
-            if(role.isEmpty()) {
-                throw new Exception("Role is empty");
-            } else {
-                this.role = role;
-            }
+            this.role = role;
+//            if(role.isEmpty()) {
+//                throw new Exception("Role is empty");
+//            } else {
+//                this.role = role;
+//            }
         }
     }
 
