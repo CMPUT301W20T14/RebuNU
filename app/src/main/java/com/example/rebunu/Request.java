@@ -115,12 +115,6 @@ public class Request extends Record {
         }
         else{
             this.riderId = riderId;
-//            if(riderId > 0){
-//                this.riderId = riderId;
-//            }
-//            else{
-//                throw  new Exception("Invalid riderId");
-//            }
         }
     }
 }
