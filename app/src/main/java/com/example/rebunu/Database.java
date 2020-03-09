@@ -18,9 +18,13 @@ import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Database {
 //    Boolean exist;
+    Record myRecord = null;
+    Profile p = (Profile)myRecord;
+    p.setPhone();
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     CollectionReference profiles = db.collection("profiles");
@@ -528,6 +532,64 @@ public class Database {
             modifyRequest((Request)record);
         }
 
+    }
+
+    public Profile queryProfileById(String id){
+        DocumentReference docRef = profiles.document(id);
+        final ArrayList<Map<String, Object>> queriedData = new ArrayList<>();
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        queriedData.add(document.getData());
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+        String phone = (String)queriedData.get(0).get("phone");
+        String email = (String)queriedData.get(0).get("email");
+        Integer balance = (Integer)queriedData.get(0).get("balance");
+        String name = (String)queriedData.get(0).get("name");
+        Boolean role = (Boolean)queriedData.get(0).get("role");
+        if(role) {
+            ArrayList<Integer> rating = (ArrayList<Integer>) queriedData.get(0).get("rating");
+            try {
+                Rating ratingObj = new Rating(rating.get(0), rating.get(1));
+                return new Profile(phone, email, name, balance, role, ratingObj);
+            } catch (Exception ignored){}
+        } else {
+            return new Profile(phone, email, name, balance, role);
+        }
+        return null;
+    }
+
+    public Request queryRequestById(String id){
+
+    }
+    public Order queryOrderById(String id){
+
+    }
+    public Record queryById(String id, Integer type){
+        if(id == null || type == null){
+            throw new IllegalArgumentException();
+        }
+        switch(type){
+            case 1:
+                return queryProfileById(id);
+
+            case 2:
+                return queryRequestById(id);
+
+            case 3:
+                return queryOrderById(id);
+        }
     }
 
 
