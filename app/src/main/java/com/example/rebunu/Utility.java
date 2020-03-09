@@ -35,7 +35,7 @@ public class Utility {
     }
 
     public static LatLng locationToLatLng(Location location) {
-        return new LatLng(location.getLatitude(), location.getLatitude());
+        return new LatLng(location.getLatitude(), location.getLongitude());
     }
 
     public static ArrayList<Location> mockSurrounding(){

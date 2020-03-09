@@ -22,8 +22,10 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -35,6 +37,33 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
     private GoogleMap gmap;
     private static final int TAG_CODE_PERMISSION_LOCATION = 1;
     private String floatingButtonStatus = "VISIBLE";
+    private LocationManager locationManager;
+    private Criteria criteria;
+
+    public void updateMap(ArrayList<Location> locations) {
+        gmap.clear();
+        if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, new String[] {
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, TAG_CODE_PERMISSION_LOCATION);
+        }
+
+        Location currentLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false)));
+        float[] distance = new float[1];
+
+       for(Location l: locations) {
+           try {
+               Location.distanceBetween(l.getLatitude(), l.getLongitude(), currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
+               gmap.addMarker(new MarkerOptions()
+                       .position(Utility.locationToLatLng(l))
+                       .title(String.valueOf(distance[0]) + "Meters"));
+           } catch (Exception ignored){};
+       }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +116,8 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
                     button_postRequest_floating.setVisibility(Button.VISIBLE);
                     floatingButtonStatus = "VISIBLE";
                 }
-                ArrayList<Location> l = Utility.mockSurrounding();
+                ArrayList<Location> location = Utility.mockSurrounding();
+                updateMap(location);
             }
         });
 
@@ -155,8 +185,8 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
         uiSettings.setMyLocationButtonEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
 
-        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        criteria = new Criteria();
 
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
