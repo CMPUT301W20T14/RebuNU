@@ -15,7 +15,7 @@ public class Order extends Record{
     private Integer price;
     private Integer riderId;
     private Integer status;
-    private Database db = new Database();
+    //private Database db = new Database();
 
     /**
      * Constructor for Order
