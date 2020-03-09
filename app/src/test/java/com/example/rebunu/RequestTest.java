@@ -40,7 +40,7 @@ public class RequestTest {
      * @param price an Integer
      * @param riderId an Integer
      */
-    void fakeRequest(Location start, Location end, Integer price, Integer riderId, Boolean noId){
+    void fakeRequest(Location start, Location end, Integer price, String riderId, Boolean noId){
         try{
             request = new Request(start, end, price, riderId, noId);
         } catch (Exception ignored){}
@@ -51,34 +51,34 @@ public class RequestTest {
      */
     @Test
     public void testConstructorAndGetters(){
-        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, 11111111, true);
+        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, "11111111", true);
         assertTrue( request.getStart().getLongitude()==10.0 && request.getStart().getLatitude()==20.0);
         assertTrue(request.getEnd().getLongitude()==30.0 && request.getEnd().getLatitude()==40.0);
         assertEquals((Integer)20, request.getPrice());
-        assertEquals((Integer)11111111, request.getRiderId());
+        assertEquals("11111111", request.getRiderId());
     }
 
     @Test
     public void testSetters(){
-        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, 11111111, true);
+        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, "11111111", true);
         try{
             assertTrue( request.getStart().getLongitude()==10.0 && request.getStart().getLatitude()==20.0);
             assertTrue(request.getEnd().getLongitude()==30.0 && request.getEnd().getLatitude()==40.0);
             assertEquals((Integer)20,request.getPrice());
-            assertEquals((Integer)11111111,request.getRiderId());
+            assertEquals("11111111", request.getRiderId());
 
 
             request.setPrice(25);
             assertTrue( request.getStart().getLongitude()==10.0 && request.getStart().getLatitude()==20.0);
             assertTrue(request.getEnd().getLongitude()==30.0 && request.getEnd().getLatitude()==40.0);
             assertEquals((Integer)25,request.getPrice());
-            assertEquals((Integer)11111111,request.getRiderId());
+            assertEquals("11111111", request.getRiderId());
 
-            request.setRiderId(22222222);
+            request.setRiderId("22222222");
             assertTrue( request.getStart().getLongitude()==10.0 && request.getStart().getLatitude()==20.0);
             assertTrue(request.getEnd().getLongitude()==30.0 && request.getEnd().getLatitude()==40.0);
             assertEquals((Integer)25,request.getPrice());
-            assertEquals((Integer)22222222,request.getRiderId());
+            assertEquals("22222222", request.getRiderId());
 
             Location start = fakeLocation(100.0, 200.0);
             Location end = fakeLocation(300.0, 400.0);
@@ -87,13 +87,13 @@ public class RequestTest {
             assertTrue( request.getStart().getLongitude()==100.0 && request.getStart().getLatitude()==200.0);
             assertTrue(request.getEnd().getLongitude()==30.0 && request.getEnd().getLatitude()==40.0);
             assertEquals((Integer)25,request.getPrice());
-            assertEquals((Integer)22222222,request.getRiderId());
+            assertEquals("22222222", request.getRiderId());
 
             request.setEnd(end);
             assertTrue( request.getStart().getLongitude()==100.0 && request.getStart().getLatitude()==200.0);
             assertTrue(request.getEnd().getLongitude()==300.0 && request.getEnd().getLatitude()==400.0);
             assertEquals((Integer)25,request.getPrice());
-            assertEquals((Integer)22222222,request.getRiderId());
+            assertEquals("22222222", request.getRiderId());
         }catch (Exception ignored){}
     }
 
@@ -102,13 +102,12 @@ public class RequestTest {
      */
     @Test
     public void testExceptions(){
-        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, 11111111, true);
+        fakeRequest(fakeLocation(10.0, 20.0), (fakeLocation(30.0, 40.0)), 20, "11111111", true);
         Integer nullStatus = null;
         Integer invalidStatus = 4;
         Integer nullPrice = null;
         Integer invalidPrice = -10;
-        Integer nullRiderId = null;
-        Integer invalidRiderId = -10;
+        String nullRiderId = null;
         Location nullStart = null;
         Location nullEnd = null;
 
@@ -121,14 +120,9 @@ public class RequestTest {
         assertThrows(NullPointerException.class,()->{
             request.setRiderId(nullRiderId);
         });
-        assertThrows(Exception.class,()->{
-            request.setRiderId(invalidRiderId);
-        });
-
         assertThrows(Exception.class, ()->{
             request.setStart(nullStart);
         });
-
         assertThrows(Exception.class, ()->{
             request.setEnd(nullEnd);
         });

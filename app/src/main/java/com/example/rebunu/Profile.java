@@ -8,7 +8,7 @@ public class Profile extends Record{
     private String phone;
     private String email;
     private String name;
-    private Double balance;
+    private Integer balance;
     private Boolean role;
     private Rating rating;
 
@@ -16,15 +16,15 @@ public class Profile extends Record{
      * Constructor for Profile
      * @param phone a String, but only consists of numbers
      * @param email a String
-     * @param username a String
+     * @param name a String
      * @param balance a Integer, non-negative
-     * @param role a String
+     * @param role a Boolean, true for Driver, false for Rider
      * @param rating a Rating object
      * @throws Exception null or empty value or invalid number exceptions
      * @see Rating
      */
     public Profile(
-            String phone, String email, String name, Integer balance, String role, Rating rating
+            String phone, String email, String name, Integer balance, Boolean role, Rating rating
     ) throws Exception{
         setPhone(phone);
         setEmail(email);
@@ -35,7 +35,17 @@ public class Profile extends Record{
         setType(1);
     }
 
-    public Profile(String phone, String email, String name, Integer balance, String role, Rating rating, Boolean noId) throws Exception {
+    public Profile(String phone, String email, String name, Integer balance, Boolean role) throws Exception {
+        setPhone(phone);
+        setEmail(email);
+        setName(name);
+        setBalance(balance);
+        setRole(role);
+        rating = null;
+        setType(1);
+    }
+
+    public Profile(String phone, String email, String name, Integer balance, Boolean role, Rating rating, Boolean noId) throws Exception {
         super(noId);
         setPhone(phone);
         setEmail(email);
