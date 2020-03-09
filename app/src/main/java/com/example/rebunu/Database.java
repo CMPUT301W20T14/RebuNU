@@ -27,7 +27,7 @@ public class Database {
 //    Boolean exist;
     Record myRecord = null;
     Profile p = (Profile)myRecord;
-    p.setPhone();
+    //p.setPhone();
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     CollectionReference profiles = db.collection("profiles");
@@ -568,17 +568,20 @@ public class Database {
                 return new Profile(phone, email, name, balance, role, ratingObj);
             } catch (Exception ignored){}
         } else {
-            return new Profile(phone, email, name, balance, role);
+            try {
+                return new Profile(phone, email, name, balance, role);
+            } catch (Exception ignored){}
         }
         return null;
     }
 
-//    public Request queryRequestById(String id){
-//
-//    }
-//    public Order queryOrderById(String id){
-//
-//    }
+
+    public Request queryRequestById(String id){
+        return null;
+    }
+    public Order queryOrderById(String id){
+        return null;
+    }
     public Record queryById(String id, Integer type){
         if(id == null || type == null){
             throw new IllegalArgumentException();

@@ -28,38 +28,38 @@ public class Rider extends User{
         return newRequest;
     }
 
-   public Request FetchRequest(){
-       Database db = new Database();
-       Integer requestId = db.getRequestIdByRiderId(getUserId());
-       return (Request) db.queryById(requestId, 2);
-   }
+//   public Request FetchRequest(){
+//       Database db = new Database();
+//       Integer requestId = db.getRequestIdByRiderId(getUserId());
+//       return (Request) db.queryById(requestId, 2);
+//   }
    /**
     * cancel order, delete request and add to order
     * @throws Exception null exception
     */
-   public void cancelRequest() throws Exception{
-       Database1 db = new Database1();
-       Order order = new Order();
-       Request request = FetchRequest();
-       if(request != null) {
-           order.setStart(request.getStart());
-           order.setEnd(request.getEnd());
-           order.setPrice(request.getPrice());
-           order.setRiderId(request.getRiderId());
-           order.setStatus(1);
-           db.add((Record) order);
-           db.delete(request);
-       } else {
-           throw new Exception("Request not exist");
-       }
-   }
+//   public void cancelRequest() throws Exception{
+//       Database db = new Database();
+//       Order order = new Order();
+//       Request request = FetchRequest();
+//       if(request != null) {
+//           order.setStart(request.getStart());
+//           order.setEnd(request.getEnd());
+//           order.setPrice(request.getPrice());
+//           order.setRiderId(request.getRiderId());
+//           order.setStatus(1);
+//           db.add((Record) order);
+//           db.delete(request);
+//       } else {
+//           throw new Exception("Request not exist");
+//       }
+//   }
    /**
     * confirm order
     * @throws Exception null exception
    */
    public void confirm(Order order) throws Exception{
        if(order != null) {
-           Database1 db = new Database1();
+           Database db = new Database();
            order.setStatus(3);
            db.modify((Record) order);
        } else {
@@ -69,7 +69,7 @@ public class Rider extends User{
 
    public void decline(Order order) throws Exception {
        if(order != null) {
-           Database1 db = new Database1();
+           Database db = new Database();
            order.setStatus(2);
            db.modify((Record) order);
        } else {
