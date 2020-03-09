@@ -86,26 +86,26 @@ public class Order extends Record{
      * Setter for rating
      * @param ratingOfThisOrder (true or false for thumbsUp)
      */
-    public void setRating(Boolean ratingOfThisOrder){
-        this.ratingOfThisOrder = ratingOfThisOrder;
-        Profile driverProfile = (Profile) db.queryById(driverId, 1);
-        Rating rating = driverProfile.getRating();
-        if(ratingOfThisOrder == null){
-            return;
-        }
-        if(ratingOfThisOrder){
-            rating.thumbsUpPlus();
-            driverProfile.setRating(rating);
-            db.modify(driverProfile);
-
-        }else{
-            rating.thumbsDownPlus();
-            driverProfile.setRating(rating);
-            db.modify(driverProfile);
-
-        }
-
-    }
+//    public void setRating(Boolean ratingOfThisOrder){
+//        this.ratingOfThisOrder = ratingOfThisOrder;
+//        Profile driverProfile = (Profile) db.queryById(driverId, 1);
+//        Rating rating = driverProfile.getRating();
+//        if(ratingOfThisOrder == null){
+//            return;
+//        }
+//        if(ratingOfThisOrder){
+//            rating.thumbsUpPlus();
+//            driverProfile.setRating(rating);
+//            db.modify(driverProfile);
+//
+//        }else{
+//            rating.thumbsDownPlus();
+//            driverProfile.setRating(rating);
+//            db.modify(driverProfile);
+//
+//        }
+//
+//    }
 
     /**
      * Setter for driverId

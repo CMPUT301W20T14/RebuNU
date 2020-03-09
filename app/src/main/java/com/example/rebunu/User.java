@@ -8,16 +8,22 @@ import android.location.Location;
  */
 public class User {
     private Location location;
-    private Integer userId;
+    private String userId;
 
-    public User(Location location, Integer Id) throws Exception {
+    /**
+     * @param location longtitude and latitude
+     * @param Id a non empty String object
+     * @throws Exception null exception
+     */
+    public User(Location location, String Id) throws Exception {
         setLocation(location);
         if(Id != null) {
-            if(Id >0) {
-                this.userId = Id;
-            } else {
-                throw new Exception("Invalid userId");
-            }
+            this.userId = Id;
+//            if(Id >0) {
+//                this.userId = Id;
+//            } else {
+//                throw new Exception("Invalid userId");
+//            }
         } else {
             throw new Exception("Null userId");
         }
@@ -27,6 +33,8 @@ public class User {
         if(location == null || userId == null) {
             throw new Exception("You cannot consturct empty User");
         }
+    }
+    protected User(Boolean forced){
     }
 
     public Location getLocation(){
@@ -43,14 +51,14 @@ public class User {
     }
 
 
-    public Profile getProfile() {
-        Profile profile;
-        Database db = new Database();
-        profile = (Profile) db.queryById(getUserId(), 1);
-        return profile;
-    }
+//    public Profile getProfile() {
+//        Profile profile;
+//        Database db = new Database();
+//        profile = (Profile) db.queryById(getUserId(), 1);
+//        return profile;
+//    }
 
-    public Integer getUserId() {
+    public String getUserId() {
         return userId;
     }
 

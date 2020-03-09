@@ -1,5 +1,6 @@
 package com.example.rebunu;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -12,6 +13,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -23,8 +25,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -111,6 +118,105 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
         button_postRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                double[] lat = {53.525564, 53.525296, 53.525695, 53.526441, 53.525612};
+                double[] lng = {-113.521412, -113.520166, -113.521335, -113.519962, -113.521459};
+                ArrayList<Request> rs = new ArrayList<>();
+                Database db = new Database();
+
+                //test add
+//                for (Integer i = 0; i<5; i++){
+//                    try{
+//                        User a = new Rider(true);
+//
+//                        Location la = Utility.latLngToLocation(new LatLng(lat[i],lng[i]));
+//                        Location lb = Utility.latLngToLocation(new LatLng(lat[4-i],lng[4-i]));
+//                        Request r = ((Rider)a).CreateRequest(la,lb,10+i,i.toString());
+//                        rs.add(r);
+////                        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
+//
+//
+//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+//
+//                }
+
+//              test delete
+//                for(Request r: rs){
+//                    try{
+//                        db.delete(r);
+//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+//
+//
+//                }
+                //delete record that not in database
+//                try{
+//                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
+//                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
+//                    Request newRequest = new Request(la, lb, 67, "8");
+//                    newRequest.setId("12345678");
+//                    db.delete(newRequest);
+//                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+
+                //test modify
+//                try{
+//                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
+//                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
+//                    Request newRequest = new Request(la, lb, 67, "8");
+//                    newRequest.setId("23rr2r43");
+//                    db.modify(newRequest);
+//                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+
+                //test register
+//                try{
+//                    HashMap<String, Object> test = new HashMap<>();
+//                    test.put("phone","12345678");
+//                    test.put("email", "test@rebunu.io");
+//                    test.put("balance",12);
+//                    test.put("name", "jack");
+//                    test.put("role",true);
+//                    test.put("password", "12345678");
+//                    String id1 = db.register(null);
+//                    String id2 = db.register(test);
+//                    Toast.makeText(getApplicationContext(),id1,Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(),id2,Toast.LENGTH_SHORT).show();
+//                }catch(Exception e){
+//                    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
+//                }
+
+                //test query
+                try{
+//                    String phone  = (String) db.profiles.document("8E9Kj6fiTCW70myD58On").get().getResult().get("phone");
+
+                    DocumentReference docRef = db.profiles.document("345");
+
+
+                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    Toast.makeText(getApplicationContext(),document.get("phone").toString(),Toast.LENGTH_SHORT).show();
+                                    Log.d("RebuNu", "DocumentSnapshot data: " + document.getData());
+                                } else {
+                                    Toast.makeText(getApplicationContext(),"No such record",Toast.LENGTH_SHORT).show();
+
+                                    Log.d("RebuNu", "No such document");
+                                }
+                            } else {
+                                Log.d("RebuNu", "get failed with ", task.getException());
+                            }
+                        }
+                    });
+
+//                    Toast.makeText(getApplicationContext(),phone,Toast.LENGTH_SHORT).show();
+                }catch(Exception e){
+                    Toast.makeText(getApplicationContext(),"fuck",Toast.LENGTH_SHORT).show();
+                }
+
+
+
+
                 if (floatingButtonStatus.equals("GONE")) {
                     layout.setVisibility(ConstraintLayout.GONE);
                     button_postRequest_floating.setVisibility(Button.VISIBLE);

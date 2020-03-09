@@ -12,7 +12,7 @@ public class Request extends Record {
     private Location start;
     private Location end;
     private Integer price;
-    private Integer riderId;
+    private String riderId;
 
     /**
      *
@@ -23,7 +23,7 @@ public class Request extends Record {
      * @throws Exception null, empty or invalid number exceptions
      */
 
-    public Request(Location start, Location end, Integer price, Integer riderId) throws Exception{
+    public Request(Location start, Location end, Integer price, String riderId) throws Exception{
         this.setStart(start);
         this.setEnd(end);
         this.setPrice(price);
@@ -31,7 +31,7 @@ public class Request extends Record {
         setType(2);
     }
 
-    public Request(Location start, Location end, Integer price, Integer riderId, Boolean noId) throws Exception{
+    public Request(Location start, Location end, Integer price, String riderId, Boolean noId) throws Exception{
         super(noId);
         this.setStart(start);
         this.setEnd(end);
@@ -55,7 +55,7 @@ public class Request extends Record {
         return price;
     }
 
-    public Integer getRiderId(){
+    public String getRiderId(){
         return riderId;
     }
 
@@ -109,17 +109,18 @@ public class Request extends Record {
      * @param riderId a positive integer
      * @throws Exception null or negative exceptions
      */
-    public void setRiderId(Integer riderId)throws Exception{
+    public void setRiderId(String riderId)throws Exception{
         if(riderId == null){
             throw new NullPointerException("RiderId is null");
         }
         else{
-            if(riderId > 0){
-                this.riderId = riderId;
-            }
-            else{
-                throw  new Exception("Invalid riderId");
-            }
+            this.riderId = riderId;
+//            if(riderId > 0){
+//                this.riderId = riderId;
+//            }
+//            else{
+//                throw  new Exception("Invalid riderId");
+//            }
         }
     }
 }

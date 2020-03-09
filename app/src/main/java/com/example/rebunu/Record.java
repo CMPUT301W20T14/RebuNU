@@ -6,13 +6,12 @@ package com.example.rebunu;
  * @see Database
  */
 public class Record {
-    private Integer id;
+    private String id;
     private Integer type;//1 for profile; 2 for request; 3 for order;
 
 
     public Record(){
         Database db = new Database();
-        this.id = db.generateUniqueId();
     }
 
     public Record(Boolean noId) {}
@@ -20,11 +19,11 @@ public class Record {
     /**
      * setters and getters
      */
-    public Integer getId(){
+    public String getId(){
         return this.id;
     }
 
-    public void setId(Integer id){
+    public void setId(String id){
         this.id = id;
     }
 
