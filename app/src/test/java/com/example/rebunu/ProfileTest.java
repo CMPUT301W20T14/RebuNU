@@ -17,7 +17,7 @@ public class ProfileTest {
      */
     void fakeProfile() {
         try {
-            profile = new Profile("1111111111", "fake@fake.fake", "fakeusername", 100d, "driver", new Rating(10, 20), true);
+            profile = new Profile("1111111111", "fake@fake.fake", "fakeusername", 100, "driver", new Rating(10, 20), true);
         } catch (Exception ignored){}
     }
 
@@ -30,7 +30,7 @@ public class ProfileTest {
         assertEquals("1111111111", profile.getPhone());
         assertEquals("fake@fake.fake", profile.getEmail());
         assertEquals("fakeusername", profile.getUsername());
-        assertEquals((Double) 100d, profile.getBalance());
+        assertEquals((Integer) 100, profile.getBalance());
         assertEquals("driver", profile.getRole());
         assertTrue((profile.getRating().getThumbsUp() == 10 && profile.getRating().getThumbsDown() == 20));
     }
@@ -46,42 +46,42 @@ public class ProfileTest {
             assertEquals("2222222222", profile.getPhone());
             assertEquals("fake@fake.fake", profile.getEmail());
             assertEquals("fakeusername", profile.getUsername());
-            assertEquals((Double) 100d, profile.getBalance());
+            assertEquals((Integer) 100, profile.getBalance());
             assertEquals("driver", profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 10 && profile.getRating().getThumbsDown() == 20));
             profile.setEmail("f@f.f");
             assertEquals("2222222222", profile.getPhone());
             assertEquals("f@f.f", profile.getEmail());
             assertEquals("fakeusername", profile.getUsername());
-            assertEquals((Double) 100d, profile.getBalance());
+            assertEquals((Integer) 100, profile.getBalance());
             assertEquals("driver", profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 10 && profile.getRating().getThumbsDown() == 20));
             profile.setUsername("usernamef");
             assertEquals("2222222222", profile.getPhone());
             assertEquals("f@f.f", profile.getEmail());
             assertEquals("usernamef", profile.getUsername());
-            assertEquals((Double) 100d, profile.getBalance());
+            assertEquals((Integer) 100, profile.getBalance());
             assertEquals("driver", profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 10 && profile.getRating().getThumbsDown() == 20));
-            profile.setBalance(200d);
+            profile.setBalance(200);
             assertEquals("2222222222", profile.getPhone());
             assertEquals("f@f.f", profile.getEmail());
             assertEquals("usernamef", profile.getUsername());
-            assertEquals((Double) 200d, profile.getBalance());
+            assertEquals((Integer) 200, profile.getBalance());
             assertEquals("driver", profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 10 && profile.getRating().getThumbsDown() == 20));
             profile.setRole("customer");
             assertEquals("2222222222", profile.getPhone());
             assertEquals("f@f.f", profile.getEmail());
             assertEquals("usernamef", profile.getUsername());
-            assertEquals((Double) 200d, profile.getBalance());
+            assertEquals((Integer) 200, profile.getBalance());
             assertEquals("customer", profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 10 && profile.getRating().getThumbsDown() == 20));
             profile.setRating(new Rating(20, 10));
             assertEquals("2222222222", profile.getPhone());
             assertEquals("f@f.f", profile.getEmail());
             assertEquals("usernamef", profile.getUsername());
-            assertEquals((Double) 200d, profile.getBalance());
+            assertEquals((Integer) 200, profile.getBalance());
             assertEquals("customer", profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 20 && profile.getRating().getThumbsDown() == 10));
         }
@@ -102,10 +102,8 @@ public class ProfileTest {
         String invalidEmail = "f2f.f";
         String nullUserName = null;
         String emptyUserName ="";
-        Double nullBalance = null;
-        Double invalidBalance1 = Double.NEGATIVE_INFINITY;
-        Double invalidBalance2 = Double.POSITIVE_INFINITY;
-        Double invalidBalance3 = Double.NaN;
+        Integer nullBalance = null;
+        Integer invalidBalance = -10;
         String nullRole = null;
         String emptyRole = "";
         Rating nullRating = null;
@@ -138,13 +136,7 @@ public class ProfileTest {
             profile.setBalance(nullBalance);
         });
         assertThrows(Exception.class, ()->{
-           profile.setBalance(invalidBalance1);
-        });
-        assertThrows(Exception.class, ()->{
-            profile.setBalance(invalidBalance2);
-        });
-        assertThrows(Exception.class, ()->{
-            profile.setBalance(invalidBalance3);
+           profile.setBalance(invalidBalance);
         });
         assertThrows(NullPointerException.class, ()->{
             profile.setRole(nullRole);

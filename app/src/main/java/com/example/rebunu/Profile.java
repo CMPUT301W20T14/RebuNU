@@ -14,17 +14,17 @@ public class Profile extends Record{
 
     /**
      * Constructor for Profile
-      * @param phone a String, but only consists of numbers
+     * @param phone a String, but only consists of numbers
      * @param email a String
-     * @param name a String
-     * @param balance a Double, cannot be NaN or Inf
+     * @param username a String
+     * @param balance a Integer, non-negative
      * @param role a String
      * @param rating a Rating object
      * @throws Exception null or empty value or invalid number exceptions
      * @see Rating
      */
     public Profile(
-            String phone, String email, String name, Double balance, Boolean role, Rating rating
+            String phone, String email, String name, Integer balance, String role, Rating rating
     ) throws Exception{
         setPhone(phone);
         setEmail(email);
@@ -35,7 +35,7 @@ public class Profile extends Record{
         setType(1);
     }
 
-    public Profile(String phone, String email, String name, Double balance, Boolean role, Rating rating, Boolean noId) throws Exception {
+    public Profile(String phone, String email, String name, Integer balance, String role, Rating rating, Boolean noId) throws Exception {
         super(noId);
         setPhone(phone);
         setEmail(email);
@@ -74,7 +74,7 @@ public class Profile extends Record{
      * Getter for balance
      * @return balance
      */
-    public Double getBalance() {
+    public Integer getBalance() {
         return balance;
     }
 
@@ -155,14 +155,14 @@ public class Profile extends Record{
 
     /**
      * Setter for balance
-     * @param balance a Double
-     * @throws Exception null or NaN or Inf exceptions
+     * @param balance a Integer
+     * @throws Exception null or invalid value exceptions
      */
-    public void setBalance(Double balance) throws Exception{
+    public void setBalance(Integer balance) throws Exception{
         if(balance == null) {
             throw new NullPointerException("Balance is null.");
         } else {
-            if(balance.isInfinite() || balance.isNaN()) {
+            if(balance < 0) {
                 throw new Exception("Invalid balance.");
             } else {
                 this.balance = balance;
