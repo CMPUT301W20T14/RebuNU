@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Database {
-    Boolean exist;
+//    Boolean exist;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     CollectionReference profiles = db.collection("profiles");
@@ -30,14 +30,68 @@ public class Database {
 
     String TAG = "RebuNu";
 
-    public void addAuth(String username, String password, String profileId){
+    public String register(HashMap<String,Object> map){
+        if(map == null){
+            return null;
+        }
+        HashMap<String,Object> profile = new HashMap<>();
+
+        profile.put("email", map.get("email"));
+        profile.put("phone", map.get("phone"));
+        profile.put("balance", map.get("balance"));
+        profile.put("role", map.get("role"));
+        profile.put("name", map.get("name"));
+        profile.put("rating", new ArrayList<Integer>());
+
+        DocumentReference proRef = profiles.document();
+        proRef
+                .set(profile)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "profile storing is successful");
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "profile saving failed");
+                    }
+                });
+
+        addAuth(map.get("phone").toString(), map.get("email").toString(), map.get("password").toString(), proRef.getId());
+
+
+
+        return proRef.getId();
+
+    }
+
+    public void addAuth(String phone, String email, String password, String profileId){
         HashMap<String, String> au = new HashMap<>();
 
         au.put("password",password);
         au.put("profileId", profileId);
 
         auth
-                .document(username)
+                .document(phone)
+                .set(au)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "auth storing is successful");
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "auth saving failed");
+                    }
+                });
+        auth
+                .document(email)
                 .set(au)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -62,7 +116,7 @@ public class Database {
         profile.put("email", p.getEmail());
         profile.put("phone", p.getPhone());
         profile.put("role", p.getRole());
-        profile.put("username", p.getUsername());
+        profile.put("name", p.getName());
 
         if(p.getRole()){
             ArrayList<Integer> rating = new ArrayList<>();
@@ -71,7 +125,7 @@ public class Database {
 
             profile.put("rating",rating);
         }else{
-            profile.put("rating",new ArrayList<>());
+            profile.put("rating",new ArrayList<Integer>());
         }
 
         DocumentReference docRef = profiles.document();
@@ -299,35 +353,37 @@ public class Database {
     }
 
     public void delete(Record record) {
-//        try{
-//
-//
-//            }
-//        }catch (Exception e){throw new IllegalArgumentException("There is no such record!");}
-
-        switch (record.getType()) {
-            case 1:
-                profiles
-                        .document(record.getId())
-                        .delete();
-
-                break;
-
-            case 2:
-                requests
-                        .document(record.getId())
-                        .delete();
-
-                break;
-
-            case 3:
-                orders
-                        .document(record.getId())
-                        .delete();
-                break;
-
-
+        if(record.getType() == 1){
+            throw new IllegalArgumentException("Cannot delete profile");
         }
+        try{
+            switch (record.getType()) {
+//                case 1:
+//                    profiles
+//                            .document(record.getId())
+//                            .delete();
+//
+//                    break;
+
+                case 2:
+                    requests
+                            .document(record.getId())
+                            .delete();
+
+                    break;
+
+                case 3:
+                    orders
+                            .document(record.getId())
+                            .delete();
+                    break;
+
+
+                }
+
+
+            } catch (Exception e){throw new IllegalArgumentException("There is no such record!");}
+
     }
 
     public void modifyProfile(Profile p){
@@ -343,7 +399,7 @@ public class Database {
         }
 
         proDocRef
-                .update("balance", p.getBalance(),"email",p.getEmail(),"phone",p.getPhone(),"role",p.getRole(),"username",p.getUsername(),"rating",rating)
+                .update("balance", p.getBalance(),"email",p.getEmail(),"phone",p.getPhone(),"role",p.getRole(),"name",p.getName(),"rating",rating)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

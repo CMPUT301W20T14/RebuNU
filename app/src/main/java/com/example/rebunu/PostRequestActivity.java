@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -118,7 +119,7 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
                 Database db = new Database();
 
                 //test add
-                for (Integer i = 0; i<1; i++){
+                for (Integer i = 0; i<5; i++){
                     try{
                         User a = new Rider(true);
 
@@ -133,7 +134,7 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
 
                 }
 
-              //test delete
+//              test delete
 //                for(Request r: rs){
 //                    try{
 //                        db.delete(r);
@@ -151,14 +152,30 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
                 }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
 
                 //test modify
-                try{
-                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
-                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
-                    Request newRequest = new Request(la, lb, 67, "8");
-                    newRequest.setId("23rr2r43");
-                    db.modify(newRequest);
-                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+//                try{
+//                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
+//                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
+//                    Request newRequest = new Request(la, lb, 67, "8");
+//                    newRequest.setId("23rr2r43");
+//                    db.modify(newRequest);
+//                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
 
+                //test register
+                try{
+                    HashMap<String, Object> test = new HashMap<>();
+                    test.put("phone","12345678");
+                    test.put("email", "test@rebunu.io");
+                    test.put("balance",12);
+                    test.put("name", "jack");
+                    test.put("role",true);
+                    test.put("password", "12345678");
+                    String id1 = db.register(null);
+                    String id2 = db.register(test);
+                    Toast.makeText(getApplicationContext(),id1,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),id2,Toast.LENGTH_SHORT).show();
+                }catch(Exception e){
+                    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
+                }
 
 
 
