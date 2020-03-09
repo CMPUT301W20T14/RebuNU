@@ -171,10 +171,11 @@ tools:context=".SignUpActivity">
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:layout_marginLeft="5dp"
                 android:fontFamily="@font/yahei"
                 android:text="@string/user_select"
+                android:textAlignment="center"
                 android:textColor="@color/rebunu_green"
                 android:textStyle="bold">
 
@@ -186,18 +187,23 @@ tools:context=".SignUpActivity">
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:id="@+id/radioButton"
-                    android:layout_width="122dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/button_long_green"
-                    android:text="RadioButton" />
+                    android:id="@+id/signup_radiobutton_rider"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:background="@drawable/chip_light"
+                    android:shadowColor="@color/rebunu_grey"
+                    android:text="@string/rider"
+                    android:textStyle="bold" />
 
                 <RadioButton
-                    android:id="@+id/radioButton2"
+                    android:id="@+id/signup_radiobutton_driver"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
                     android:background="@drawable/chip_light"
-                    android:text="RadioButton" />
+                    android:text="@string/driver"
+                    android:textStyle="bold" />
             </RadioGroup>
 
         </LinearLayout>
@@ -219,7 +225,7 @@ tools:context=".SignUpActivity">
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="50dp"
             android:layout_weight="1" />
 
     </LinearLayout>
