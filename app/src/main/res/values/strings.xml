@@ -6,6 +6,11 @@
     <string name="sign_up">SIGN UP</string>
     <string name="finish">FINISH</string>
     <string name="post_request">POST REQUEST</string>
+    <string name="tips">TIPS</string>
+    <string name="accept">ACCEPT</string>
+    <string name="decline">DECLINE</string>
+    <string name="pay_your_trip">PAY YOUR TRIP</string>
+    <string name="search_nearby">SEARCH NEARBY</string>
 
     <!-- Image Description -->
     <string name="logo_description">This is the logo of RebuNe.</string>
@@ -13,7 +18,7 @@
     <!-- Greetings -->
     <string name="welcome_back">WELCOME BACK!</string>
     <string name="where_to_go">WHERE TO GO?</string>
-
+    <string name="ready_to_go">READY TO GO</string>
 
     <!-- Sign Up Form -->
     <string name="name">NAME</string>
@@ -41,10 +46,25 @@
     <string name="user_role_rider">RIDER</string>
     <string name="user_role_driver">DRIVER</string>
 
-    <!-- Post Request -->
+    <!-- Driver Information (This is temporarily used for ui only. Information should be updated based on different drivers.) -->
+    <string name="driver_name">Driver\'s Name</string>
+    <string name="driver_like">2020</string>
+    <string name="driver_dislike">14</string>
+    <string name="driver_phone">780–2020-C301</string>
+    <string name="driver_email">DRIVER@REBUNU.COM</string>
+
+    <!-- Rider: Post Request -->
     <string name="from">FROM WHERE</string>
     <string name="to">TO</string>
     <string name="estimated_rate">ESTIMATED RATE</string>
+    <string name="estimated_rate_numeric">20.20</string>
+
+    <!-- Rider: Rating -->
+    <string name="awesome">AWESOME!</string>
+    <string name="need_to_improve">NEED TO IMPROVE</string>
+
+    <!-- Driver: Search Request -->
+
 
     <!-- Error -->
     <string name="password_empty">PASSWORD CANNOT BE EMPTY</string>

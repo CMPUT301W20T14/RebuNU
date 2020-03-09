@@ -22,8 +22,11 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -35,6 +38,33 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
     private GoogleMap gmap;
     private static final int TAG_CODE_PERMISSION_LOCATION = 1;
     private String floatingButtonStatus = "VISIBLE";
+    private LocationManager locationManager;
+    private Criteria criteria;
+
+    public void updateMap(ArrayList<Location> locations) {
+        gmap.clear();
+        if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, new String[] {
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, TAG_CODE_PERMISSION_LOCATION);
+        }
+
+        Location currentLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false)));
+        float[] distance = new float[1];
+
+       for(Location l: locations) {
+           try {
+               Location.distanceBetween(l.getLatitude(), l.getLongitude(), currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
+               gmap.addMarker(new MarkerOptions()
+                       .position(Utility.locationToLatLng(l))
+                       .title(String.valueOf(distance[0]) + "Meters"));
+           } catch (Exception ignored){};
+       }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,12 +112,81 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
         button_postRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                double[] lat = {53.525564, 53.525296, 53.525695, 53.526441, 53.525612};
+                double[] lng = {-113.521412, -113.520166, -113.521335, -113.519962, -113.521459};
+                ArrayList<Request> rs = new ArrayList<>();
+                Database db = new Database();
+
+                //test add
+                for (Integer i = 0; i<5; i++){
+                    try{
+                        User a = new Rider(true);
+
+                        Location la = Utility.latLngToLocation(new LatLng(lat[i],lng[i]));
+                        Location lb = Utility.latLngToLocation(new LatLng(lat[4-i],lng[4-i]));
+                        Request r = ((Rider)a).CreateRequest(la,lb,10+i,i.toString());
+                        rs.add(r);
+//                        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
+
+
+                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+
+                }
+
+//              test delete
+//                for(Request r: rs){
+//                    try{
+//                        db.delete(r);
+//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+//
+//
+//                }
+                //delete record that not in database
+                try{
+                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
+                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
+                    Request newRequest = new Request(la, lb, 67, "8");
+                    newRequest.setId("12345678");
+                    db.delete(newRequest);
+                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+
+                //test modify
+//                try{
+//                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
+//                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
+//                    Request newRequest = new Request(la, lb, 67, "8");
+//                    newRequest.setId("23rr2r43");
+//                    db.modify(newRequest);
+//                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+
+                //test register
+                try{
+                    HashMap<String, Object> test = new HashMap<>();
+                    test.put("phone","12345678");
+                    test.put("email", "test@rebunu.io");
+                    test.put("balance",12);
+                    test.put("name", "jack");
+                    test.put("role",true);
+                    test.put("password", "12345678");
+                    String id1 = db.register(null);
+                    String id2 = db.register(test);
+                    Toast.makeText(getApplicationContext(),id1,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),id2,Toast.LENGTH_SHORT).show();
+                }catch(Exception e){
+                    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
+                }
+
+
+
+
                 if (floatingButtonStatus.equals("GONE")) {
                     layout.setVisibility(ConstraintLayout.GONE);
                     button_postRequest_floating.setVisibility(Button.VISIBLE);
                     floatingButtonStatus = "VISIBLE";
                 }
-                ArrayList<Location> l = Utility.mockSurrounding();
+                ArrayList<Location> location = Utility.mockSurrounding();
+                updateMap(location);
             }
         });
 
@@ -155,8 +254,8 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
         uiSettings.setMyLocationButtonEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
 
-        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        criteria = new Criteria();
 
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
