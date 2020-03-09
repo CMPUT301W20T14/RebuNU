@@ -10,6 +10,11 @@ public class User {
     private Location location;
     private String userId;
 
+    /**
+     * @param location longtitude and latitude
+     * @param Id a non empty String object
+     * @throws Exception null exception
+     */
     public User(Location location, String Id) throws Exception {
         setLocation(location);
         if(Id != null) {
