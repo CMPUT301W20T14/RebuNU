@@ -13,9 +13,14 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -88,6 +93,15 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
         button_postRequest_floating = findViewById(R.id.postRequest_button_postRequest_floating);
         button_hide = findViewById(R.id.postRequest_button_hide);
 
+        LinearLayout EstimateRateLayout = findViewById(R.id.postRequest_estimated_rate_layout);
+        EditText endText = findViewById(R.id.postRequest_edittext_to);
+        EstimateRateLayout.setVisibility(LinearLayout.GONE);
+        TextView EstimateRateText = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
+        Location test_start = Utility.latLngToLocation(new LatLng(60.00,100.00));
+        Location test_end = Utility.latLngToLocation(new LatLng(65.00,105.00));
+
+
+
         // Reference: https://developer.android.com/training/permissions/requesting.html Posted on 2019-12-27.
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
@@ -111,6 +125,24 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
                     layout.setVisibility(ConstraintLayout.VISIBLE);
                     button_postRequest_floating.setVisibility(Button.GONE);
                     floatingButtonStatus = "GONE";
+                    Integer price = Utility.getEstimatePrice(test_start,test_end,(float)2.5);
+                    endText.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            EstimateRateText.setText(price);
+                            EstimateRateLayout.setVisibility(LinearLayout.VISIBLE);
+                        }
+                    });
                 }
             }
         });
