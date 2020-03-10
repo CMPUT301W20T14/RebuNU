@@ -8,20 +8,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.google.common.collect.Maps;
-
 /**
  * Login screen
  * @author Zijian Xi
  */
 public class LoginActivity extends AppCompatActivity {
 
-    public Boolean auth(String username, String password) {
-        // authentication implementation
-        //Database db = new Database();
-        //return db.auth(username, password);
-        return true;
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                 } else return;
                 // make sure identification is valid
                 if(flag) {
-                    Intent postRequestIntent = new Intent(LoginActivity.this, PostRequestActivity.class);
+                    Intent postRequestIntent = new Intent(LoginActivity.this, RiderActivity.class);
                     startActivity(postRequestIntent);
                 } else return; // actually more code needed for wrong username/password notification
             }
