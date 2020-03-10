@@ -65,15 +65,13 @@
         <LinearLayout
             android:layout_width="280dp"
             android:layout_height="350dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="40dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="48dp" />
 
             <EditText
                 android:id="@+id/postRequest_edittext_from"
@@ -118,14 +116,58 @@
                 android:textColor="@color/rebunu_green"
                 android:textStyle="bold" />
 
-            <Space
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/postRequest_textview_estimatedRateNumeric"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/estimated_rate_numeric"
+                        android:textColor="@color/rebunu_green"
+                        android:textSize="26sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/postRequest_textview_estimatedRate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/yahei"
+                        android:text="@string/estimated_rate"
+                        android:textColor="@color/rebunu_green"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/postRequest_button_tips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_tips"
+                    android:fontFamily="@font/yahei"
+                    android:text="@string/tips"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/postRequest_button_postRequest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
                 android:background="@drawable/button_long_green"
                 android:fontFamily="@font/yahei"
                 android:text="@string/post_request"
