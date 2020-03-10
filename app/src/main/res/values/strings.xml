@@ -67,6 +67,7 @@
 
 
     <!-- Error -->
+    <string name="password_or_email_or_phone_wrong">WRONG EMAIL/PHONE/PASSWORD</string>
     <string name="password_empty">PASSWORD CANNOT BE EMPTY</string>
     <string name="password_wrong">WRONG PASSWORD</string>
     <string name="email_or_phone_empty">EMAIL/PHONE CANNOT BE EMPTY</string>

@@ -18,12 +18,8 @@ public class LoginActivity extends AppCompatActivity {
 
     public Boolean auth(String username, String password) {
         // authentication implementation
-        Database db = new Database();
-//        if(db.auth(username,password) == true) {
-//            return true;
-//        } else {
-//            return false;
-//        }
+        //Database db = new Database();
+        //return db.auth(username, password);
         return true;
     }
     @Override
@@ -65,8 +61,9 @@ public class LoginActivity extends AppCompatActivity {
                     // do something for authentication
                     flag = auth(editText_emailOrPhone.getText().toString(),
                             editText_password.getText().toString());
-                    if(flag == false) {
-                        editText_emailOrPhone.setError("USER ID OR PASSWORD IS WRONG");
+                    if(!flag) {
+                        editText_emailOrPhone.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
+                        editText_password.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
                     }
                 } else return;
                 // make sure identification is valid
