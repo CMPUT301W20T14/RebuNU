@@ -43,6 +43,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
     private LocationManager locationManager;
     private Criteria criteria;
 
+
     public void updateMap(ArrayList<Location> locations) {
         gmap.clear();
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -79,6 +80,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         Button button_postRequest;
         Button button_postRequest_floating;
         Button button_hide;
+        Button button_tips;
         TextView postRequest_textview_estimatedRateNumeric;
         EditText postRequest_edittext_from;
         EditText postRequest_edittext_to;
@@ -89,6 +91,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         button_postRequest = findViewById(R.id.postRequest_button_postRequest);
         button_postRequest_floating = findViewById(R.id.postRequest_button_postRequest_floating);
         button_hide = findViewById(R.id.postRequest_button_hide);
+        button_tips = findViewById(R.id.postRequest_button_tips);
         postRequest_textview_estimatedRateNumeric = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
         postRequest_edittext_from = findViewById(R.id.postRequest_edittext_from);
         postRequest_edittext_to = findViewById(R.id.postRequest_edittext_to);
@@ -167,16 +170,52 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             }
         });
 
+        button_tips.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                    postRequest_textview_estimatedRateNumeric.setText(new Integer(Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()) + 1).toString());
+                }catch (Exception e){
+                    postRequest_textview_estimatedRateNumeric.setText("1");
+                }
+            }
+        });
+
+
 
 
         button_postRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                double[] lat = {53.525564, 53.525296, 53.525695, 53.526441, 53.525612};
-                double[] lng = {-113.521412, -113.520166, -113.521335, -113.519962, -113.521459};
-                ArrayList<Request> rs = new ArrayList<>();
-                Database db = new Database();
+                try {
+                    if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
+                        String rawStart = postRequest_edittext_from.getText().toString();
+                        String rawEnd = postRequest_edittext_to.getText().toString();
+                        String[] splitedStart = rawStart.split(",");
+                        String[] splitedEnd = rawEnd.split(",");
+                        Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
+                        Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
+
+                        User myRider = new Rider(true);
+                        String riderId = getIntent().getExtras().get("profileId").toString();
+                        Request myRequest = ((Rider)myRider).CreateRequest(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
+
+                        Toast.makeText(getApplicationContext(),myRequest.getId(),Toast.LENGTH_SHORT).show();
+                        button_postRequest.setVisibility(View.GONE);
+
+                    }else{
+                        postRequest_edittext_from.setError(getResources().getString(R.string.invalid_input));
+                        postRequest_edittext_to.setError(getResources().getString(R.string.invalid_input));
+                    }
+                }catch (Exception ignored){
+                    //Toast.makeText(getApplicationContext(), ignored.toString(), Toast.LENGTH_SHORT).show();
+                }
+
+//                double[] lat = {53.525564, 53.525296, 53.525695, 53.526441, 53.525612};
+//                double[] lng = {-113.521412, -113.520166, -113.521335, -113.519962, -113.521459};
+//                ArrayList<Request> rs = new ArrayList<>();
+//                Database db = new Database();
 
                 //test add
 //                for (Integer i = 0; i<5; i++){
