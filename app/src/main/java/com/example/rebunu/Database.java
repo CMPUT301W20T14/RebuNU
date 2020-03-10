@@ -538,7 +538,27 @@ public class Database {
     }
 
     public Profile queryProfileById(String id) {
-        queryProfileByIdHelper(id);
+        DocumentReference docRef = profiles.document(id);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Map<String, Object> dataMap = document.getData();
+                        Log.d(TAG, "DocumentSnapshot data: " + dataMap);
+                        Utility.dataMap = dataMap;
+                        Utility.dataId = document.getId();
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+
+        while(!docRef.get().isComplete()){}
         if(Utility.dataMap != null) {
             String phone = (String) Utility.dataMap.get("phone");
             String email = (String) Utility.dataMap.get("email");
@@ -565,31 +585,56 @@ public class Database {
                 } catch (Exception ignored) {}
             }
         }
-
         return null;
     }
 
-    public void queryProfileByIdHelper(String id) {
-        DocumentReference docRef = profiles.document(id);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Map<String, Object> dataMap = document.getData();
-                        Log.d(TAG, "DocumentSnapshot data: " + dataMap);
-                        Utility.dataMap = dataMap;
-                        Utility.dataId = document.getId();
-                    } else {
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
-    }
+//    public Profile queryProfileById(String id){
+//        Profile profile = new Profile();
+//        profiles.document(id)
+//                .get()
+//                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+//
+//                        try{
+//                            if(Utility.dataMap != null) {
+//
+//                                profile.setPhone((String) documentSnapshot.get("phone"));
+//                                profile.setEmail((String) documentSnapshot.get("email"));
+//                                profile.setBalance((Integer) documentSnapshot.get("balance"));
+//                                ArrayList<Integer> rawRating = (ArrayList<Integer>) documentSnapshot.get("rating");
+//
+//                                profile.setName((String) documentSnapshot.get("name"));
+//                                profile.setRole((Boolean) documentSnapshot.get("role"));
+//
+//                                profile.setId(documentSnapshot.getId());
+//                                profile.setType(1);
+//
+//                                if((Boolean) documentSnapshot.get("role")) {
+//                                    try {
+//                                        profile.setRating(new Rating(rawRating.get(0), rawRating.get(1)));
+//
+//                                    } catch (Exception ignored) {}
+//                                } else {
+//                                    try {
+//                                        profile.setRating(new Rating(0, 0));
+//
+//                                    } catch (Exception ignored) {}
+//                                }
+//                            }
+//                        }catch (Exception e){}
+//
+//
+//
+//
+//
+//                        }
+//
+//
+//
+//                });
+//        return profile;
+//    }
 
 
 
