@@ -48,7 +48,7 @@ public class Database {
         profile.put("balance", map.get("balance"));
         profile.put("role", map.get("role"));
         profile.put("name", map.get("name"));
-        profile.put("rating", new ArrayList<Integer>());
+        profile.put("rating", map.get("rating"));
 
         DocumentReference proRef = profiles.document();
         proRef
