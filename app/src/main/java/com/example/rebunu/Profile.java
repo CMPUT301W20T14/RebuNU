@@ -55,9 +55,6 @@ public class Profile extends Record{
         setRating(rating);
         setType(1);
     }
-    public Profile(){
-
-    }
 
     /**
      * Getter for phone

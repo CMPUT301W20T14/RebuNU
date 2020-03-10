@@ -200,18 +200,22 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
 //                    db.modify(newRequest);
 //                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
 
-                //test register
+//                test register
 //                try{
 //                    HashMap<String, Object> test = new HashMap<>();
-//                    test.put("phone","12345678");
-//                    test.put("email", "test@rebunu.io");
-//                    test.put("balance",12);
-//                    test.put("name", "jack");
+//                    test.put("phone","999");
+//                    test.put("email", "999");
+//                    test.put("balance",0);
+//                    test.put("name", "999");
 //                    test.put("role",true);
-//                    test.put("password", "12345678");
-//                    String id1 = db.register(null);
+//                    test.put("password", "999");
+//                    ArrayList<Integer> rating = new ArrayList<>();
+//                    rating.add(0);
+//                    rating.add(0);
+//                    test.put("rating", rating);
+////                    String id1 = db.register(null);
 //                    String id2 = db.register(test);
-//                    Toast.makeText(getApplicationContext(),id1,Toast.LENGTH_SHORT).show();
+////                    Toast.makeText(getApplicationContext(),id1,Toast.LENGTH_SHORT).show();
 //                    Toast.makeText(getApplicationContext(),id2,Toast.LENGTH_SHORT).show();
 //                }catch(Exception e){
 //                    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
@@ -250,8 +254,8 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
 
                 //test queryById
                 //try{
-                    Profile p = (Profile) db.queryById("8E9Kj6fiTCW70myD58On",1);
-                    Toast.makeText(getApplicationContext(),p.getPhone(),Toast.LENGTH_SHORT).show();
+//                    Profile p = (Profile) db.queryById("8E9Kj6fiTCW70myD58On",1);
+//                    Toast.makeText(getApplicationContext(),p.getPhone(),Toast.LENGTH_SHORT).show();
                 //}catch (Exception e){
                 //    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
                 //}
