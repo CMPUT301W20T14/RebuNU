@@ -15,18 +15,18 @@ public class Utility {
     public static Map<String, Object> dataMap = null;
     public static String dataId = null;
 
-    public static Integer getEstimatePrice(Location start, Location end, @Nullable Float priceFactor) {
+    public static Integer getEstimatePrice(Location start, Location end, @Nullable Integer priceFactor) {
         float[] dis = new float[1];
         Integer price = 0;
 
         Location.distanceBetween(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude(), dis);
 
         if(priceFactor != null) {
-            price = (Integer)((Float)(dis[0] * priceFactor)).intValue();
+            price = (Float.valueOf((dis[0] / 1000f) * priceFactor)).intValue();
         } else {
-            price = (Integer)((Float)(dis[0])).intValue();
+            price = (Float.valueOf((dis[0] / 1000f) * 100)).intValue();
         }
-        return price;
+        return 6 + price;
     }
 
     public static Location latLngToLocation(LatLng latLng) {

@@ -17,7 +17,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,25 +75,23 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
         Toast.makeText(getApplicationContext(), (String) getIntent().getExtras().get("profileId") + getIntent().getExtras().get("role").toString(), Toast.LENGTH_SHORT).show();
 
-        ConstraintLayout layout;
+        ConstraintLayout postRequest_layout;
         Button button_postRequest;
         Button button_postRequest_floating;
         Button button_hide;
+        TextView postRequest_textview_estimatedRateNumeric;
+        EditText postRequest_edittext_from;
+        EditText postRequest_edittext_to;
 
-        layout = findViewById(R.id.postRequest_layout);
+
+        postRequest_layout = findViewById(R.id.postRequest_layout);
         mapView = findViewById(R.id.postRequest_mapView);
         button_postRequest = findViewById(R.id.postRequest_button_postRequest);
         button_postRequest_floating = findViewById(R.id.postRequest_button_postRequest_floating);
         button_hide = findViewById(R.id.postRequest_button_hide);
-
-        LinearLayout EstimateRateLayout = findViewById(R.id.postRequest_estimated_rate_layout);
-        EditText endText = findViewById(R.id.postRequest_edittext_to);
-        EstimateRateLayout.setVisibility(LinearLayout.GONE);
-        TextView EstimateRateText = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
-        Location test_start = Utility.latLngToLocation(new LatLng(60.00,100.00));
-        Location test_end = Utility.latLngToLocation(new LatLng(65.00,105.00));
-
-
+        postRequest_textview_estimatedRateNumeric = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
+        postRequest_edittext_from = findViewById(R.id.postRequest_edittext_from);
+        postRequest_edittext_to = findViewById(R.id.postRequest_edittext_to);
 
         // Reference: https://developer.android.com/training/permissions/requesting.html Posted on 2019-12-27.
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -107,7 +104,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             }, TAG_CODE_PERMISSION_LOCATION);
         }
 
-        layout.setVisibility(ConstraintLayout.GONE);
+        postRequest_layout.setVisibility(ConstraintLayout.GONE);
         button_postRequest_floating.setVisibility(Button.VISIBLE);
         mapView.onCreate(null);
         mapView.getMapAsync(this);
@@ -116,30 +113,61 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             @Override
             public void onClick(View v) {
                 if (floatingButtonStatus.equals("VISIBLE")) {
-                    layout.setVisibility(ConstraintLayout.VISIBLE);
+                    postRequest_layout.setVisibility(ConstraintLayout.VISIBLE);
                     button_postRequest_floating.setVisibility(Button.GONE);
                     floatingButtonStatus = "GONE";
-                    Integer price = Utility.getEstimatePrice(test_start,test_end,(float)2.5);
-                    endText.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                            EstimateRateText.setText(price);
-                            EstimateRateLayout.setVisibility(LinearLayout.VISIBLE);
-                        }
-                    });
                 }
             }
         });
+
+        postRequest_edittext_from.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
+                        String rawStart = postRequest_edittext_from.getText().toString();
+                        String rawEnd = postRequest_edittext_to.getText().toString();
+                        String[] splitedStart = rawStart.split(",");
+                        String[] splitedEnd = rawEnd.split(",");
+                        Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
+                        Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
+                        postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
+                    }
+                }catch (Exception ignored){
+                    //Toast.makeText(getApplicationContext(), ignored.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        postRequest_edittext_to.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
+                        String rawStart = postRequest_edittext_from.getText().toString();
+                        String rawEnd = postRequest_edittext_to.getText().toString();
+                        String[] splitedStart = rawStart.split(",");
+                        String[] splitedEnd = rawEnd.split(",");
+                        Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
+                        Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
+                        postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
+                    }
+                }catch (Exception ignored){
+                    //Toast.makeText(getApplicationContext(), ignored.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
 
         button_postRequest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -253,10 +281,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 //}
 
 
-
-
                 if (floatingButtonStatus.equals("GONE")) {
-                    layout.setVisibility(ConstraintLayout.GONE);
+                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
                     button_postRequest_floating.setVisibility(Button.VISIBLE);
                     floatingButtonStatus = "VISIBLE";
                 }
@@ -269,7 +295,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             @Override
             public void onClick(View v) {
                 if (floatingButtonStatus.equals("GONE")) {
-                    layout.setVisibility(ConstraintLayout.GONE);
+                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
                     button_postRequest_floating.setVisibility(Button.VISIBLE);
                     floatingButtonStatus = "VISIBLE";
                 }
@@ -280,7 +306,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             // not sure working yet..
             @Override
             public void onClick(View v) {
-                layout.setVisibility(ConstraintLayout.VISIBLE);
+                postRequest_layout.setVisibility(ConstraintLayout.VISIBLE);
             }
         });
     }

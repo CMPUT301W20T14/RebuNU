@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -98,10 +99,13 @@ public class LoginActivity extends AppCompatActivity {
                                             Log.d(TAG, "Auth Success");
                                         } else {
                                             Log.d(TAG, "No such document");
+                                            editText_emailOrPhone.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
+                                            editText_password.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
                                             return;
                                         }
                                     } else {
                                         Log.d(TAG, "get failed with ", task.getException());
+                                        Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
                                         return;
                                     }
                                 }
