@@ -21,7 +21,7 @@ import java.util.Map;
 
 /**
  * Login screen
- * @author Zijian Xi
+ * @author Zijian Xi, Zihao Huang
  */
 public class LoginActivity extends AppCompatActivity {
 
