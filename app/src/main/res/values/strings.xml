@@ -73,6 +73,7 @@
     <string name="email_or_phone_empty">EMAIL/PHONE CANNOT BE EMPTY</string>
     <string name="email_or_phone_wrong">WRONG EMAIL/PHONE</string>
     <string name="title_activity_maps">Map</string>
+    <string name="username_empty">USERNAME CANNOT BE EMPTY""</string>
 
     <!-- Google Maps API Key -->
     <string name="google_maps_key">AIzaSyCPFD2nnvGCAY8JeAeng3RLail2nCfeWHg</string>
