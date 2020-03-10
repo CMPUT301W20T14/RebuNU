@@ -217,7 +217,7 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
                 //test queryById
                 //try{
                     Profile p = (Profile) db.queryById("8E9Kj6fiTCW70myD58On",1);
-                    Toast.makeText(getApplicationContext(),p.getId(),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),p.getPhone(),Toast.LENGTH_SHORT).show();
                 //}catch (Exception e){
                 //    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
                 //}
