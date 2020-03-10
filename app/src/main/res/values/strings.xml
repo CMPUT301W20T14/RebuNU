@@ -74,9 +74,11 @@
     <string name="email_or_phone_wrong">WRONG EMAIL/PHONE</string>
     <string name="title_activity_maps">Map</string>
     <string name="username_empty">USERNAME CANNOT BE EMPTY""</string>
-    <string name="email_empty">EMAIL CANNOT BE EMPTY""</string>
     <string name="phone_empty">PHONE CANNOT BE EMPTY""</string>
-    <string name="confirmpassword_empty">CONFIRMPASSWORD CANNOT BE EMPTY""</string>
+    <string name="email_empty">EMAIL CANNOT BE EMPTY""</string>
+    <string name="confirmPassword_empty">CONFIRM PASSWORD CANNOT BE EMPTY""</string>
+    <string name="two_password_not_match">TWO PASSWORDS ARE NOT MATCH""</string>
+    <string name="not_select_role">SELECT YOUR ROLE""</string>
 
     <!-- Google Maps API Key -->
     <string name="google_maps_key">AIzaSyCPFD2nnvGCAY8JeAeng3RLail2nCfeWHg</string>

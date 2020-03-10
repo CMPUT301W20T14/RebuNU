@@ -178,10 +178,107 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 ArrayList<Request> rs = new ArrayList<>();
                 Database db = new Database();
 
-                Profile p = (Profile) db.queryById("8E9Kj6fiTCW70myD58On",1);
-                Toast.makeText(getApplicationContext(),p.getPhone(),Toast.LENGTH_SHORT).show();
+                //test add
+//                for (Integer i = 0; i<5; i++){
+//                    try{
+//                        User a = new Rider(true);
+//
+//                        Location la = Utility.latLngToLocation(new LatLng(lat[i],lng[i]));
+//                        Location lb = Utility.latLngToLocation(new LatLng(lat[4-i],lng[4-i]));
+//                        Request r = ((Rider)a).CreateRequest(la,lb,10+i,i.toString());
+//                        rs.add(r);
+////                        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
+//
+//
+//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+//
+//                }
 
+//              test delete
+//                for(Request r: rs){
+//                    try{
+//                        db.delete(r);
+//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+//
+//
+//                }
+                //delete record that not in database
+//                try{
+//                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
+//                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
+//                    Request newRequest = new Request(la, lb, 67, "8");
+//                    newRequest.setId("12345678");
+//                    db.delete(newRequest);
+//                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
 
+                //test modify
+//                try{
+//                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
+//                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
+//                    Request newRequest = new Request(la, lb, 67, "8");
+//                    newRequest.setId("23rr2r43");
+//                    db.modify(newRequest);
+//                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+
+//                test register
+//                try{
+//                    HashMap<String, Object> test = new HashMap<>();
+//                    test.put("phone","999");
+//                    test.put("email", "999");
+//                    test.put("balance",0);
+//                    test.put("name", "999");
+//                    test.put("role",true);
+//                    test.put("password", "999");
+//                    ArrayList<Integer> rating = new ArrayList<>();
+//                    rating.add(0);
+//                    rating.add(0);
+//                    test.put("rating", rating);
+////                    String id1 = db.register(null);
+//                    String id2 = db.register(test);
+////                    Toast.makeText(getApplicationContext(),id1,Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(),id2,Toast.LENGTH_SHORT).show();
+//                }catch(Exception e){
+//                    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
+//                }
+
+                //test query
+//                try{
+////                    String phone  = (String) db.profiles.document("8E9Kj6fiTCW70myD58On").get().getResult().get("phone");
+//
+//                    DocumentReference docRef = db.profiles.document("345");
+//
+//
+//                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                            if (task.isSuccessful()) {
+//                                DocumentSnapshot document = task.getResult();
+//                                if (document.exists()) {
+//                                    Toast.makeText(getApplicationContext(),document.get("phone").toString(),Toast.LENGTH_SHORT).show();
+//                                    Log.d("RebuNu", "DocumentSnapshot data: " + document.getData());
+//                                } else {
+//                                    Toast.makeText(getApplicationContext(),"No such record",Toast.LENGTH_SHORT).show();
+//
+//                                    Log.d("RebuNu", "No such document");
+//                                }
+//                            } else {
+//                                Log.d("RebuNu", "get failed with ", task.getException());
+//                            }
+//                        }
+//                    });
+//
+////                    Toast.makeText(getApplicationContext(),phone,Toast.LENGTH_SHORT).show();
+//                }catch(Exception e){
+//                    Toast.makeText(getApplicationContext(),"fuck",Toast.LENGTH_SHORT).show();
+//                }
+
+                //test queryById
+                //try{
+//                    Profile p = (Profile) db.queryById("8E9Kj6fiTCW70myD58On",1);
+//                    Toast.makeText(getApplicationContext(),p.getPhone(),Toast.LENGTH_SHORT).show();
+                //}catch (Exception e){
+                //    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
+                //}
 
 
                 if (floatingButtonStatus.equals("GONE")) {
