@@ -15,12 +15,10 @@ public class Utility {
     public static Map<String, Object> dataMap = null;
     public static String dataId = null;
 
-    public static Integer getEstimatePrice(Request request, @Nullable Float priceFactor) {
+    public static Integer getEstimatePrice(Location start, Location end, @Nullable Float priceFactor) {
         float[] dis = new float[1];
         Integer price = 0;
 
-        Location start = request.getStart();
-        Location end = request.getEnd();
         Location.distanceBetween(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude(), dis);
 
         if(priceFactor != null) {
