@@ -50,7 +50,7 @@
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:background="#D11F241F"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <Button
             android:id="@+id/postRequest_button_hide"
@@ -65,8 +65,8 @@
         <LinearLayout
             android:layout_width="280dp"
             android:layout_height="350dp"
-            android:layout_marginBottom="30dp"
             android:layout_marginTop="40dp"
+            android:layout_marginBottom="30dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -22,11 +22,11 @@ public class Utility {
         Location.distanceBetween(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude(), dis);
 
         if(priceFactor != null) {
-            price = (Integer)((Float)(dis[0] * priceFactor)).intValue();
+            price = ((Float)((dis[0] / 1000)* priceFactor.floatValue())).intValue();
         } else {
-            price = (Integer)((Float)(dis[0])).intValue();
+            price = ((Float)((dis[0] / 1000))).intValue();
         }
-        return price;
+        return price + 6;
     }
 
     public static Location latLngToLocation(LatLng latLng) {

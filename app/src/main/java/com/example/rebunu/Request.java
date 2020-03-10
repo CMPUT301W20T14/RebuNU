@@ -99,7 +99,7 @@ public class Request extends Record {
                 this.price = price;
             }
             else{
-                throw  new Exception("Invalid price");
+                throw new Exception("Invalid price");
             }
         }
     }
