@@ -82,6 +82,8 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_request);
 
+        Toast.makeText(getApplicationContext(), (String) getIntent().getExtras().get("profileId") + getIntent().getExtras().get("role").toString(), Toast.LENGTH_SHORT).show();
+
         ConstraintLayout layout;
         Button button_postRequest;
         Button button_postRequest_floating;
