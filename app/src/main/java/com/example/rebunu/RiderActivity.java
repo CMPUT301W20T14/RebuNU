@@ -17,7 +17,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,25 +75,23 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
         Toast.makeText(getApplicationContext(), (String) getIntent().getExtras().get("profileId") + getIntent().getExtras().get("role").toString(), Toast.LENGTH_SHORT).show();
 
-        ConstraintLayout layout;
+        ConstraintLayout postRequest_layout;
         Button button_postRequest;
         Button button_postRequest_floating;
         Button button_hide;
+        TextView postRequest_textview_estimatedRateNumeric;
+        EditText postRequest_edittext_from;
+        EditText postRequest_edittext_to;
 
-        layout = findViewById(R.id.postRequest_layout);
+
+        postRequest_layout = findViewById(R.id.postRequest_layout);
         mapView = findViewById(R.id.postRequest_mapView);
         button_postRequest = findViewById(R.id.postRequest_button_postRequest);
         button_postRequest_floating = findViewById(R.id.postRequest_button_postRequest_floating);
         button_hide = findViewById(R.id.postRequest_button_hide);
-
-        LinearLayout EstimateRateLayout = findViewById(R.id.postRequest_estimated_rate_layout);
-        EditText endText = findViewById(R.id.postRequest_edittext_to);
-        EstimateRateLayout.setVisibility(LinearLayout.GONE);
-        TextView EstimateRateText = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
-        Location test_start = Utility.latLngToLocation(new LatLng(60.00,100.00));
-        Location test_end = Utility.latLngToLocation(new LatLng(65.00,105.00));
-
-
+        postRequest_textview_estimatedRateNumeric = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
+        postRequest_edittext_from = findViewById(R.id.postRequest_edittext_from);
+        postRequest_edittext_to = findViewById(R.id.postRequest_edittext_to);
 
         // Reference: https://developer.android.com/training/permissions/requesting.html Posted on 2019-12-27.
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -107,7 +104,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             }, TAG_CODE_PERMISSION_LOCATION);
         }
 
-        layout.setVisibility(ConstraintLayout.GONE);
+        postRequest_layout.setVisibility(ConstraintLayout.GONE);
         button_postRequest_floating.setVisibility(Button.VISIBLE);
         mapView.onCreate(null);
         mapView.getMapAsync(this);
@@ -116,30 +113,61 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             @Override
             public void onClick(View v) {
                 if (floatingButtonStatus.equals("VISIBLE")) {
-                    layout.setVisibility(ConstraintLayout.VISIBLE);
+                    postRequest_layout.setVisibility(ConstraintLayout.VISIBLE);
                     button_postRequest_floating.setVisibility(Button.GONE);
                     floatingButtonStatus = "GONE";
-                    Integer price = Utility.getEstimatePrice(test_start,test_end,(float)2.5);
-                    endText.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                            EstimateRateText.setText(price);
-                            EstimateRateLayout.setVisibility(LinearLayout.VISIBLE);
-                        }
-                    });
                 }
             }
         });
+
+        postRequest_edittext_from.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
+                        String rawStart = postRequest_edittext_from.getText().toString();
+                        String rawEnd = postRequest_edittext_to.getText().toString();
+                        String[] splitedStart = rawStart.split(",");
+                        String[] splitedEnd = rawEnd.split(",");
+                        Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
+                        Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
+                        postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
+                    }
+                }catch (Exception ignored){
+                    //Toast.makeText(getApplicationContext(), ignored.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        postRequest_edittext_to.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
+                        String rawStart = postRequest_edittext_from.getText().toString();
+                        String rawEnd = postRequest_edittext_to.getText().toString();
+                        String[] splitedStart = rawStart.split(",");
+                        String[] splitedEnd = rawEnd.split(",");
+                        Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
+                        Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
+                        postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
+                    }
+                }catch (Exception ignored){
+                    //Toast.makeText(getApplicationContext(), ignored.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
 
         button_postRequest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,109 +178,14 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 ArrayList<Request> rs = new ArrayList<>();
                 Database db = new Database();
 
-                //test add
-//                for (Integer i = 0; i<5; i++){
-//                    try{
-//                        User a = new Rider(true);
-//
-//                        Location la = Utility.latLngToLocation(new LatLng(lat[i],lng[i]));
-//                        Location lb = Utility.latLngToLocation(new LatLng(lat[4-i],lng[4-i]));
-//                        Request r = ((Rider)a).CreateRequest(la,lb,10+i,i.toString());
-//                        rs.add(r);
-////                        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
-//
-//
-//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
-//
-//                }
-
-//              test delete
-//                for(Request r: rs){
-//                    try{
-//                        db.delete(r);
-//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
-//
-//
-//                }
-                //delete record that not in database
-//                try{
-//                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
-//                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
-//                    Request newRequest = new Request(la, lb, 67, "8");
-//                    newRequest.setId("12345678");
-//                    db.delete(newRequest);
-//                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
-
-                //test modify
-//                try{
-//                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
-//                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
-//                    Request newRequest = new Request(la, lb, 67, "8");
-//                    newRequest.setId("23rr2r43");
-//                    db.modify(newRequest);
-//                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
-
-                //test register
-//                try{
-//                    HashMap<String, Object> test = new HashMap<>();
-//                    test.put("phone","12345678");
-//                    test.put("email", "test@rebunu.io");
-//                    test.put("balance",12);
-//                    test.put("name", "jack");
-//                    test.put("role",true);
-//                    test.put("password", "12345678");
-//                    String id1 = db.register(null);
-//                    String id2 = db.register(test);
-//                    Toast.makeText(getApplicationContext(),id1,Toast.LENGTH_SHORT).show();
-//                    Toast.makeText(getApplicationContext(),id2,Toast.LENGTH_SHORT).show();
-//                }catch(Exception e){
-//                    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
-//                }
-
-                //test query
-//                try{
-////                    String phone  = (String) db.profiles.document("8E9Kj6fiTCW70myD58On").get().getResult().get("phone");
-//
-//                    DocumentReference docRef = db.profiles.document("345");
-//
-//
-//                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                DocumentSnapshot document = task.getResult();
-//                                if (document.exists()) {
-//                                    Toast.makeText(getApplicationContext(),document.get("phone").toString(),Toast.LENGTH_SHORT).show();
-//                                    Log.d("RebuNu", "DocumentSnapshot data: " + document.getData());
-//                                } else {
-//                                    Toast.makeText(getApplicationContext(),"No such record",Toast.LENGTH_SHORT).show();
-//
-//                                    Log.d("RebuNu", "No such document");
-//                                }
-//                            } else {
-//                                Log.d("RebuNu", "get failed with ", task.getException());
-//                            }
-//                        }
-//                    });
-//
-////                    Toast.makeText(getApplicationContext(),phone,Toast.LENGTH_SHORT).show();
-//                }catch(Exception e){
-//                    Toast.makeText(getApplicationContext(),"fuck",Toast.LENGTH_SHORT).show();
-//                }
-
-                //test queryById
-                //try{
-                    Profile p = (Profile) db.queryById("8E9Kj6fiTCW70myD58On",1);
-                    Toast.makeText(getApplicationContext(),p.getPhone(),Toast.LENGTH_SHORT).show();
-                //}catch (Exception e){
-                //    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
-                //}
+                Profile p = (Profile) db.queryById("8E9Kj6fiTCW70myD58On",1);
+                Toast.makeText(getApplicationContext(),p.getPhone(),Toast.LENGTH_SHORT).show();
 
 
 
 
                 if (floatingButtonStatus.equals("GONE")) {
-                    layout.setVisibility(ConstraintLayout.GONE);
+                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
                     button_postRequest_floating.setVisibility(Button.VISIBLE);
                     floatingButtonStatus = "VISIBLE";
                 }
@@ -265,7 +198,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             @Override
             public void onClick(View v) {
                 if (floatingButtonStatus.equals("GONE")) {
-                    layout.setVisibility(ConstraintLayout.GONE);
+                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
                     button_postRequest_floating.setVisibility(Button.VISIBLE);
                     floatingButtonStatus = "VISIBLE";
                 }
@@ -276,7 +209,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             // not sure working yet..
             @Override
             public void onClick(View v) {
-                layout.setVisibility(ConstraintLayout.VISIBLE);
+                postRequest_layout.setVisibility(ConstraintLayout.VISIBLE);
             }
         });
     }
