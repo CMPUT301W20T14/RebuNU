@@ -9,6 +9,6 @@ public class DriverActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_driver2);
+        setContentView(R.layout.activity_driver);
     }
 }
