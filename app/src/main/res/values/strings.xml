@@ -79,6 +79,7 @@
     <string name="confirmPassword_empty">CONFIRM PASSWORD CANNOT BE EMPTY""</string>
     <string name="two_password_not_match">TWO PASSWORDS ARE NOT MATCH""</string>
     <string name="not_select_role">SELECT YOUR ROLE""</string>
+    <string name="invalid_input">INVALID INPUT""</string>
 
     <!-- Google Maps API Key -->
     <string name="google_maps_key">AIzaSyCPFD2nnvGCAY8JeAeng3RLail2nCfeWHg</string>
