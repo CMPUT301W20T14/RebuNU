@@ -1,14 +1,23 @@
 package com.example.rebunu;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.common.collect.Maps;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import org.w3c.dom.Document;
+
+import java.util.Map;
 
 /**
  * Login screen
@@ -16,16 +25,14 @@ import com.google.common.collect.Maps;
  */
 public class LoginActivity extends AppCompatActivity {
 
-    public Boolean auth(String username, String password) {
-        // authentication implementation
-        //Database db = new Database();
-        //return db.auth(username, password);
-        return true;
-    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        Database db = new Database();
+        String TAG = "RebuNu";
 
         Button button_return;
         Button button_login;
@@ -47,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
         button_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Boolean flag = true;
                 if(editText_password.getText().toString().isEmpty()) {
                     editText_password.setError(getResources().getString(R.string.password_empty));
@@ -58,19 +66,41 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 // make sure already input identification
                 if(flag) {
-                    // do something for authentication
-                    flag = auth(editText_emailOrPhone.getText().toString(),
-                            editText_password.getText().toString());
-                    if(!flag) {
-                        editText_emailOrPhone.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
-                        editText_password.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
-                    }
+                    // make sure identification is valid
+                    db.auth.document(editText_emailOrPhone.getText().toString())
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        if (document.exists()) {
+                                            String realPassword =(String) document.getData().get("password");
+                                            String profileId = (String) document.getData().get("profileId");
+                                            Boolean role = (Boolean) document.getData().get("role");
+                                            if(editText_password.getText().toString().equals(realPassword)){
+                                                Intent postRequestIntent = new Intent(LoginActivity.this, PostRequestActivity.class);
+                                                postRequestIntent.putExtra("profileId", profileId);
+                                                postRequestIntent.putExtra("role", role);
+                                                startActivity(postRequestIntent);
+                                            }else{
+                                                editText_emailOrPhone.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
+                                                editText_password.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
+                                                return;
+                                            }
+                                            Log.d(TAG, "Auth Success");
+                                        } else {
+                                            Log.d(TAG, "No such document");
+                                            return;
+                                        }
+                                    } else {
+                                        Log.d(TAG, "get failed with ", task.getException());
+                                        return;
+                                    }
+                                }
+                            });
+
                 } else return;
-                // make sure identification is valid
-                if(flag) {
-                    Intent postRequestIntent = new Intent(LoginActivity.this, PostRequestActivity.class);
-                    startActivity(postRequestIntent);
-                } else return; // actually more code needed for wrong username/password notification
             }
         });
     }

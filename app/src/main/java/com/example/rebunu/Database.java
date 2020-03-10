@@ -67,7 +67,7 @@ public class Database {
                     }
                 });
 
-        addAuth(map.get("phone").toString(), map.get("email").toString(), map.get("password").toString(), proRef.getId());
+        addAuth(map.get("phone").toString(), map.get("email").toString(), map.get("password").toString(), proRef.getId(),(Boolean)map.get("role"));
 
 
 
@@ -75,11 +75,12 @@ public class Database {
 
     }
 
-    public void addAuth(String phone, String email, String password, String profileId){
-        HashMap<String, String> au = new HashMap<>();
+    public void addAuth(String phone, String email, String password, String profileId, Boolean role){
+        HashMap<String, Object> au = new HashMap<>();
 
         au.put("password",password);
         au.put("profileId", profileId);
+        au.put("role", role);
 
         auth
                 .document(phone)
