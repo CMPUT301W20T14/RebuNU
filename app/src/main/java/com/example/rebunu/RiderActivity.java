@@ -179,20 +179,20 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 Database db = new Database();
 
                 //test add
-//                for (Integer i = 0; i<5; i++){
-//                    try{
-//                        User a = new Rider(true);
-//
-//                        Location la = Utility.latLngToLocation(new LatLng(lat[i],lng[i]));
-//                        Location lb = Utility.latLngToLocation(new LatLng(lat[4-i],lng[4-i]));
-//                        Request r = ((Rider)a).CreateRequest(la,lb,10+i,i.toString());
-//                        rs.add(r);
-////                        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
-//
-//
-//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
-//
-//                }
+                for (Integer i = 0; i<5; i++){
+                    try{
+                        User a = new Rider(true);
+
+                        Location la = Utility.latLngToLocation(new LatLng(lat[i],lng[i]));
+                        Location lb = Utility.latLngToLocation(new LatLng(lat[4-i],lng[4-i]));
+                        Request r = ((Rider)a).CreateRequest(la,lb,10+i,i.toString());
+                        rs.add(r);
+//                        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
+
+
+                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+
+                }
 
 //              test delete
 //                for(Request r: rs){

@@ -8,6 +8,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -18,6 +19,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
+
+import org.imperiumlabs.geofirestore.GeoFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +37,7 @@ public class Database {
     CollectionReference requests = db.collection("requests");
     CollectionReference orders = db.collection("orders");
     CollectionReference auth= db.collection("auth");
+    GeoFirestore geoFirestore = new GeoFirestore(requests);
 
     String TAG = "RebuNu";
 
@@ -187,10 +191,8 @@ public class Database {
                         Log.d(TAG, "request saving failed");
                     }
                 });
-
+        geoFirestore.setLocation(docRef.getId(), start);
         return docRef.getId();
-
-
     }
 
     public String addOrder(Order o){

@@ -28,8 +28,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.GeoPoint;
+
+import org.imperiumlabs.geofirestore.GeoFirestore;
+import org.imperiumlabs.geofirestore.GeoQuery;
+import org.imperiumlabs.geofirestore.listeners.GeoQueryDataEventListener;
+import org.imperiumlabs.geofirestore.listeners.GeoQueryEventListener;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Objects;
 
 public class DriverActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -42,7 +50,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private Criteria criteria;
 
     public void updateMap(ArrayList<Location> locations) {
-        gmap.clear();
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
@@ -58,10 +65,12 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
         for(Location l: locations) {
             try {
+                assert currentLocation != null;
                 Location.distanceBetween(l.getLatitude(), l.getLongitude(), currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
                 gmap.addMarker(new MarkerOptions()
                         .position(Utility.locationToLatLng(l))
-                        .title(String.valueOf(distance[0]) + "Meters"));
+                        .title("Distance: " + String.valueOf(Double.valueOf(distance[0]).intValue()) + " Meters. " +
+                                "Geolocation: (" + l.getLatitude() + ", " + l.getLongitude()+ ")"));
             } catch (Exception ignored){};
         }
     }
@@ -83,6 +92,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         button_searchNearby_floating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                gmap.clear();
                 if (!(ContextCompat.checkSelfPermission(DriverActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(DriverActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
@@ -96,8 +106,37 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 Location currentLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false)));
                 assert currentLocation != null;
                 double lat = currentLocation.getLatitude();
-                double lon = currentLocation.getLongitude();
-                LatLng cur = new LatLng(lat, lon);
+                double lng = currentLocation.getLongitude();
+
+                Database db = new Database();
+
+                GeoQuery geoQuery = db.geoFirestore.queryAtLocation(new GeoPoint(lat, lng), 5.0);
+                geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+                    @Override
+                    public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
+                        Map<String, Object> dataMap = documentSnapshot.getData();
+                        ArrayList<GeoPoint> geoPoints = (ArrayList<GeoPoint>)dataMap.get("pos");
+                        GeoPoint startPoint = geoPoints.get(0);
+                        ArrayList<Location> l = new ArrayList<>();
+                        l.add(Utility.latLngToLocation(new LatLng(startPoint.getLatitude(), startPoint.getLongitude())));
+                        updateMap(l);
+                    }
+                    @Override
+                    public void onDocumentExited(DocumentSnapshot documentSnapshot) {}
+
+                    @Override
+                    public void onDocumentMoved(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {}
+
+                    @Override
+                    public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
+                    }
+
+                    @Override
+                    public void onGeoQueryReady() {}
+
+                    @Override
+                    public void onGeoQueryError(Exception e) {}
+                });
             }
         });
 
