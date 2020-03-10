@@ -184,35 +184,43 @@ public class PostRequestActivity extends AppCompatActivity implements OnMapReady
 //                }
 
                 //test query
-                try{
-//                    String phone  = (String) db.profiles.document("8E9Kj6fiTCW70myD58On").get().getResult().get("phone");
+//                try{
+////                    String phone  = (String) db.profiles.document("8E9Kj6fiTCW70myD58On").get().getResult().get("phone");
+//
+//                    DocumentReference docRef = db.profiles.document("345");
+//
+//
+//                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                            if (task.isSuccessful()) {
+//                                DocumentSnapshot document = task.getResult();
+//                                if (document.exists()) {
+//                                    Toast.makeText(getApplicationContext(),document.get("phone").toString(),Toast.LENGTH_SHORT).show();
+//                                    Log.d("RebuNu", "DocumentSnapshot data: " + document.getData());
+//                                } else {
+//                                    Toast.makeText(getApplicationContext(),"No such record",Toast.LENGTH_SHORT).show();
+//
+//                                    Log.d("RebuNu", "No such document");
+//                                }
+//                            } else {
+//                                Log.d("RebuNu", "get failed with ", task.getException());
+//                            }
+//                        }
+//                    });
+//
+////                    Toast.makeText(getApplicationContext(),phone,Toast.LENGTH_SHORT).show();
+//                }catch(Exception e){
+//                    Toast.makeText(getApplicationContext(),"fuck",Toast.LENGTH_SHORT).show();
+//                }
 
-                    DocumentReference docRef = db.profiles.document("345");
-
-
-                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()) {
-                                    Toast.makeText(getApplicationContext(),document.get("phone").toString(),Toast.LENGTH_SHORT).show();
-                                    Log.d("RebuNu", "DocumentSnapshot data: " + document.getData());
-                                } else {
-                                    Toast.makeText(getApplicationContext(),"No such record",Toast.LENGTH_SHORT).show();
-
-                                    Log.d("RebuNu", "No such document");
-                                }
-                            } else {
-                                Log.d("RebuNu", "get failed with ", task.getException());
-                            }
-                        }
-                    });
-
-//                    Toast.makeText(getApplicationContext(),phone,Toast.LENGTH_SHORT).show();
-                }catch(Exception e){
-                    Toast.makeText(getApplicationContext(),"fuck",Toast.LENGTH_SHORT).show();
-                }
+                //test queryById
+                //try{
+                    Profile p = (Profile) db.queryById("8E9Kj6fiTCW70myD58On",1);
+                    Toast.makeText(getApplicationContext(),p.getId(),Toast.LENGTH_SHORT).show();
+                //}catch (Exception e){
+                //    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
+                //}
 
 
 

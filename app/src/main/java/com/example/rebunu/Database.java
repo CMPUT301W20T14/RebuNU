@@ -537,17 +537,50 @@ public class Database {
 
     }
 
-    public Profile queryProfileById(String id){
+    public Profile queryProfileById(String id) {
+        queryProfileByIdHelper(id);
+        if(Utility.dataMap != null) {
+            String phone = (String) Utility.dataMap.get("phone");
+            String email = (String) Utility.dataMap.get("email");
+            Integer balance = (Integer) Utility.dataMap.get("balance");
+            ArrayList<Integer> rawRating = (ArrayList<Integer>) Utility.dataMap.get("rating");
+            String name = (String) Utility.dataMap.get("name");
+            Boolean role = (Boolean) Utility.dataMap.get("role");
+            Profile profile = null;
+            String dataId = Utility.dataId;
+            Utility.dataId = null;
+            Utility.dataMap = null;
+
+            if(role) {
+                try {
+                    profile = new Profile(phone, email, name, balance, role, new Rating(rawRating.get(0), rawRating.get(1)));
+                    profile.setId(dataId);
+                    return profile;
+                } catch (Exception ignored) {}
+            } else {
+                try {
+                    profile = new Profile(phone, email, name, balance, role);
+                    profile.setId(dataId);
+                    return profile;
+                } catch (Exception ignored) {}
+            }
+        }
+
+        return null;
+    }
+
+    public void queryProfileByIdHelper(String id) {
         DocumentReference docRef = profiles.document(id);
-        final ArrayList<Map<String, Object>> queriedData = new ArrayList<>();
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        queriedData.add(document.getData());
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        Map<String, Object> dataMap = document.getData();
+                        Log.d(TAG, "DocumentSnapshot data: " + dataMap);
+                        Utility.dataMap = dataMap;
+                        Utility.dataId = document.getId();
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -556,24 +589,9 @@ public class Database {
                 }
             }
         });
-        String phone = (String)queriedData.get(0).get("phone");
-        String email = (String)queriedData.get(0).get("email");
-        Integer balance = (Integer)queriedData.get(0).get("balance");
-        String name = (String)queriedData.get(0).get("name");
-        Boolean role = (Boolean)queriedData.get(0).get("role");
-        if(role) {
-            ArrayList<Integer> rating = (ArrayList<Integer>) queriedData.get(0).get("rating");
-            try {
-                Rating ratingObj = new Rating(rating.get(0), rating.get(1));
-                return new Profile(phone, email, name, balance, role, ratingObj);
-            } catch (Exception ignored){}
-        } else {
-            try {
-                return new Profile(phone, email, name, balance, role);
-            } catch (Exception ignored){}
-        }
-        return null;
     }
+
+
 
 
     public Request queryRequestById(String id){

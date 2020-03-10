@@ -9,8 +9,12 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Utility {
+    public static Map<String, Object> dataMap = null;
+    public static String dataId = null;
+
     public static Integer getEstimatePrice(Request request, @Nullable Float priceFactor) {
         float[] dis = new float[1];
         Integer price = 0;
@@ -52,4 +56,5 @@ public class Utility {
         }
         return nearByCars;
     }
+
 }
