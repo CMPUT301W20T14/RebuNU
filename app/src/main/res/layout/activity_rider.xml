@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PostRequestActivity">
+    tools:context=".RiderActivity">
 
     <Button
         android:id="@+id/postRequest_button_postRequest_floating"

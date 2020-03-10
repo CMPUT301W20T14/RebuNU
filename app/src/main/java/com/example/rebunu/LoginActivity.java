@@ -79,10 +79,17 @@ public class LoginActivity extends AppCompatActivity {
                                             String profileId = (String) document.getData().get("profileId");
                                             Boolean role = (Boolean) document.getData().get("role");
                                             if(editText_password.getText().toString().equals(realPassword)){
-                                                Intent postRequestIntent = new Intent(LoginActivity.this, PostRequestActivity.class);
-                                                postRequestIntent.putExtra("profileId", profileId);
-                                                postRequestIntent.putExtra("role", role);
-                                                startActivity(postRequestIntent);
+                                                if(role) {
+                                                    Intent postRequestIntent = new Intent(LoginActivity.this, DriverActivity.class);
+                                                    postRequestIntent.putExtra("profileId", profileId);
+                                                    postRequestIntent.putExtra("role", role);
+                                                    startActivity(postRequestIntent);
+                                                } else {
+                                                    Intent postRequestIntent = new Intent(LoginActivity.this, RiderActivity.class);
+                                                    postRequestIntent.putExtra("profileId", profileId);
+                                                    postRequestIntent.putExtra("role", role);
+                                                    startActivity(postRequestIntent);
+                                                }
                                             }else{
                                                 editText_emailOrPhone.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
                                                 editText_password.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
