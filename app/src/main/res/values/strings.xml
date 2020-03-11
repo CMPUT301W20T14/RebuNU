@@ -58,6 +58,7 @@
     <string name="to">TO</string>
     <string name="estimated_rate">ESTIMATED RATE</string>
     <string name="estimated_rate_numeric">20.20</string>
+    <string name="searching">SEARCHING</string>
 
     <!-- Rider: Rating -->
     <string name="awesome">AWESOME!</string>
