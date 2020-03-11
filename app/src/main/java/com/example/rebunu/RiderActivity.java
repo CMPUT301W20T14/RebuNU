@@ -91,10 +91,13 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
         ConstraintLayout postRequest_layout;
         LinearLayout postRequest_estimated_rate_layout;
+        ConstraintLayout wait_responding_layout;
+        ConstraintLayout rider_layout_request_confirmed;
         Button button_postRequest;
         Button button_postRequest_floating;
         Button button_hide;
         Button button_tips;
+        Button rider_button_tips_request_confirmed;
         Button button_cancel;
         Button button_accept;
         Button button_decline;
@@ -102,23 +105,34 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         Button button_cancel_request;
 
         TextView postRequest_textview_estimatedRateNumeric;
+        TextView rider_textview_estimatedRateNumeric_request_confirmed;
         EditText postRequest_edittext_from;
         EditText postRequest_edittext_to;
+        EditText rider_edittext_from_request_confirmed;
+        EditText rider_edittext_to_request_confirmed;
 
 
         postRequest_layout = findViewById(R.id.postRequest_layout);
         postRequest_estimated_rate_layout = findViewById(R.id.postRequest_estimated_rate_layout);
+        wait_responding_layout = findViewById(R.id.wait_responding_layout);
+        rider_layout_request_confirmed = findViewById(R.id.rider_layout_request_confirmed);
         mapView = findViewById(R.id.postRequest_mapView);
         button_postRequest = findViewById(R.id.postRequest_button_postRequest);
         button_postRequest_floating = findViewById(R.id.postRequest_button_postRequest_floating);
         button_hide = findViewById(R.id.postRequest_button_hide);
         button_tips = findViewById(R.id.postRequest_button_tips);
-        button_accept = findViewById(R.id.rider_button_accept_request_accepted);
+        rider_button_tips_request_confirmed = findViewById(R.id.rider_button_tips_request_confirmed);
+//        button_accept = findViewById(R.id.rider_button_accept_request_accepted);
         button_cancel = findViewById(R.id.rider_button_decline_request_accepted);
 
+
         postRequest_textview_estimatedRateNumeric = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
+        rider_textview_estimatedRateNumeric_request_confirmed = findViewById(R.id.rider_textview_estimatedRateNumeric_request_confirmed);
         postRequest_edittext_from = findViewById(R.id.postRequest_edittext_from);
         postRequest_edittext_to = findViewById(R.id.postRequest_edittext_to);
+        rider_edittext_from_request_confirmed = findViewById(R.id.rider_edittext_from_request_confirmed);
+        rider_edittext_to_request_confirmed = findViewById(R.id.rider_edittext_to_request_confirmed);
+
 
         // Reference: https://developer.android.com/training/permissions/requesting.html Posted on 2019-12-27.
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -133,6 +147,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
         postRequest_layout.setVisibility(ConstraintLayout.GONE);
         postRequest_estimated_rate_layout.setVisibility(LinearLayout.GONE);
+        wait_responding_layout.setVisibility(ConstraintLayout.GONE);
+        rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
         button_postRequest_floating.setVisibility(Button.VISIBLE);
         mapView.onCreate(null);
         mapView.getMapAsync(this);
@@ -143,6 +159,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 if (floatingButtonStatus.equals("VISIBLE")) {
                     postRequest_layout.setVisibility(ConstraintLayout.VISIBLE);
                     button_postRequest_floating.setVisibility(Button.GONE);
+                    button_postRequest.setVisibility(Button.VISIBLE);
                     floatingButtonStatus = "GONE";
                 }
             }
@@ -207,6 +224,16 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 }
             }
         });
+        rider_button_tips_request_confirmed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                    rider_textview_estimatedRateNumeric_request_confirmed.setText(new Integer(Integer.parseInt(rider_textview_estimatedRateNumeric_request_confirmed.getText().toString()) + 1).toString());
+                }catch (Exception e){
+                    rider_textview_estimatedRateNumeric_request_confirmed.setText("1");
+                }
+            }
+        });
 
 
 
@@ -228,13 +255,14 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         String riderId = getIntent().getExtras().get("profileId").toString();
                         Request myRequest = ((Rider)myRider).CreateRequest(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
 
-                        Toast.makeText(getApplicationContext(),myRequest.getId(),Toast.LENGTH_SHORT).show();
-//                        button_postRequest.setVisibility(View.GONE);
+//                        Toast.makeText(getApplicationContext(),myRequest.getId(),Toast.LENGTH_SHORT).show();
+
+
 
                         Database db = new Database();
                         final DocumentReference reqRef = db.requests.document(myRequest.getId());
 
-                        ListenerRegistration re1 = reqRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        reqRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                             @Override
                             public void onEvent(@Nullable DocumentSnapshot snapshot,
                                                 @Nullable FirebaseFirestoreException e) {
@@ -244,21 +272,28 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                 }
 
                                 if (snapshot != null && snapshot.exists()) {
-                                    if (flag){
-                                        Toast.makeText(getApplicationContext(),"Changed!!", Toast.LENGTH_SHORT).show();
-                                        flag = false;
-
-
-                                    }
-                                    flag = true;
+//                                    if (flag){
+//                                        Toast.makeText(getApplicationContext(),"Changed!!", Toast.LENGTH_SHORT).show();
+//                                        flag = false;
+//
+//
+//                                    }
+//                                    flag = true;
 //                                    Log.d("", "Current data: " + snapshot.getData());
                                 } else {
-                                    Toast.makeText(getApplicationContext(),"Accepted!!", Toast.LENGTH_SHORT).show();
-                                    Log.d("", "Current data: null");
+//                                    Toast.makeText(getApplicationContext(),"Accepted!!", Toast.LENGTH_SHORT).show();
+
+                                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
+                                    rider_layout_request_confirmed.setVisibility(ConstraintLayout.VISIBLE);
+
+                                    rider_edittext_from_request_confirmed.setText(postRequest_edittext_from.getText().toString());
+                                    rider_edittext_to_request_confirmed.setText(postRequest_edittext_to.getText().toString());
+                                    rider_textview_estimatedRateNumeric_request_confirmed.setText(postRequest_textview_estimatedRateNumeric.getText().toString());
+
+
                                 }
                             }
                         });
-//                        re1.remove();
 
 
 
@@ -379,11 +414,13 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 //}
 
 
-                if (floatingButtonStatus.equals("GONE")) {
-                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
-                    button_postRequest_floating.setVisibility(Button.VISIBLE);
-                    floatingButtonStatus = "VISIBLE";
-                }
+//                if (floatingButtonStatus.equals("GONE")) {
+//                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
+//                    button_postRequest_floating.setVisibility(Button.VISIBLE);
+//                    floatingButtonStatus = "VISIBLE";
+//                }
+                button_postRequest.setVisibility(Button.GONE);
+                wait_responding_layout.setVisibility(ConstraintLayout.VISIBLE);
                 ArrayList<Location> location = Utility.mockSurrounding();
                 updateMap(location);
             }
