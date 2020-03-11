@@ -53,12 +53,19 @@
     <string name="driver_phone">780–2020-C301</string>
     <string name="driver_email">DRIVER@REBUNU.COM</string>
 
+
+
     <!-- Rider: Post Request -->
     <string name="from">FROM WHERE</string>
     <string name="to">TO</string>
     <string name="estimated_rate">ESTIMATED RATE</string>
     <string name="estimated_rate_numeric">20.20</string>
     <string name="searching">SEARCHING</string>
+    <string name="cancel">CANCEL</string>
+    <string name="contact">CONTACT</string>
+    <string name="START">8888 Rebunu Avenue, Edmonton</string>
+    <string name="END">University of Alberta</string>
+    <string name="cancel_request">CANCEL REQUEST</string>
 
     <!-- Rider: Rating -->
     <string name="awesome">AWESOME!</string>
