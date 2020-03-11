@@ -1,5 +1,6 @@
 package com.example.rebunu;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -14,6 +15,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,12 +29,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 /**
- * @author Zijian Xi
+ * @author Zijian Xi, Zihao HUang
  */
 public class RiderActivity extends AppCompatActivity implements OnMapReadyCallback{
     // Reference: https://www.zoftino.com/android-mapview-tutorial posted on November 14, 2017
@@ -42,6 +48,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
     private String floatingButtonStatus = "VISIBLE";
     private LocationManager locationManager;
     private Criteria criteria;
+    Boolean flag = false;
 
 
     public void updateMap(ArrayList<Location> locations) {
@@ -202,7 +209,36 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         Request myRequest = ((Rider)myRider).CreateRequest(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
 
                         Toast.makeText(getApplicationContext(),myRequest.getId(),Toast.LENGTH_SHORT).show();
-                        button_postRequest.setVisibility(View.GONE);
+//                        button_postRequest.setVisibility(View.GONE);
+
+                        Database db = new Database();
+                        final DocumentReference reqRef = db.requests.document(myRequest.getId());
+
+                        reqRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                                @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w("", "Listen failed.", e);
+                                    return;
+                                }
+
+                                if (snapshot != null && snapshot.exists()) {
+                                    if (flag){
+                                        Toast.makeText(getApplicationContext(),"Changed!!", Toast.LENGTH_SHORT).show();
+                                        flag = false;
+
+                                    }
+                                    flag = true;
+//                                    Toast.makeText(getApplicationContext(),"Changed!!", Toast.LENGTH_SHORT).show();
+                                    Log.d("", "Current data: " + snapshot.getData());
+                                } else {
+                                    Toast.makeText(getApplicationContext(),"Accepted!!", Toast.LENGTH_SHORT).show();
+                                    Log.d("", "Current data: null");
+                                }
+                            }
+                        });
+
 
                     }else{
                         postRequest_edittext_from.setError(getResources().getString(R.string.invalid_input));
@@ -218,20 +254,20 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 //                Database db = new Database();
 
                 //test add
-                for (Integer i = 0; i<5; i++){
-                    try{
-                        User a = new Rider(true);
-
-                        Location la = Utility.latLngToLocation(new LatLng(lat[i],lng[i]));
-                        Location lb = Utility.latLngToLocation(new LatLng(lat[4-i],lng[4-i]));
-                        Request r = ((Rider)a).CreateRequest(la,lb,10+i,i.toString());
-                        rs.add(r);
-//                        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
-
-
-                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
-
-                }
+//                for (Integer i = 0; i<5; i++){
+//                    try{
+//                        User a = new Rider(true);
+//
+//                        Location la = Utility.latLngToLocation(new LatLng(lat[i],lng[i]));
+//                        Location lb = Utility.latLngToLocation(new LatLng(lat[4-i],lng[4-i]));
+//                        Request r = ((Rider)a).CreateRequest(la,lb,10+i,i.toString());
+//                        rs.add(r);
+////                        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
+//
+//
+//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
+//
+//                }
 
 //              test delete
 //                for(Request r: rs){
