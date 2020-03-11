@@ -491,39 +491,44 @@ public class Database {
                             Log.w(TAG, "Error updating document", e);
                         }
                     });
+            geoFirestore.setLocation(r.getId(), start);
 
-//            db.runTransaction(new Transaction.Function<Void>() {
-//                @Override
-//                public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-//                    DocumentSnapshot snapshot = transaction.get(reqDocRef);
-//                    transaction.update(reqDocRef, "price", r.getPrice());
-////                    transaction.update(reqDocRef, "riderId", r.getRiderId());
-//
-////                    ArrayList<GeoPoint> pos = new ArrayList<>();
-////                    GeoPoint start = new GeoPoint(r.getStart().getLatitude(), r.getStart().getLongitude());
-////                    GeoPoint end= new GeoPoint(r.getEnd().getLatitude(), r.getEnd().getLongitude());
-////
-////                    pos.add(start);
-////                    pos.add(end);
-////
-////                    transaction.update(reqDocRef, "pos", pos);
-//
-//
-//                    // Success
-//                    return null;
-//                }
-//            }).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                @Override
-//                public void onSuccess(Void aVoid) {
-//                    Log.d(TAG, "Transaction success!");
-//                }
-//            })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Log.w(TAG, "Transaction failure.", e);
-//                        }
-//                    });
+
+
+        }catch (Exception e){
+            throw new IllegalArgumentException("No such record!");
+        }
+
+
+
+    }
+    public void modifyOrder(Order o){
+        try{
+            final DocumentReference ordDocRef = orders.document(o.getId());
+            ArrayList<GeoPoint> pos = new ArrayList<>();
+            GeoPoint start = new GeoPoint(o.getStart().getLatitude(), o.getStart().getLongitude());
+            GeoPoint end= new GeoPoint(o.getEnd().getLatitude(), o.getEnd().getLongitude());
+
+            pos.add(start);
+            pos.add(end);
+
+
+            ordDocRef
+                    .update("price", o.getPrice(),"riderId",o.getRiderId(),"pos",pos, "driverId",o.getDriverId(),"rating", o.getRating(),"status",o.getStatus())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error updating document", e);
+                        }
+                    });
+
+
 
         }catch (Exception e){
             throw new IllegalArgumentException("No such record!");
@@ -534,7 +539,7 @@ public class Database {
     }
     public void modify(Record record){
         if(record.getType() == 3){
-            throw new IllegalArgumentException("Cannot modify order");
+            modifyOrder((Order)record);
         }
         if(record.getType() == 1){
             modifyProfile((Profile)record);
@@ -545,56 +550,56 @@ public class Database {
 
     }
 
-    public Profile queryProfileById(String id) {
-        DocumentReference docRef = profiles.document(id);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Map<String, Object> dataMap = document.getData();
-                        Log.d(TAG, "DocumentSnapshot data: " + dataMap);
-                        Utility.dataMap = dataMap;
-                        Utility.dataId = document.getId();
-                    } else {
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
-
-        while(!docRef.get().isComplete()){}
-        if(Utility.dataMap != null) {
-            String phone = (String) Utility.dataMap.get("phone");
-            String email = (String) Utility.dataMap.get("email");
-            Integer balance = (Integer) Utility.dataMap.get("balance");
-            ArrayList<Integer> rawRating = (ArrayList<Integer>) Utility.dataMap.get("rating");
-            String name = (String) Utility.dataMap.get("name");
-            Boolean role = (Boolean) Utility.dataMap.get("role");
-            Profile profile = null;
-            String dataId = Utility.dataId;
-            Utility.dataId = null;
-            Utility.dataMap = null;
-
-            if(role) {
-                try {
-                    profile = new Profile(phone, email, name, balance, role, new Rating(rawRating.get(0), rawRating.get(1)));
-                    profile.setId(dataId);
-                    return profile;
-                } catch (Exception ignored) {}
-            } else {
-                try {
-                    profile = new Profile(phone, email, name, balance, role);
-                    profile.setId(dataId);
-                    return profile;
-                } catch (Exception ignored) {}
-            }
-        }
-        return null;
-    }
+//    public Profile queryProfileById(String id) {
+//        DocumentReference docRef = profiles.document(id);
+//        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    DocumentSnapshot document = task.getResult();
+//                    if (document.exists()) {
+//                        Map<String, Object> dataMap = document.getData();
+//                        Log.d(TAG, "DocumentSnapshot data: " + dataMap);
+//                        Utility.dataMap = dataMap;
+//                        Utility.dataId = document.getId();
+//                    } else {
+//                        Log.d(TAG, "No such document");
+//                    }
+//                } else {
+//                    Log.d(TAG, "get failed with ", task.getException());
+//                }
+//            }
+//        });
+//
+//        while(!docRef.get().isComplete()){}
+//        if(Utility.dataMap != null) {
+//            String phone = (String) Utility.dataMap.get("phone");
+//            String email = (String) Utility.dataMap.get("email");
+//            Integer balance = (Integer) Utility.dataMap.get("balance");
+//            ArrayList<Integer> rawRating = (ArrayList<Integer>) Utility.dataMap.get("rating");
+//            String name = (String) Utility.dataMap.get("name");
+//            Boolean role = (Boolean) Utility.dataMap.get("role");
+//            Profile profile = null;
+//            String dataId = Utility.dataId;
+//            Utility.dataId = null;
+//            Utility.dataMap = null;
+//
+//            if(role) {
+//                try {
+//                    profile = new Profile(phone, email, name, balance, role, new Rating(rawRating.get(0), rawRating.get(1)));
+//                    profile.setId(dataId);
+//                    return profile;
+//                } catch (Exception ignored) {}
+//            } else {
+//                try {
+//                    profile = new Profile(phone, email, name, balance, role);
+//                    profile.setId(dataId);
+//                    return profile;
+//                } catch (Exception ignored) {}
+//            }
+//        }
+//        return null;
+//    }
 
 //    public Profile queryProfileById(String id){
 //        Profile profile = new Profile();
@@ -647,28 +652,28 @@ public class Database {
 
 
 
-    public Request queryRequestById(String id){
-        return null;
-    }
-    public Order queryOrderById(String id){
-        return null;
-    }
-    public Record queryById(String id, Integer type){
-        if(id == null || type == null){
-            throw new IllegalArgumentException();
-        }
-        switch(type){
-            case 1:
-                return queryProfileById(id);
-
-            case 2:
-                return queryRequestById(id);
-
-            case 3:
-                return queryOrderById(id);
-        }
-        return null;
-    }
+//    public Request queryRequestById(String id){
+//        return null;
+//    }
+//    public Order queryOrderById(String id){
+//        return null;
+//    }
+//    public Record queryById(String id, Integer type){
+//        if(id == null || type == null){
+//            throw new IllegalArgumentException();
+//        }
+//        switch(type){
+//            case 1:
+//                return queryProfileById(id);
+//
+//            case 2:
+//                return queryRequestById(id);
+//
+//            case 3:
+//                return queryOrderById(id);
+//        }
+//        return null;
+//    }
 
 
 //    public String getRequestIdByRiderId(String riderId){
