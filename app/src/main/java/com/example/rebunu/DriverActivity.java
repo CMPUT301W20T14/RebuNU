@@ -26,7 +26,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
@@ -37,6 +40,7 @@ import org.imperiumlabs.geofirestore.listeners.GeoQueryDataEventListener;
 import org.imperiumlabs.geofirestore.listeners.GeoQueryEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,7 +53,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private LocationManager locationManager;
     private Criteria criteria;
 
-    public void updateMap(ArrayList<Location> locations) {
+    public void updateMap(ArrayList<Map<String, Object>> locations) {
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
@@ -63,15 +67,27 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         Location currentLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false)));
         float[] distance = new float[1];
 
-        for(Location l: locations) {
+        for(Map<String, Object> l: locations) {
             try {
                 assert currentLocation != null;
-                Location.distanceBetween(l.getLatitude(), l.getLongitude(), currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
-                gmap.addMarker(new MarkerOptions()
-                        .position(Utility.locationToLatLng(l))
+                ArrayList<GeoPoint> pos = (ArrayList<GeoPoint>)l.get("pos");
+                Integer price = ((Long) l.get("price")).intValue();
+                String riderId = (String) l.get("riderId");
+                Map<String, Object> tag = new HashMap<>();
+                tag.put("price", price);
+                tag.put("pos", pos);
+                tag.put("riderId", riderId);
+                assert pos != null;
+                Location.distanceBetween(pos.get(0).getLatitude(), pos.get(0).getLongitude(), currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
+                Marker marker = gmap.addMarker(new MarkerOptions()
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.available_request_icon_small))
+                        .position(new LatLng(pos.get(0).getLatitude(), pos.get(0).getLongitude()))
                         .title("Distance: " + String.valueOf(Double.valueOf(distance[0]).intValue()) + " Meters. " +
-                                "Geolocation: (" + l.getLatitude() + ", " + l.getLongitude()+ ")"));
-            } catch (Exception ignored){};
+                                "Geolocation: (" + pos.get(0).getLatitude() + ", " + pos.get(0).getLongitude()+ ")"));
+                marker.setTag(tag);
+            } catch (Exception ignored){
+               String error =  ignored.toString();
+            };
         }
     }
 
@@ -107,6 +123,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 assert currentLocation != null;
                 double lat = currentLocation.getLatitude();
                 double lng = currentLocation.getLongitude();
+                gmap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lng)));
 
                 Database db = new Database();
 
@@ -115,11 +132,9 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     @Override
                     public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
                         Map<String, Object> dataMap = documentSnapshot.getData();
-                        ArrayList<GeoPoint> geoPoints = (ArrayList<GeoPoint>)dataMap.get("pos");
-                        GeoPoint startPoint = geoPoints.get(0);
-                        ArrayList<Location> l = new ArrayList<>();
-                        l.add(Utility.latLngToLocation(new LatLng(startPoint.getLatitude(), startPoint.getLongitude())));
-                        updateMap(l);
+                        ArrayList<Map<String, Object>> dataMapList = new ArrayList<>();
+                        dataMapList.add(dataMap);
+                        updateMap(dataMapList);
                     }
                     @Override
                     public void onDocumentExited(DocumentSnapshot documentSnapshot) {}
@@ -128,9 +143,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     public void onDocumentMoved(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {}
 
                     @Override
-                    public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
-                    }
-
+                    public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {}
                     @Override
                     public void onGeoQueryReady() {}
 
@@ -217,8 +230,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         Location currentLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false)));
         assert currentLocation != null;
         double lat = currentLocation.getLatitude();
-        double lon = currentLocation.getLongitude();
-        LatLng cur = new LatLng(lat, lon);
+        double lng = currentLocation.getLongitude();
+        LatLng cur = new LatLng(lat, lng);
         gmap.moveCamera(CameraUpdateFactory.newLatLng(cur));
     }
 }
