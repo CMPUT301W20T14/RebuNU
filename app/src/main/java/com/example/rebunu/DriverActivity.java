@@ -44,6 +44,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Driver screen
+ * @author Zijian Xi, Zihao Huang
+ */
+
 public class DriverActivity extends AppCompatActivity implements OnMapReadyCallback {
     // Reference: https://www.zoftino.com/android-mapview-tutorial posted on November 14, 2017
     private MapView mapView;

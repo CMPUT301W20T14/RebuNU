@@ -1,5 +1,6 @@
 package com.example.rebunu;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,15 +31,19 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 /**
+ * Rider screen
  * @author Zijian Xi, Zihao HUang
  */
 public class RiderActivity extends AppCompatActivity implements OnMapReadyCallback{
@@ -84,21 +90,32 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         Toast.makeText(getApplicationContext(), (String) getIntent().getExtras().get("profileId") + getIntent().getExtras().get("role").toString(), Toast.LENGTH_SHORT).show();
 
         ConstraintLayout postRequest_layout;
+        LinearLayout postRequest_estimated_rate_layout;
         Button button_postRequest;
         Button button_postRequest_floating;
         Button button_hide;
         Button button_tips;
+        Button button_cancel;
+        Button button_accept;
+        Button button_decline;
+        Button button_contact;
+        Button button_cancel_request;
+
         TextView postRequest_textview_estimatedRateNumeric;
         EditText postRequest_edittext_from;
         EditText postRequest_edittext_to;
 
 
         postRequest_layout = findViewById(R.id.postRequest_layout);
+        postRequest_estimated_rate_layout = findViewById(R.id.postRequest_estimated_rate_layout);
         mapView = findViewById(R.id.postRequest_mapView);
         button_postRequest = findViewById(R.id.postRequest_button_postRequest);
         button_postRequest_floating = findViewById(R.id.postRequest_button_postRequest_floating);
         button_hide = findViewById(R.id.postRequest_button_hide);
         button_tips = findViewById(R.id.postRequest_button_tips);
+        button_accept = findViewById(R.id.rider_button_accept_request_accepted);
+        button_cancel = findViewById(R.id.rider_button_decline_request_accepted);
+
         postRequest_textview_estimatedRateNumeric = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
         postRequest_edittext_from = findViewById(R.id.postRequest_edittext_from);
         postRequest_edittext_to = findViewById(R.id.postRequest_edittext_to);
@@ -115,6 +132,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         }
 
         postRequest_layout.setVisibility(ConstraintLayout.GONE);
+        postRequest_estimated_rate_layout.setVisibility(LinearLayout.GONE);
         button_postRequest_floating.setVisibility(Button.VISIBLE);
         mapView.onCreate(null);
         mapView.getMapAsync(this);
@@ -169,6 +187,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         String[] splitedEnd = rawEnd.split(",");
                         Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
                         Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
+
+                        postRequest_estimated_rate_layout.setVisibility(LinearLayout.VISIBLE);
                         postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
                     }
                 }catch (Exception ignored){
@@ -214,7 +234,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         Database db = new Database();
                         final DocumentReference reqRef = db.requests.document(myRequest.getId());
 
-                        reqRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        ListenerRegistration re1 = reqRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                             @Override
                             public void onEvent(@Nullable DocumentSnapshot snapshot,
                                                 @Nullable FirebaseFirestoreException e) {
@@ -228,16 +248,19 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                         Toast.makeText(getApplicationContext(),"Changed!!", Toast.LENGTH_SHORT).show();
                                         flag = false;
 
+
                                     }
                                     flag = true;
-//                                    Toast.makeText(getApplicationContext(),"Changed!!", Toast.LENGTH_SHORT).show();
-                                    Log.d("", "Current data: " + snapshot.getData());
+//                                    Log.d("", "Current data: " + snapshot.getData());
                                 } else {
                                     Toast.makeText(getApplicationContext(),"Accepted!!", Toast.LENGTH_SHORT).show();
                                     Log.d("", "Current data: null");
                                 }
                             }
                         });
+//                        re1.remove();
+
+
 
 
                     }else{
@@ -245,7 +268,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         postRequest_edittext_to.setError(getResources().getString(R.string.invalid_input));
                     }
                 }catch (Exception ignored){
-                    //Toast.makeText(getApplicationContext(), ignored.toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), ignored.toString(), Toast.LENGTH_SHORT).show();
                 }
 
 //                double[] lat = {53.525564, 53.525296, 53.525695, 53.526441, 53.525612};

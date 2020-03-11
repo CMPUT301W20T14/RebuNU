@@ -26,6 +26,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Database
+ * @author Zihao Huang
+ */
+
 public class Database {
 //    Boolean exist;
     Record myRecord = null;
