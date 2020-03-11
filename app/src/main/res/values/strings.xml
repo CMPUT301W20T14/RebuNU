@@ -80,6 +80,9 @@
     <string name="two_password_not_match">TWO PASSWORDS ARE NOT MATCH""</string>
     <string name="not_select_role">SELECT YOUR ROLE""</string>
     <string name="invalid_input">INVALID INPUT""</string>
+    <string name="invalid_email_address">INVALID EMAIL ADDRESS""</string>
+    <string name="email_address_exists">EMAIL ADDRESS ALREADY EXISTS""</string>
+    <string name="phone_exists">PHONE ALREADY EXISTS""</string>
 
     <!-- Google Maps API Key -->
     <string name="google_maps_key">AIzaSyCPFD2nnvGCAY8JeAeng3RLail2nCfeWHg</string>

@@ -48,6 +48,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
     private String floatingButtonStatus = "VISIBLE";
     private LocationManager locationManager;
     private Criteria criteria;
+    Boolean flag = false;
 
 
     public void updateMap(ArrayList<Location> locations) {
@@ -223,6 +224,13 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                 }
 
                                 if (snapshot != null && snapshot.exists()) {
+                                    if (flag){
+                                        Toast.makeText(getApplicationContext(),"Changed!!", Toast.LENGTH_SHORT).show();
+                                        flag = false;
+
+                                    }
+                                    flag = true;
+//                                    Toast.makeText(getApplicationContext(),"Changed!!", Toast.LENGTH_SHORT).show();
                                     Log.d("", "Current data: " + snapshot.getData());
                                 } else {
                                     Toast.makeText(getApplicationContext(),"Accepted!!", Toast.LENGTH_SHORT).show();
@@ -230,6 +238,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                 }
                             }
                         });
+
 
                     }else{
                         postRequest_edittext_from.setError(getResources().getString(R.string.invalid_input));
