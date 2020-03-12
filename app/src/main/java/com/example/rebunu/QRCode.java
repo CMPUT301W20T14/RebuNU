@@ -28,11 +28,11 @@ public class QRCode {
 
 
         try {
-            BitMatrix bitMatrix = qrCodeWriter.encode(this.content, BarcodeFormat.QR_CODE, 200, 200);
-            Bitmap bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565);
+            BitMatrix bitMatrix = qrCodeWriter.encode(this.content, BarcodeFormat.QR_CODE, 700, 700);
+            Bitmap bitmap = Bitmap.createBitmap(700, 700, Bitmap.Config.RGB_565);
 
-            for (int x = 0; x < 200; x++){
-                for (int y = 0; y < 200; y++){
+            for (int x = 0; x < 700; x++){
+                for (int y = 0; y < 700; y++){
                     bitmap.setPixel(x,y,bitMatrix.get(x,y)? Color.BLACK : Color.WHITE);
                 }
             }
