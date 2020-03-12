@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -51,10 +52,13 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
     private MapView mapView;
     private GoogleMap gmap;
     private static final int TAG_CODE_PERMISSION_LOCATION = 1;
-    private String floatingButtonStatus = "VISIBLE";
+//    private String floatingButtonStatus = "VISIBLE";
+    Boolean cancell_clicked = false;
     private LocationManager locationManager;
     private Criteria criteria;
-    Boolean flag = false;
+    Integer flag = 0;
+    Request myRequest = null;
+
 
 
     public void updateMap(ArrayList<Location> locations) {
@@ -87,35 +91,42 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rider);
 
+
         Toast.makeText(getApplicationContext(), (String) getIntent().getExtras().get("profileId") + getIntent().getExtras().get("role").toString(), Toast.LENGTH_SHORT).show();
 
         ConstraintLayout postRequest_layout;
         LinearLayout postRequest_estimated_rate_layout;
         ConstraintLayout wait_responding_layout;
         ConstraintLayout rider_layout_request_confirmed;
+        ConstraintLayout rider_layout_request_accepted = findViewById(R.id.rider_layout_request_accepted);
         Button button_postRequest;
         Button button_postRequest_floating;
         Button button_hide;
         Button button_tips;
         Button rider_button_tips_request_confirmed;
-        Button button_cancel;
-        Button button_accept;
-        Button button_decline;
-        Button button_contact;
-        Button button_cancel_request;
+        Button rider_button_cancel_post_request;
+        Button rider_button_hide_request_confirmed = findViewById(R.id.rider_button_hide_request_confirmed);
+        Button rider_button_accept_request_confirmed = findViewById(R.id.rider_button_accept_request_confirmed);
+        Button rider_button_decline_request_confirmed = findViewById(R.id.rider_button_decline_request_confirmed);
+        Button rider_button_hide_request_accepted = findViewById(R.id.rider_button_hide_request_accepted);
+
 
         TextView postRequest_textview_estimatedRateNumeric;
         TextView rider_textview_estimatedRateNumeric_request_confirmed;
+
+
         EditText postRequest_edittext_from;
         EditText postRequest_edittext_to;
         EditText rider_edittext_from_request_confirmed;
         EditText rider_edittext_to_request_confirmed;
 
 
+
         postRequest_layout = findViewById(R.id.postRequest_layout);
         postRequest_estimated_rate_layout = findViewById(R.id.postRequest_estimated_rate_layout);
         wait_responding_layout = findViewById(R.id.wait_responding_layout);
         rider_layout_request_confirmed = findViewById(R.id.rider_layout_request_confirmed);
+
         mapView = findViewById(R.id.postRequest_mapView);
         button_postRequest = findViewById(R.id.postRequest_button_postRequest);
         button_postRequest_floating = findViewById(R.id.postRequest_button_postRequest_floating);
@@ -123,11 +134,12 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         button_tips = findViewById(R.id.postRequest_button_tips);
         rider_button_tips_request_confirmed = findViewById(R.id.rider_button_tips_request_confirmed);
 //        button_accept = findViewById(R.id.rider_button_accept_request_accepted);
-        button_cancel = findViewById(R.id.rider_button_decline_request_accepted);
+        rider_button_cancel_post_request = findViewById(R.id.rider_button_cancel_post_request);
 
 
         postRequest_textview_estimatedRateNumeric = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
         rider_textview_estimatedRateNumeric_request_confirmed = findViewById(R.id.rider_textview_estimatedRateNumeric_request_confirmed);
+
         postRequest_edittext_from = findViewById(R.id.postRequest_edittext_from);
         postRequest_edittext_to = findViewById(R.id.postRequest_edittext_to);
         rider_edittext_from_request_confirmed = findViewById(R.id.rider_edittext_from_request_confirmed);
@@ -149,6 +161,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         postRequest_estimated_rate_layout.setVisibility(LinearLayout.GONE);
         wait_responding_layout.setVisibility(ConstraintLayout.GONE);
         rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
+        rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
         button_postRequest_floating.setVisibility(Button.VISIBLE);
         mapView.onCreate(null);
         mapView.getMapAsync(this);
@@ -156,12 +169,31 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         button_postRequest_floating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (floatingButtonStatus.equals("VISIBLE")) {
+                if (flag == 0) {
+                    postRequest_estimated_rate_layout.setVisibility(LinearLayout.GONE);
+                    wait_responding_layout.setVisibility(ConstraintLayout.GONE);
                     postRequest_layout.setVisibility(ConstraintLayout.VISIBLE);
                     button_postRequest_floating.setVisibility(Button.GONE);
                     button_postRequest.setVisibility(Button.VISIBLE);
-                    floatingButtonStatus = "GONE";
+                    flag = 1;
+                    return;
                 }
+                if(flag == 1){
+                    postRequest_layout.setVisibility(ConstraintLayout.VISIBLE);
+                    button_postRequest_floating.setVisibility(Button.GONE);
+                    return;
+                }
+                if(flag == 2){
+                    rider_layout_request_confirmed.setVisibility(ConstraintLayout.VISIBLE);
+                    button_postRequest_floating.setVisibility(Button.GONE);
+                    return;
+                }
+                if(flag == 3){
+                    rider_layout_request_accepted.setVisibility(ConstraintLayout.VISIBLE);
+                    button_postRequest_floating.setVisibility(Button.GONE);
+                    return;
+                }
+
             }
         });
 
@@ -241,6 +273,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         button_postRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                cancell_clicked = false;
 
                 try {
                     if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
@@ -253,7 +286,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
                         User myRider = new Rider(true);
                         String riderId = getIntent().getExtras().get("profileId").toString();
-                        Request myRequest = ((Rider)myRider).CreateRequest(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
+                        myRequest = ((Rider)myRider).CreateRequest(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
+
 
 //                        Toast.makeText(getApplicationContext(),myRequest.getId(),Toast.LENGTH_SHORT).show();
 
@@ -262,7 +296,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         Database db = new Database();
                         final DocumentReference reqRef = db.requests.document(myRequest.getId());
 
-                        reqRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        ListenerRegistration LG = reqRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                             @Override
                             public void onEvent(@Nullable DocumentSnapshot snapshot,
                                                 @Nullable FirebaseFirestoreException e) {
@@ -283,12 +317,76 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                 } else {
 //                                    Toast.makeText(getApplicationContext(),"Accepted!!", Toast.LENGTH_SHORT).show();
 
-                                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
-                                    rider_layout_request_confirmed.setVisibility(ConstraintLayout.VISIBLE);
+                                    if(!cancell_clicked){
+                                        postRequest_layout.setVisibility(ConstraintLayout.GONE);
+                                        rider_layout_request_confirmed.setVisibility(ConstraintLayout.VISIBLE);
 
-                                    rider_edittext_from_request_confirmed.setText(postRequest_edittext_from.getText().toString());
-                                    rider_edittext_to_request_confirmed.setText(postRequest_edittext_to.getText().toString());
-                                    rider_textview_estimatedRateNumeric_request_confirmed.setText(postRequest_textview_estimatedRateNumeric.getText().toString());
+                                        rider_edittext_from_request_confirmed.setText(postRequest_edittext_from.getText().toString());
+                                        rider_edittext_to_request_confirmed.setText(postRequest_edittext_to.getText().toString());
+                                        rider_textview_estimatedRateNumeric_request_confirmed.setText(postRequest_textview_estimatedRateNumeric.getText().toString());
+
+                                        Database dbo = new Database();
+                                        DocumentReference ordRef = dbo.orders.document(myRequest.getId());
+                                        ordRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot document = task.getResult();
+                                                    if (document.exists()) {
+                                                        String driverId = (String) document.get("driverId");
+                                                        Database dbp = new Database();
+                                                        DocumentReference proRef = dbp.profiles.document(driverId);
+                                                        proRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    DocumentSnapshot document = task.getResult();
+                                                                    if (document.exists()) {
+                                                                        TextView rider_textview_name_request_confirmed = findViewById(R.id.rider_textview_name_request_confirmed);
+                                                                        TextView rider_textview_like_request_confirmed = findViewById(R.id.rider_textview_like_request_confirmed);
+                                                                        TextView rider_textview_dislike_request_confirmed = findViewById(R.id.rider_textview_dislike_request_confirmed);
+
+                                                                        ArrayList<Long> rating = new ArrayList<>();
+                                                                        rating = (ArrayList<Long>)document.get("rating");
+
+                                                                        rider_textview_name_request_confirmed.setText((String)document.get("name"));
+                                                                        rider_textview_like_request_confirmed.setText(rating.get(0).toString());
+                                                                        rider_textview_dislike_request_confirmed.setText(rating.get(1).toString());
+
+
+//                                                                        Toast.makeText(getApplicationContext(),(String)document.get("name"), Toast.LENGTH_SHORT).show();
+//                                                                        Toast.makeText(getApplicationContext(),((ArrayList<Integer>)document.get("rating")).get(0).toString(), Toast.LENGTH_SHORT).show();
+
+
+
+                                                                        Log.d("", " Success");
+                                                                    } else {
+                                                                        Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
+                                                                        Log.d("", "No such document");
+                                                                        return;
+                                                                    }
+                                                                } else {
+                                                                    Log.d("", "get failed with ", task.getException());
+                                                                    Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                                                    return;
+                                                                }
+                                                            }
+                                                        });
+
+                                                        Log.d("", " Success");
+                                                    } else {
+                                                        Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
+                                                        Log.d("", "No such document");
+                                                        return;
+                                                    }
+                                                } else {
+                                                    Log.d("", "get failed with ", task.getException());
+                                                    Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                                    return;
+                                                }
+                                            }
+                                        });
+                                    }
 
 
                                 }
@@ -426,14 +524,89 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             }
         });
 
+        rider_button_cancel_post_request.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancell_clicked = true;
+                Database db = new Database();
+                db.delete(myRequest);
+                db.modifyOrderStatus(myRequest.getId(), 1);
+
+                postRequest_edittext_from.setText("");
+                postRequest_edittext_to.setText("");
+                postRequest_textview_estimatedRateNumeric.setText("");
+                postRequest_layout.setVisibility(ConstraintLayout.GONE);
+                button_postRequest_floating.setVisibility(Button.VISIBLE);
+                button_postRequest.setVisibility(Button.GONE);
+
+                flag = 0;
+            }
+        });
+
+
+        rider_button_accept_request_confirmed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Database db = new Database();
+                db.modifyOrderStatus(myRequest.getId(), 3);
+                rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
+                rider_layout_request_accepted.setVisibility(ConstraintLayout.VISIBLE);
+
+
+            }
+        });
+
+        rider_button_decline_request_confirmed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancell_clicked = true;
+                Database db = new Database();
+                db.modifyOrderStatus(myRequest.getId(), 2);
+
+                postRequest_edittext_from.setText("");
+                postRequest_edittext_to.setText("");
+                postRequest_textview_estimatedRateNumeric.setText("");
+                postRequest_layout.setVisibility(ConstraintLayout.GONE);
+                button_postRequest_floating.setVisibility(Button.VISIBLE);
+                button_postRequest.setVisibility(Button.GONE);
+                rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
+
+
+                flag = 0;
+
+            }
+        });
+
+
         button_hide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (floatingButtonStatus.equals("GONE")) {
-                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
-                    button_postRequest_floating.setVisibility(Button.VISIBLE);
-                    floatingButtonStatus = "VISIBLE";
-                }
+                postRequest_layout.setVisibility(ConstraintLayout.GONE);
+                button_postRequest_floating.setVisibility(Button.VISIBLE);
+                flag = 1;
+//                if (floatingButtonStatus.equals("GONE")) {
+//                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
+//                    button_postRequest_floating.setVisibility(Button.VISIBLE);
+//                    floatingButtonStatus = "VISIBLE";
+//                }
+            }
+        });
+
+        rider_button_hide_request_confirmed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
+                button_postRequest_floating.setVisibility(Button.VISIBLE);
+                flag = 2;
+            }
+        });
+
+        rider_button_hide_request_accepted.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
+                button_postRequest_floating.setVisibility(Button.VISIBLE);
+                flag = 3;
             }
         });
 

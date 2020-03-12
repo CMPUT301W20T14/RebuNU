@@ -533,6 +533,34 @@ public class Database {
 
 
     }
+
+    public void modifyOrderStatus(String id, Integer status){
+        try{
+            final DocumentReference ordDocRef = orders.document(id);
+
+            ordDocRef
+                    .update("status",status)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error updating document", e);
+                        }
+                    });
+
+
+
+        }catch (Exception e){
+            throw new IllegalArgumentException("No such record!");
+        }
+
+    }
+
     public void modifyOrder(Order o){
         try{
             final DocumentReference ordDocRef = orders.document(o.getId());
