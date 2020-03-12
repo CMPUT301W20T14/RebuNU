@@ -1,5 +1,6 @@
 package com.example.rebunu;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -33,6 +34,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 
 import org.imperiumlabs.geofirestore.GeoFirestore;
@@ -288,7 +291,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     button_accept_request_accepted.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Toast.makeText(getApplicationContext(), recId, Toast.LENGTH_SHORT).show();
                             Order order = new Order();
                             try {
                                 order.setStart(Utility.geoPointToLocation(start));
@@ -296,12 +298,39 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                 order.setPrice(price);
                                 order.setDriverId((String)getIntent().getExtras().get("profileId"));
                                 order.setRiderId(riderId);
+                                order.setId(recId);
                                 button_hide_request_accepted.setVisibility(View.GONE);
                                 button_accept_request_accepted.setVisibility(View.GONE);
                                 ProgressBar progressbar_request_accepted = findViewById(R.id.driver_progressbar_request_accepted);
                                 TextView textview_confirming_request_accepted = findViewById(R.id.driver_textview_confirming_request_accepted);
                                 progressbar_request_accepted.setVisibility(View.VISIBLE);
                                 textview_confirming_request_accepted.setVisibility(View.VISIBLE);
+                                Database db = new Database();
+                                // add correspond order
+                                String realId = db.add(order);
+                                Toast.makeText(getApplicationContext(), recId + " <-> " + realId, Toast.LENGTH_SHORT).show();
+                                // delete correspond request
+                                db.deleteById(recId, 2);
+                                // and monitor document
+                                db.orders.document(recId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                        if(e != null){
+                                            //
+                                            return;
+                                        }
+                                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                                            Integer status = ((Long) documentSnapshot.getData().get("status")).intValue();
+                                            if(status == 3) {
+                                                // proceed
+                                                Toast.makeText(getApplicationContext(), "Both agreed", Toast.LENGTH_SHORT).show();
+                                            } else if (status == 2) {
+                                                // user cancelled the order
+                                                Toast.makeText(getApplicationContext(), "User cancelled", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }
+                                });
                             } catch (Exception e){
                                 Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
                             }

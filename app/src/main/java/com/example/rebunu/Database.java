@@ -217,7 +217,7 @@ public class Database {
         order.put("status",o.getStatus());
         order.put("driverId",o.getDriverId());
 
-        DocumentReference docRef = orders.document();
+        DocumentReference docRef = orders.document(o.getId());
 
         docRef
                 .set(order)
@@ -398,6 +398,37 @@ public class Database {
 
 
             } catch (Exception e){throw new IllegalArgumentException("There is no such record!");}
+
+    }
+    public void deleteById(String id, Integer type) {
+        if(type == 1){
+            throw new IllegalArgumentException("Cannot delete profile");
+        }
+        try{
+            switch (type) {
+//                case 1:
+//                    profiles
+//                            .document(record.getId())
+//                            .delete();
+//
+//                    break;
+
+                case 2:
+                    requests
+                            .document(id)
+                            .delete();
+
+                    break;
+
+                case 3:
+                    orders
+                            .document(id)
+                            .delete();
+                    break;
+
+
+            }
+        } catch (Exception e){throw new IllegalArgumentException("There is no such record!");}
 
     }
 
