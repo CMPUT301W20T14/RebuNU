@@ -27,12 +27,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <com.google.android.gms.maps.MapView
         android:id="@+id/postRequest_mapView"
         android:layout_width="match_parent"
@@ -45,12 +39,6 @@
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/postRequest_layout"
@@ -193,7 +181,7 @@
                 android:id="@+id/wait_responding_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
                 <Button
                     android:id="@+id/rider_button_cancel_post_request"
