@@ -132,7 +132,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     PackageManager.PERMISSION_GRANTED &&
                     ContextCompat.checkSelfPermission(DriverActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
                             PackageManager.PERMISSION_GRANTED)) {
-                ActivityCompat.requestPermissions(DriverActivity.this, new String[] {
+                ActivityCompat.requestPermissions(DriverActivity.this, new String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION
                 }, TAG_CODE_PERMISSION_LOCATION);
@@ -153,6 +153,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     recordIdToDataMap.put(documentSnapshot.getId(), dataMap);
                     updateRequestOnMap();
                 }
+
                 @Override
                 public void onDocumentExited(@NonNull DocumentSnapshot documentSnapshot) {
                     // if a request no longer satisfy our requirements, ie, cancelled or out of radius
@@ -160,14 +161,22 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     try {
                         recordIdToDataMap.remove(documentSnapshot.getId());
                         updateRequestOnMap();
-                    } catch (Exception ignored){}
+                    } catch (Exception ignored) {
+                    }
                 }
+
                 @Override
-                public void onDocumentMoved(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {}
+                public void onDocumentMoved(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
+                }
+
                 @Override
-                public void onDocumentChanged(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {}
+                public void onDocumentChanged(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
+                }
+
                 @Override
-                public void onGeoQueryReady() {}
+                public void onGeoQueryReady() {
+                }
+
                 @Override
                 public void onGeoQueryError(@NonNull Exception e) {
                     Toast.makeText(getApplicationContext(), "Searching failed, due to: " + e.toString(), Toast.LENGTH_SHORT).show();
@@ -177,7 +186,9 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
         mapView.onCreate(null);
         mapView.getMapAsync(this);
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PackageManager.PERMISSION_GRANTED);
+    }
+
+//       ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PackageManager.PERMISSION_GRANTED);
 
 //        button_searchNearby_floating.setOnClickListener(new View.OnClickListener() {
 //            @Override

@@ -51,7 +51,7 @@
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:background="#D11F241F"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <Button
             android:id="@+id/driver_button_hide_request_accepted"
