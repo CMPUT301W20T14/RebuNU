@@ -43,6 +43,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 
 import org.w3c.dom.Text;
 
+import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -211,6 +212,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
         rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
         rider_layout_information.setVisibility(ConstraintLayout.GONE);
+        rider_layout_rating.setVisibility(ConstraintLayout.GONE);
+        rider_layout_qrcode.setVisibility(ConstraintLayout.GONE);
 
         button_postRequest_floating.setVisibility(Button.VISIBLE);
         mapView.onCreate(null);
@@ -225,6 +228,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                     postRequest_layout.setVisibility(ConstraintLayout.VISIBLE);
                     button_postRequest_floating.setVisibility(Button.GONE);
                     button_postRequest.setVisibility(Button.VISIBLE);
+//                    rider_layout_rating.setVisibility(ConstraintLayout.VISIBLE);
+//                    button_postRequest_floating.setVisibility(Button.GONE);
                     flag = 1;
                     return;
                 }
@@ -328,6 +333,23 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             }
         });
 
+        rider_button_payYourTrip_rating.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+
+                rider_layout_rating.setVisibility(ConstraintLayout.GONE);
+                QRCode qrCode = new QRCode();
+                try {
+                    qrCode.setDriverId(666);
+                    qrCode.setRiderId(777);
+                    qrCode.setPrice(888);
+                    qrCode.setContent();
+                    rider_imageview_qrcode.setImageBitmap(qrCode.QRCode(qrCode.getContent()));
+
+                }catch (Exception ignored){}
+                rider_layout_qrcode.setVisibility(ConstraintLayout.VISIBLE);
+
+            }
+        });
 
 
 
@@ -775,6 +797,22 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             public void onClick(View v) {
                 rider_layout_information.setVisibility(ConstraintLayout.GONE);
                 rider_layout_request_accepted.setVisibility(ConstraintLayout.VISIBLE);
+
+            }
+        });
+
+        rider_button_hide_rating.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rider_layout_rating.setVisibility(ConstraintLayout.GONE);
+
+            }
+        });
+
+        rider_button_hide_qrcode.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                rider_layout_qrcode.setVisibility(ConstraintLayout.GONE);
 
             }
         });
