@@ -4,6 +4,7 @@ package com.example.rebunu;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -35,6 +37,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import org.imperiumlabs.geofirestore.GeoQuery;
 import org.imperiumlabs.geofirestore.listeners.GeoQueryDataEventListener;
@@ -173,7 +177,32 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
         mapView.onCreate(null);
         mapView.getMapAsync(this);
-    }
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PackageManager.PERMISSION_GRANTED);
+
+//        button_searchNearby_floating.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                button_searchNearby_floating.setVisibility(button_searchNearby_floating.GONE);
+//
+//            }
+//        });
+
+//        @Override
+//        protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//
+//            IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+//
+//            if (intentResult != null) {
+//                if (intentResult.getContents() == null){
+//
+//                }
+//                else {
+//
+//                }
+//            }
+//            super.onActivityResult(requestCode, resultCode, data);
+//        }
+//    }
 
     @Override
     protected void onResume() {
