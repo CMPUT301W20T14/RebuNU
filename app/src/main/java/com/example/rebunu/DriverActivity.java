@@ -1,52 +1,43 @@
 package com.example.rebunu;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 
-import org.imperiumlabs.geofirestore.GeoFirestore;
 import org.imperiumlabs.geofirestore.GeoQuery;
 import org.imperiumlabs.geofirestore.listeners.GeoQueryDataEventListener;
-import org.imperiumlabs.geofirestore.listeners.GeoQueryEventListener;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -55,6 +46,8 @@ import java.util.Objects;
  * @author Zijian Xi, Zihao Huang
  */
 
+// Since I am clear that I am using correct down-casting, I will suppress type unchecked warnings.
+@SuppressWarnings("unchecked")
 public class DriverActivity extends AppCompatActivity implements OnMapReadyCallback {
     // Reference: https://www.zoftino.com/android-mapview-tutorial posted on November 14, 2017
     private MapView mapView;
@@ -63,9 +56,13 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private String floatingButtonStatus = "SHOW_ALL_REQUEST";
     private LocationManager locationManager;
     private Criteria criteria;
-    private HashMap<Marker, Object> markerMap = new HashMap<>();
+    private Map<String, Map<String, Object>> recordIdToDataMap = new HashMap<>();
 
-    public void updateRequestOnMap(ArrayList<Map<String, Object>> locations) {
+    public void updateRequestOnMap() {
+        float[] distance = new float[1];
+        Location currentLocation;
+
+        // check if we have permission, if not, ask for permission
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
@@ -75,35 +72,29 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     Manifest.permission.ACCESS_COARSE_LOCATION
             }, TAG_CODE_PERMISSION_LOCATION);
         }
+        currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
 
-        Location currentLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false)));
-        float[] distance = new float[1];
+        for(Map<String, Object> dataMap: recordIdToDataMap.values()) {
+            ArrayList<GeoPoint> pos = (ArrayList<GeoPoint>) Objects.requireNonNull(dataMap.get("pos"));
+            //Integer price = ((Long) Objects.requireNonNull(dataMap.get("price"))).intValue();
+            //String riderId = (String) Objects.requireNonNull(dataMap.get("riderId"));
+            //String recordId = (String) Objects.requireNonNull(dataMap.get("recordId"));
+            dataMap.put("state", "multiple");
 
-        for(Map<String, Object> l: locations) {
+            // calculate distance between request beginning location and current location
+            Location.distanceBetween(pos.get(0).getLatitude(), pos.get(0).getLongitude(), currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
+            // update request icon on map
             try {
-                assert currentLocation != null;
-                ArrayList<GeoPoint> pos = (ArrayList<GeoPoint>)l.get("pos");
-                Integer price = ((Long) l.get("price")).intValue();
-                String riderId = (String) l.get("riderId");
-                String recId =(String) l.get("recId");
-                Map<String, Object> tag = new HashMap<>();
-                tag.put("price", price);
-                tag.put("pos", pos);
-                tag.put("riderId", riderId);
-                tag.put("recId", recId);
-                assert pos != null;
-                Location.distanceBetween(pos.get(0).getLatitude(), pos.get(0).getLongitude(), currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
                 Marker marker = gmap.addMarker(new MarkerOptions()
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.available_request_icon_small))
-                        .position(new LatLng(pos.get(0).getLatitude(), pos.get(0).getLongitude()))
-                        .title("Distance: " + String.valueOf(Double.valueOf(distance[0]).intValue()) + " Meters. " +
-                                "Geolocation: (" + pos.get(0).getLatitude() + ", " + pos.get(0).getLongitude()+ ")"));
-                marker.setTag(tag);
-                markerMap.put(marker, false);
-
-            } catch (Exception ignored){
-               String error =  ignored.toString();
-            };
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.available_request_icon_small))
+                    .position(new LatLng(pos.get(0).getLatitude(), pos.get(0).getLongitude()))
+                    .title("Distance: " + Double.valueOf(distance[0]).intValue() + " Meters. " +
+                        "Geolocation: (" + pos.get(0).getLatitude() + ", " + pos.get(0).getLongitude()+ ")"));
+                dataMap.put("marker", marker);
+                marker.setTag(dataMap);
+            } catch (Exception e){
+               Toast.makeText(getApplicationContext(), "Update request on map failed, due to: " + e.toString(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -112,74 +103,76 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver);
 
+        // initialise database for later query
         Database db = new Database();
-        String TAG = "RebuNu";
 
-        Button button_searchNearby_floating;
-
-        button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
+        Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
         mapView = findViewById(R.id.driver_mapView);
 
-        button_searchNearby_floating.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                gmap.clear();
-                markerMap.clear();
-                if (!(ContextCompat.checkSelfPermission(DriverActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(DriverActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                                PackageManager.PERMISSION_GRANTED)) {
-                    ActivityCompat.requestPermissions(DriverActivity.this, new String[] {
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                    }, TAG_CODE_PERMISSION_LOCATION);
-                }
-                assert locationManager != null;
-                Location currentLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false)));
-                assert currentLocation != null;
-                double lat = currentLocation.getLatitude();
-                double lng = currentLocation.getLongitude();
-                gmap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lng)));
+        button_searchNearby_floating.setOnClickListener(v -> {
+            // before update, clear all current markers on the map
+            gmap.clear();
+            // and clear their selection state(ie, selected will show with darker color, unselected will show with lighter color)
+            recordIdToDataMap.clear();
 
-                Database db = new Database();
-
-                GeoQuery geoQuery = db.geoFirestore.queryAtLocation(new GeoPoint(lat, lng), 5.0);
-                geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
-                    @Override
-                    public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
-                        Map<String, Object> dataMap = documentSnapshot.getData();
-                        dataMap.put("recId", documentSnapshot.getId());
-                        ArrayList<Map<String, Object>> dataMapList = new ArrayList<>();
-                        dataMapList.add(dataMap);
-                        updateRequestOnMap(dataMapList);
-                    }
-                    @Override
-                    public void onDocumentExited(DocumentSnapshot documentSnapshot) {}
-                    @Override
-                    public void onDocumentMoved(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {}
-                    @Override
-                    public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {}
-                    @Override
-                    public void onGeoQueryReady() {}
-                    @Override
-                    public void onGeoQueryError(Exception e) {
-                        Toast.makeText(getApplicationContext(), "Searching failed, due to: " + e.toString(), Toast.LENGTH_SHORT);
-                    }
-                });
+            // check if we have permission, if not, ask for permission
+            if (!(ContextCompat.checkSelfPermission(DriverActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(DriverActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                            PackageManager.PERMISSION_GRANTED)) {
+                ActivityCompat.requestPermissions(DriverActivity.this, new String[] {
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                }, TAG_CODE_PERMISSION_LOCATION);
             }
+            // get current location
+            Location currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
+            // and relocate camera to show current location
+            gmap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+
+            // search all request with center = current location and radius = 5 kilometers
+            GeoQuery geoQuery = db.geoFirestore.queryAtLocation(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()), 5.0);
+            geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+                @Override
+                public void onDocumentEntered(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
+                    // if a request satisfy our requirements
+                    Map<String, Object> dataMap = Objects.requireNonNull(documentSnapshot.getData());
+                    dataMap.put("recordId", documentSnapshot.getId());
+                    recordIdToDataMap.put(documentSnapshot.getId(), dataMap);
+                    updateRequestOnMap();
+                }
+                @Override
+                public void onDocumentExited(@NonNull DocumentSnapshot documentSnapshot) {
+                    // if a request no longer satisfy our requirements, ie, cancelled or out of radius
+                    Toast.makeText(getApplicationContext(), documentSnapshot.getId(), Toast.LENGTH_SHORT).show();
+                    try {
+                        recordIdToDataMap.remove(documentSnapshot.getId());
+                        updateRequestOnMap();
+                    } catch (Exception ignored){}
+                }
+                @Override
+                public void onDocumentMoved(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {}
+                @Override
+                public void onDocumentChanged(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {}
+                @Override
+                public void onGeoQueryReady() {}
+                @Override
+                public void onGeoQueryError(@NonNull Exception e) {
+                    Toast.makeText(getApplicationContext(), "Searching failed, due to: " + e.toString(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
-
         // Reference: https://developer.android.com/training/permissions/requesting.html Posted on 2019-12-27.
-        if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED)) {
-            ActivityCompat.requestPermissions(this, new String[] {
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, TAG_CODE_PERMISSION_LOCATION);
-        }
+//        if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+//                PackageManager.PERMISSION_GRANTED &&
+//                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+//                        PackageManager.PERMISSION_GRANTED)) {
+//            ActivityCompat.requestPermissions(this, new String[] {
+//                    Manifest.permission.ACCESS_FINE_LOCATION,
+//                    Manifest.permission.ACCESS_COARSE_LOCATION
+//            }, TAG_CODE_PERMISSION_LOCATION);
+//        }
         mapView.onCreate(null);
         mapView.getMapAsync(this);
     }
@@ -201,29 +194,35 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         super.onStop();
         mapView.onStop();
     }
+
     @Override
     protected void onPause() {
         mapView.onPause();
         super.onPause();
     }
+
     @Override
     protected void onDestroy() {
         mapView.onDestroy();
         super.onDestroy();
     }
+
     @Override
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         gmap = googleMap;
+        // minimal zoom out scale
         gmap.setMinZoomPreference(16);
         gmap.setMyLocationEnabled(true);
         UiSettings uiSettings = gmap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
+        // compass will only show if map has been rotated
         uiSettings.setCompassEnabled(true);
         uiSettings.setMyLocationButtonEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
@@ -231,6 +230,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         criteria = new Criteria();
 
+        // check if we have permission, if not, ask for permission
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
@@ -242,134 +242,118 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         }
         // get current location
         // Reference: https://stackoverflow.com/questions/36878087/get-current-location-lat-long-in-android-google-map-when-app-start Posted on Apr 27 '16 at 21:04 by Dijkstra
-        assert locationManager != null;
-        Location currentLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false)));
-        assert currentLocation != null;
-        double lat = currentLocation.getLatitude();
-        double lng = currentLocation.getLongitude();
-        LatLng cur = new LatLng(lat, lng);
-        gmap.moveCamera(CameraUpdateFactory.newLatLng(cur));
-        gmap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                if(markerMap.containsKey(marker)) {
-                    for (Marker m: markerMap.keySet()) {
-                        m.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.available_request_icon_small));
-                    }
-                    markerMap.remove(marker);
-                    markerMap.put(marker, true);
-                    marker.showInfoWindow();
-                    for(HashMap.Entry<Marker, Object> e: markerMap.entrySet()) {
-                        if(!((Boolean)e.getValue())) {
-                            e.getKey().setIcon(BitmapDescriptorFactory.fromResource(R.drawable.unselected_request_icon_small));
-                        }
-                    }
-                    markerMap.remove(marker);
-                    markerMap.put(marker, false);
-                    Map<String, Object> tag = (Map<String, Object>) marker.getTag();
-                    assert tag != null;
-                    ArrayList<GeoPoint> pos = (ArrayList<GeoPoint>) tag.get("pos");
-                    assert pos != null;
-                    Integer price = (Integer) tag.get("price");
-                    assert price != null;
-                    GeoPoint start = pos.get(0);
-                    GeoPoint end = pos.get(1);
-                    String recId = (String) tag.get("recId");
-                    assert recId != null;
-                    String riderId = (String) tag.get("riderId");
-                    assert riderId != null;
+        Location currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
 
-                    Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
-                    ConstraintLayout layout_request_accepted = findViewById(R.id.driver_layout_request_accepted);
-                    Button button_hide_request_accepted = findViewById(R.id.driver_button_hide_request_accepted);
-                    TextView textview_fromWhere_request_accepted = findViewById(R.id.driver_textview_fromWhere_request_accepted);
-                    TextView textview_to_request_accepted = findViewById(R.id.driver_textview_to_request_accepted);
-                    TextView textview_estimatedRateNumeric_request_accepted = findViewById(R.id.driver_textview_estimatedRateNumeric_request_accepted);
-                    Button button_accept_request_accepted = findViewById(R.id.driver_button_accept_request_accepted);
-                    Button button_hide_accepted = findViewById(R.id.driver_button_hide_request_accepted);
+        // set current location in the middle of the camera, or to say, the visible area's center is user's current location
+        gmap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+        gmap.setOnMarkerClickListener(marker -> {
+            Map<String, Object> dataMap = Objects.requireNonNull((Map<String, Object>) marker.getTag());
+            String state = Objects.requireNonNull((String) dataMap.get("state"));
+            if(state.equals("multiple")) {
+                // no matter what, we know what marker has been selected :)
+                // and retrieve bind information correspondingly
+                ArrayList<GeoPoint> pos = Objects.requireNonNull((ArrayList<GeoPoint>) dataMap.get("pos"));
+                Integer price = Objects.requireNonNull((Long) dataMap.get("price")).intValue();
+                String recId = Objects.requireNonNull((String) dataMap.get("recordId"));
+                String riderId = Objects.requireNonNull((String) dataMap.get("riderId"));
+                GeoPoint start = pos.get(0);
+                GeoPoint end = pos.get(1);
 
-                    button_accept_request_accepted.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Order order = new Order();
-                            try {
-                                order.setStart(Utility.geoPointToLocation(start));
-                                order.setEnd(Utility.geoPointToLocation(end));
-                                order.setPrice(price);
-                                order.setDriverId((String)getIntent().getExtras().get("profileId"));
-                                order.setRiderId(riderId);
-                                order.setId(recId);
-                                button_hide_request_accepted.setVisibility(View.GONE);
-                                button_accept_request_accepted.setVisibility(View.GONE);
-                                ProgressBar progressbar_request_accepted = findViewById(R.id.driver_progressbar_request_accepted);
-                                TextView textview_confirming_request_accepted = findViewById(R.id.driver_textview_confirming_request_accepted);
-                                progressbar_request_accepted.setVisibility(View.VISIBLE);
-                                textview_confirming_request_accepted.setVisibility(View.VISIBLE);
-                                Database db = new Database();
-                                // add correspond order
-                                String realId = db.add(order);
-                                Toast.makeText(getApplicationContext(), recId + " <-> " + realId, Toast.LENGTH_SHORT).show();
-                                // delete correspond request
-                                db.deleteById(recId, 2);
-                                // and monitor document
-                                db.orders.document(recId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                                        if(e != null){
-                                            //
-                                            return;
-                                        }
-                                        if (documentSnapshot != null && documentSnapshot.exists()) {
-                                            Integer status = ((Long) documentSnapshot.getData().get("status")).intValue();
-                                            if(status == 3) {
-                                                // proceed
-                                                Toast.makeText(getApplicationContext(), "Both agreed", Toast.LENGTH_SHORT).show();
-                                            } else if (status == 2) {
-                                                // user cancelled the order
-                                                Toast.makeText(getApplicationContext(), "User cancelled", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    }
-                                });
-                            } catch (Exception e){
-                                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
+                ConstraintLayout layout_request_accepted = findViewById(R.id.driver_layout_request_accepted);
+                Button button_hide_request_accepted = findViewById(R.id.driver_button_hide_request_accepted);
+                TextView textview_fromWhere_request_accepted = findViewById(R.id.driver_textview_fromWhere_request_accepted);
+                TextView textview_to_request_accepted = findViewById(R.id.driver_textview_to_request_accepted);
+                TextView textview_estimatedRateNumeric_request_accepted = findViewById(R.id.driver_textview_estimatedRateNumeric_request_accepted);
+                Button button_accept_request_accepted = findViewById(R.id.driver_button_accept_request_accepted);
+
+                // this is for driver to accepted request
+                button_accept_request_accepted.setOnClickListener(v -> {
+                    Order order = new Order();
+                    try {
+                        // initialise a new Order object, we do not set status now, because it is not decided by rider to accept
+                        order.setStart(Utility.geoPointToLocation(start));
+                        order.setEnd(Utility.geoPointToLocation(end));
+                        order.setPrice(price);
+                        order.setDriverId((String) Objects.requireNonNull(getIntent().getExtras()).get("profileId"));
+                        order.setRiderId(riderId);
+                        order.setId(recId);
+
+                        // update the view
+                        button_hide_request_accepted.setVisibility(View.GONE);
+                        button_accept_request_accepted.setVisibility(View.GONE);
+                        ProgressBar progressbar_request_accepted = findViewById(R.id.driver_progressbar_request_accepted);
+                        TextView textview_confirming_request_accepted = findViewById(R.id.driver_textview_confirming_request_accepted);
+                        progressbar_request_accepted.setVisibility(View.VISIBLE);
+                        textview_confirming_request_accepted.setVisibility(View.VISIBLE);
+
+                        Database db = new Database();
+                        // add correspond order
+                        String realId = db.add(order);
+                        Toast.makeText(getApplicationContext(), recId + " <-> " + realId, Toast.LENGTH_SHORT).show();
+                        // delete correspond request
+                        db.deleteById(recId, 2);
+                        // and monitor document
+                        // a DocumentSnapshot listener, this is how we can monitor a specific record
+                        db.orders.document(recId).addSnapshotListener((documentSnapshot, e) -> {
+                            if(e != null){
+                                //
+                                return;
                             }
-                        }
-                    });
-
-                    button_hide_accepted.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if(floatingButtonStatus.equals("SHOW_ALL_REQUEST")) {
-                                layout_request_accepted.setVisibility(View.GONE);
-                                button_searchNearby_floating.setVisibility(View.VISIBLE);
-                                button_searchNearby_floating.performClick();
+                            if (documentSnapshot != null && documentSnapshot.exists()) {
+                                int status = ((Long) Objects.requireNonNull(Objects.requireNonNull(documentSnapshot.getData()).get("status"))).intValue();
+                                if(status == 3) {
+                                    // proceed
+                                    Toast.makeText(getApplicationContext(), "Both agreed", Toast.LENGTH_SHORT).show();
+                                } else if (status == 2) {
+                                    // user cancelled the order
+                                    Toast.makeText(getApplicationContext(), "User cancelled", Toast.LENGTH_SHORT).show();
+                                }
                             }
-                        }
-                    });
-                    button_searchNearby_floating.setVisibility(View.GONE);
-                    layout_request_accepted.setVisibility(View.VISIBLE);
+                        });
+                    } catch (Exception e){
+                        Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-                    String from = "(" + String.valueOf(start.getLatitude()) + ", " + String.valueOf(start.getLongitude()) + ")";
-                    String to = "(" + String.valueOf(end.getLatitude()) + ", " + String.valueOf(end.getLongitude()) + ")";
-                    textview_fromWhere_request_accepted.setText(from);
-                    textview_to_request_accepted.setText(to);
-                    textview_estimatedRateNumeric_request_accepted.setText(price.toString());
+                button_hide_request_accepted.setOnClickListener(v -> {
+                    if(floatingButtonStatus.equals("SHOW_ALL_REQUEST")) {
+                        // update the view
+                        layout_request_accepted.setVisibility(View.GONE);
+                        button_searchNearby_floating.setVisibility(View.VISIBLE);
+                        button_searchNearby_floating.performClick();
+                    }
+                });
 
-                    gmap.clear();
-                    gmap.addMarker(new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.pick))
-                            .position(new LatLng(pos.get(0).getLatitude(), pos.get(0).getLongitude()))
-                            .title("start"));
-                    gmap.addMarker(new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.drop))
-                            .position(new LatLng(pos.get(1).getLatitude(), pos.get(1).getLongitude()))
-                            .title("end"));
-                } else {
-                    marker.showInfoWindow();
-                }
-                return true;
+                // update the view
+                button_searchNearby_floating.setVisibility(View.GONE);
+                layout_request_accepted.setVisibility(View.VISIBLE);
+
+                String from = "(" + start.getLatitude() + ", " + start.getLongitude() + ")";
+                String to = "(" + end.getLatitude() + ", " + end.getLongitude() + ")";
+                textview_fromWhere_request_accepted.setText(from);
+                textview_to_request_accepted.setText(to);
+                textview_estimatedRateNumeric_request_accepted.setText(price.toString());
+
+                // before we show pick up and drop locations, we want to make sure there is no other request marker(car icon)
+                // so we clear the map view
+                gmap.clear();
+                Marker startMarker = gmap.addMarker(new MarkerOptions()
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.pick))
+                        .position(new LatLng(pos.get(0).getLatitude(), pos.get(0).getLongitude()))
+                        .title("start"));
+                Marker endMarker = gmap.addMarker(new MarkerOptions()
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.drop))
+                        .position(new LatLng(pos.get(1).getLatitude(), pos.get(1).getLongitude()))
+                        .title("end"));
+                Map<String, Object> tag = new HashMap<>();
+                tag.put("state", "two");
+                startMarker.setTag(tag);
+                endMarker.setTag(tag);
+            } else {
+                marker.showInfoWindow();
             }
+            return true;
         });
     }
 }
