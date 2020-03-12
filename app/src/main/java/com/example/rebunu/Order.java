@@ -9,11 +9,11 @@ import android.location.Location;
 public class Order extends Record{
     private QRCode qr;
     private Boolean ratingOfThisOrder; //True for thumbsUp, False for thumbsDown
-    private Integer driverId;
+    private String driverId;
     private Location start;
     private Location end;
     private Integer price;
-    private Integer riderId;
+    private String riderId;
     private Integer status;
     //private Database db = new Database();
 
@@ -25,8 +25,8 @@ public class Order extends Record{
     public Order(){
         this.qr = null;
         this.ratingOfThisOrder = null;
-        this.driverId = -1;
-        this.riderId = -1;
+        this.driverId = "";
+        this.riderId = "";
         this.start = null;
         this.end = null;
         this.price = -1;
@@ -49,7 +49,7 @@ public class Order extends Record{
         return price;
     }
 
-    public Integer getRiderId(){
+    public String getRiderId(){
         return riderId;
     }
 
@@ -63,7 +63,7 @@ public class Order extends Record{
         return ratingOfThisOrder;
     }
 
-    public Integer getDriverId() {
+    public String getDriverId() {
         return driverId;
     }
 
@@ -112,11 +112,11 @@ public class Order extends Record{
      * @param driverId a positive integer
      * @throws NullPointerException null exception
      */
-    public void setDriverId(Integer driverId) throws Exception {
+    public void setDriverId(String driverId) throws Exception {
         if (driverId == null) {
             throw new NullPointerException("driverId is null.");
         } else {
-            if (driverId < 0) {
+            if (driverId.isEmpty()) {
                 throw new Exception("Invalid driverId.");
             } else {
                 this.driverId = driverId;
@@ -176,16 +176,14 @@ public class Order extends Record{
      * @param riderId a positive integer
      * @throws Exception null or negative exceptions
      */
-    public void setRiderId(Integer riderId)throws Exception{
+    public void setRiderId(String riderId)throws Exception{
         if(riderId == null){
             throw new NullPointerException("RiderId is null");
-        }
-        else{
-            if(riderId > 0){
-                this.riderId = riderId;
-            }
-            else{
+        } else{
+            if(riderId.isEmpty()){
                 throw  new Exception("Invalid riderId");
+            } else{
+                this.riderId = riderId;
             }
         }
     }

@@ -72,7 +72,7 @@
     <string name="need_to_improve">NEED TO IMPROVE</string>
 
     <!-- Driver: Search Request -->
-
+    <string name="confirming">CONFIRMING</string>>
 
     <!-- Error -->
     <string name="password_or_email_or_phone_wrong">WRONG EMAIL/PHONE/PASSWORD</string>

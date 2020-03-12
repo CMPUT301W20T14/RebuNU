@@ -5,6 +5,7 @@ import android.location.Location;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +39,13 @@ public class Utility {
 
     public static LatLng locationToLatLng(Location location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
+    }
+
+    public static Location geoPointToLocation(GeoPoint geoPoint) {
+        Location location = new Location("");
+        location.setLatitude(geoPoint.getLatitude());
+        location.setLongitude(geoPoint.getLongitude());
+        return location;
     }
 
     public static ArrayList<Location> mockSurrounding(){
