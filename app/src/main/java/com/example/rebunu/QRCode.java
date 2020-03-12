@@ -118,10 +118,9 @@ public class QRCode {
 
     /**
      * Setter for content
-     * @param content a String
      * @throws NullPointerException null exception or empty exception
      */
-    public void setContent(String content){
+    public void setContent(){
         this.content = this.driverId + " "
                      + this.riderId + " "
                      + this.price + "";
