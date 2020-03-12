@@ -40,6 +40,8 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -58,6 +60,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
     private Criteria criteria;
     Integer flag = 0;
     Request myRequest = null;
+    String driverId = null;
 
 
 
@@ -98,7 +101,10 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         LinearLayout postRequest_estimated_rate_layout;
         ConstraintLayout wait_responding_layout;
         ConstraintLayout rider_layout_request_confirmed;
-        ConstraintLayout rider_layout_request_accepted = findViewById(R.id.rider_layout_request_accepted);
+        ConstraintLayout rider_layout_request_accepted;
+        ConstraintLayout rider_layout_information;
+
+
         Button button_postRequest;
         Button button_postRequest_floating;
         Button button_hide;
@@ -109,10 +115,26 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         Button rider_button_accept_request_confirmed = findViewById(R.id.rider_button_accept_request_confirmed);
         Button rider_button_decline_request_confirmed = findViewById(R.id.rider_button_decline_request_confirmed);
         Button rider_button_hide_request_accepted = findViewById(R.id.rider_button_hide_request_accepted);
+        Button rider_button_decline_request_accepted = findViewById(R.id.rider_button_decline_request_accepted);
+        Button rider_button_tips_request_accepted = findViewById(R.id.rider_button_tips_request_accepted);
+        Button rider_button_contact_request_accepted = findViewById(R.id.rider_button_contact_request_accepted);
+        Button rider_button_hide_information = findViewById(R.id.rider_button_hide_information);
+
 
 
         TextView postRequest_textview_estimatedRateNumeric;
         TextView rider_textview_estimatedRateNumeric_request_confirmed;
+        TextView rider_textview_estimatedRateNumeric_request_accepted;
+        TextView rider_textview_fromWhere_request_accepted;
+        TextView rider_textview_to_request_accepted;
+        TextView rider_textview_name_request_accepted;
+        TextView rider_textview_like_request_accepted;
+        TextView rider_textview_dislike_request_accepted;
+        TextView rider_textview_name_information;
+        TextView rider_textview_like_information;
+        TextView rider_textview_dislike_information;
+//        TextView rider_textview_phone;
+//        TextView rider_textview_email;
 
 
         EditText postRequest_edittext_from;
@@ -126,6 +148,10 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         postRequest_estimated_rate_layout = findViewById(R.id.postRequest_estimated_rate_layout);
         wait_responding_layout = findViewById(R.id.wait_responding_layout);
         rider_layout_request_confirmed = findViewById(R.id.rider_layout_request_confirmed);
+        rider_layout_request_accepted = findViewById(R.id.rider_layout_request_accepted);
+        rider_layout_information = findViewById(R.id.rider_layout_information);
+
+
 
         mapView = findViewById(R.id.postRequest_mapView);
         button_postRequest = findViewById(R.id.postRequest_button_postRequest);
@@ -139,6 +165,19 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
         postRequest_textview_estimatedRateNumeric = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
         rider_textview_estimatedRateNumeric_request_confirmed = findViewById(R.id.rider_textview_estimatedRateNumeric_request_confirmed);
+        rider_textview_estimatedRateNumeric_request_accepted = findViewById(R.id.rider_textview_estimatedRateNumeric_request_accepted);
+        rider_textview_fromWhere_request_accepted = findViewById(R.id.rider_textview_fromWhere_request_accepted);
+        rider_textview_to_request_accepted = findViewById(R.id.rider_textview_to_request_accepted);
+        rider_textview_name_request_accepted = findViewById(R.id.rider_textview_name_request_accepted);
+        rider_textview_like_request_accepted = findViewById(R.id.rider_textview_like_request_accepted);
+        rider_textview_dislike_request_accepted = findViewById(R.id.rider_textview_dislike_request_accepted);
+        rider_textview_name_information = findViewById(R.id.rider_textview_name_information);
+        rider_textview_like_information = findViewById(R.id.rider_textview_like_information);
+        rider_textview_dislike_information = findViewById(R.id.rider_textview_dislike_information);
+//        rider_textview_phone = findViewById(R.id.rider_textview_phone);
+//        rider_textview_email = findViewById(R.id.rider_textview_email);
+
+
 
         postRequest_edittext_from = findViewById(R.id.postRequest_edittext_from);
         postRequest_edittext_to = findViewById(R.id.postRequest_edittext_to);
@@ -162,6 +201,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         wait_responding_layout.setVisibility(ConstraintLayout.GONE);
         rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
         rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
+        rider_layout_information.setVisibility(ConstraintLayout.GONE);
+
         button_postRequest_floating.setVisibility(Button.VISIBLE);
         mapView.onCreate(null);
         mapView.getMapAsync(this);
@@ -266,6 +307,17 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 }
             }
         });
+        rider_button_tips_request_accepted.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                    rider_textview_estimatedRateNumeric_request_accepted.setText(new Integer(Integer.parseInt(rider_textview_estimatedRateNumeric_request_confirmed.getText().toString()) + 1).toString());
+                    //rider_textview_estimatedRateNumeric_request_confirmed.setText(new Integer(Integer.parseInt(rider_textview_estimatedRateNumeric_request_confirmed.getText().toString()) + 1).toString());
+                }catch (Exception e){
+                    rider_textview_estimatedRateNumeric_request_accepted.setText("1");
+                }
+            }
+        });
 
 
 
@@ -333,7 +385,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                                 if (task.isSuccessful()) {
                                                     DocumentSnapshot document = task.getResult();
                                                     if (document.exists()) {
-                                                        String driverId = (String) document.get("driverId");
+                                                        driverId = (String) document.get("driverId");
                                                         Database dbp = new Database();
                                                         DocumentReference proRef = dbp.profiles.document(driverId);
                                                         proRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -552,6 +604,30 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
                 rider_layout_request_accepted.setVisibility(ConstraintLayout.VISIBLE);
 
+//                rider_edittext_from_request_confirmed.setText(postRequest_edittext_from.getText().toString());
+//                rider_edittext_to_request_confirmed.setText(postRequest_edittext_to.getText().toString());
+//                rider_textview_estimatedRateNumeric_request_confirmed.setText(postRequest_textview_estimatedRateNumeric.getText().toString());
+                TextView rider_textview_name_request_confirmed = findViewById(R.id.rider_textview_name_request_confirmed);
+                TextView rider_textview_like_request_confirmed = findViewById(R.id.rider_textview_like_request_confirmed);
+                TextView rider_textview_dislike_request_confirmed = findViewById(R.id.rider_textview_dislike_request_confirmed);
+
+//                rider_textview_fromWhere_request_accepted = findViewById(R.id.rider_textview_fromWhere_request_accepted);
+//                rider_textview_to_request_accepted = findViewById(R.id.rider_textview_to_request_accepted);
+//                rider_textview_name_request_accepted = findViewById(R.id.rider_textview_name_request_accepted);
+//                rider_textview_like_request_accepted = findViewById(R.id.rider_textview_like_request_accepted);
+//                rider_textview_dislike_request_accepted = findViewById(R.id.rider_textview_dislike_request_accepted);
+//                rider_textview_estimatedRateNumeric_request_accepted
+
+                rider_textview_fromWhere_request_accepted.setText(rider_edittext_from_request_confirmed.getText().toString());
+                rider_textview_to_request_accepted.setText(rider_edittext_to_request_confirmed.getText().toString());
+                rider_textview_estimatedRateNumeric_request_accepted.setText(rider_textview_estimatedRateNumeric_request_confirmed.getText().toString());
+
+                rider_textview_name_request_accepted.setText(rider_textview_name_request_confirmed.getText().toString());
+                rider_textview_like_request_accepted.setText(rider_textview_like_request_confirmed.getText().toString());
+                rider_textview_dislike_request_accepted.setText(rider_textview_dislike_request_confirmed.getText().toString());
+
+
+
 
             }
         });
@@ -573,6 +649,81 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
 
                 flag = 0;
+
+            }
+        });
+
+        rider_button_decline_request_accepted.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancell_clicked = true;
+                Database db = new Database();
+                db.modifyOrderStatus(myRequest.getId(), 4);
+
+                postRequest_edittext_from.setText("");
+                postRequest_edittext_to.setText("");
+                postRequest_textview_estimatedRateNumeric.setText("");
+
+                postRequest_layout.setVisibility(ConstraintLayout.GONE);
+                button_postRequest_floating.setVisibility(Button.VISIBLE);
+                button_postRequest.setVisibility(Button.GONE);
+                rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
+                rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
+
+                flag = 0;
+
+            }
+        });
+
+
+        rider_button_contact_request_accepted.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rider_layout_information.setVisibility(ConstraintLayout.VISIBLE);
+                rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
+
+//                TextView rider_textview_name_information;
+//                TextView rider_textview_like_information;
+//                TextView rider_textview_dislike_information;
+
+//                rider_textview_name_request_accepted.setText(rider_textview_name_request_confirmed.getText().toString());
+//                rider_textview_like_request_accepted.setText(rider_textview_like_request_confirmed.getText().toString());
+//                rider_textview_dislike_request_accepted.setText(rider_textview_dislike_request_confirmed.getText().toString());
+
+                rider_textview_name_information.setText(rider_textview_name_request_accepted.getText().toString());
+                rider_textview_like_information.setText(rider_textview_like_request_accepted.getText().toString());
+                rider_textview_dislike_information.setText(rider_textview_dislike_request_accepted.getText().toString());
+
+                Database dbp = new Database();
+                dbp.profiles.document(driverId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+
+//                                rider_textview_phone;
+//                                rider_textview_email;
+                                TextView rider_textview_phone = findViewById(R.id.rider_textview_phone);
+                                TextView rider_textview_email = findViewById(R.id.rider_textview_email);
+                                rider_textview_phone.setText((String) document.get("phone"));
+                                rider_textview_email.setText((String) document.get("email"));
+
+
+
+                                Log.d("", " Success");
+                            } else {
+                                Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
+                                Log.d("", "No such document");
+                                return;
+                            }
+                        } else {
+                            Log.d("", "get failed with ", task.getException());
+                            Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                });
 
             }
         });
@@ -609,6 +760,16 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 flag = 3;
             }
         });
+
+        rider_button_hide_information.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rider_layout_information.setVisibility(ConstraintLayout.GONE);
+                rider_layout_request_accepted.setVisibility(ConstraintLayout.VISIBLE);
+
+            }
+        });
+
 
         mapView.setOnClickListener(new View.OnClickListener() {
             // not sure working yet..
