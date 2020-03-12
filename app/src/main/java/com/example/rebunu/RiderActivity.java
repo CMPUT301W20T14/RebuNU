@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -257,6 +258,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @SuppressLint("SetTextI18n")
             @Override
             public void afterTextChanged(Editable s) {
                 try {
@@ -281,6 +283,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
+            @SuppressLint("SetTextI18n")
             @Override
             public void afterTextChanged(Editable s) {
                 try {

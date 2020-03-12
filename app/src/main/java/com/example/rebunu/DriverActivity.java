@@ -6,7 +6,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -30,6 +32,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -42,6 +45,8 @@ import org.imperiumlabs.geofirestore.listeners.GeoQueryDataEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -50,7 +55,7 @@ import java.util.Objects;
  * @author Zijian Xi, Zihao Huang
  */
 
-// Since I am clear that I am using correct down-casting, I will suppress type unchecked warnings.
+// Since we are clear that I am using correct down-casting, we will suppress type "unchecked" warnings.
 @SuppressWarnings("unchecked")
 public class DriverActivity extends AppCompatActivity implements OnMapReadyCallback {
     // Reference: https://www.zoftino.com/android-mapview-tutorial posted on November 14, 2017
@@ -65,6 +70,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     public void updateRequestOnMap() {
         float[] distance = new float[1];
         Location currentLocation;
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
         // check if we have permission, if not, ask for permission
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -80,9 +86,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
         for(Map<String, Object> dataMap: recordIdToDataMap.values()) {
             ArrayList<GeoPoint> pos = (ArrayList<GeoPoint>) Objects.requireNonNull(dataMap.get("pos"));
-            //Integer price = ((Long) Objects.requireNonNull(dataMap.get("price"))).intValue();
-            //String riderId = (String) Objects.requireNonNull(dataMap.get("riderId"));
-            //String recordId = (String) Objects.requireNonNull(dataMap.get("recordId"));
             dataMap.put("state", "multiple");
 
             // calculate distance between request beginning location and current location
@@ -96,9 +99,14 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                         "Geolocation: (" + pos.get(0).getLatitude() + ", " + pos.get(0).getLongitude()+ ")"));
                 dataMap.put("marker", marker);
                 marker.setTag(dataMap);
+                builder.include(marker.getPosition());
             } catch (Exception e){
                Toast.makeText(getApplicationContext(), "Update request on map failed, due to: " + e.toString(), Toast.LENGTH_SHORT).show();
             }
+            // https://stackoverflow.com/questions/14828217/android-map-v2-zoom-to-show-all-the-markers answered Feb 12 '13 at 8:53 by andr
+            // https://stackoverflow.com/questions/14828217/android-map-v2-zoom-to-show-all-the-markers answered Jun 24 '16 at 12:19 by Zumry Mohamed
+            // zoom to show all the markers, auto bounding and fitting
+            gmap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), (int) (getResources().getDisplayMetrics().widthPixels * 0.30)));
         }
     }
 
@@ -124,7 +132,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     PackageManager.PERMISSION_GRANTED &&
                     ContextCompat.checkSelfPermission(DriverActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
                             PackageManager.PERMISSION_GRANTED)) {
-                ActivityCompat.requestPermissions(DriverActivity.this, new String[] {
+                ActivityCompat.requestPermissions(DriverActivity.this, new String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION
                 }, TAG_CODE_PERMISSION_LOCATION);
@@ -132,7 +140,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
             // get current location
             Location currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
             // and relocate camera to show current location
-            gmap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+            gmap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
 
             // search all request with center = current location and radius = 5 kilometers
             GeoQuery geoQuery = db.geoFirestore.queryAtLocation(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()), 5.0);
@@ -145,6 +153,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     recordIdToDataMap.put(documentSnapshot.getId(), dataMap);
                     updateRequestOnMap();
                 }
+
                 @Override
                 public void onDocumentExited(@NonNull DocumentSnapshot documentSnapshot) {
                     // if a request no longer satisfy our requirements, ie, cancelled or out of radius
@@ -152,14 +161,22 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     try {
                         recordIdToDataMap.remove(documentSnapshot.getId());
                         updateRequestOnMap();
-                    } catch (Exception ignored){}
+                    } catch (Exception ignored) {
+                    }
                 }
+
                 @Override
-                public void onDocumentMoved(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {}
+                public void onDocumentMoved(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
+                }
+
                 @Override
-                public void onDocumentChanged(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {}
+                public void onDocumentChanged(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
+                }
+
                 @Override
-                public void onGeoQueryReady() {}
+                public void onGeoQueryReady() {
+                }
+
                 @Override
                 public void onGeoQueryError(@NonNull Exception e) {
                     Toast.makeText(getApplicationContext(), "Searching failed, due to: " + e.toString(), Toast.LENGTH_SHORT).show();
@@ -167,19 +184,11 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
             });
         });
 
-        // Reference: https://developer.android.com/training/permissions/requesting.html Posted on 2019-12-27.
-//        if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-//                PackageManager.PERMISSION_GRANTED &&
-//                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
-//                        PackageManager.PERMISSION_GRANTED)) {
-//            ActivityCompat.requestPermissions(this, new String[] {
-//                    Manifest.permission.ACCESS_FINE_LOCATION,
-//                    Manifest.permission.ACCESS_COARSE_LOCATION
-//            }, TAG_CODE_PERMISSION_LOCATION);
-//        }
         mapView.onCreate(null);
         mapView.getMapAsync(this);
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PackageManager.PERMISSION_GRANTED);
+    }
+
+//       ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PackageManager.PERMISSION_GRANTED);
 
 //        button_searchNearby_floating.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -247,7 +256,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMap) {
         gmap = googleMap;
         // minimal zoom out scale
-        gmap.setMinZoomPreference(16);
+        gmap.setMinZoomPreference(10);
         gmap.setMyLocationEnabled(true);
         UiSettings uiSettings = gmap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
@@ -269,12 +278,13 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     Manifest.permission.ACCESS_COARSE_LOCATION
             }, TAG_CODE_PERMISSION_LOCATION);
         }
+
         // get current location
         // Reference: https://stackoverflow.com/questions/36878087/get-current-location-lat-long-in-android-google-map-when-app-start Posted on Apr 27 '16 at 21:04 by Dijkstra
         Location currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
 
         // set current location in the middle of the camera, or to say, the visible area's center is user's current location
-        gmap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+        gmap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
         gmap.setOnMarkerClickListener(marker -> {
             Map<String, Object> dataMap = Objects.requireNonNull((Map<String, Object>) marker.getTag());
             String state = Objects.requireNonNull((String) dataMap.get("state"));
@@ -357,11 +367,20 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 // update the view
                 button_searchNearby_floating.setVisibility(View.GONE);
                 layout_request_accepted.setVisibility(View.VISIBLE);
-
-                String from = "(" + start.getLatitude() + ", " + start.getLongitude() + ")";
-                String to = "(" + end.getLatitude() + ", " + end.getLongitude() + ")";
-                textview_fromWhere_request_accepted.setText(from);
-                textview_to_request_accepted.setText(to);
+                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(start.getLatitude(), start.getLongitude(), 1);
+                    String startAddress = addresses.get(0).getAddressLine(0);
+                    addresses = geocoder.getFromLocation(end.getLatitude(), end.getLongitude(), 1);
+                    String endAddress = addresses.get(0).getAddressLine(1);
+                    textview_fromWhere_request_accepted.setText(startAddress);
+                    textview_to_request_accepted.setText(endAddress);
+                } catch (Exception ignored){
+                    String from = "(" + start.getLatitude() + ", " + start.getLongitude() + ")";
+                    String to = "(" + end.getLatitude() + ", " + end.getLongitude() + ")";
+                    textview_fromWhere_request_accepted.setText(from);
+                    textview_to_request_accepted.setText(to);
+                }
                 textview_estimatedRateNumeric_request_accepted.setText(price.toString());
 
                 // before we show pick up and drop locations, we want to make sure there is no other request marker(car icon)
@@ -379,6 +398,11 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 tag.put("state", "two");
                 startMarker.setTag(tag);
                 endMarker.setTag(tag);
+                LatLngBounds.Builder latLngBuilder = new LatLngBounds.Builder();
+                latLngBuilder.include(startMarker.getPosition());
+                latLngBuilder.include(endMarker.getPosition());
+                gmap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBuilder.build(),
+                        (int) (getResources().getDisplayMetrics().widthPixels * 0.30)));
             } else {
                 marker.showInfoWindow();
             }
