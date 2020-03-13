@@ -69,54 +69,54 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private Criteria criteria;
     private Map<String, Map<String, Object>> recordIdToDataMap = new HashMap<>();
 
-    public void updateRequestOnMap() {
-        float[] distance = new float[1];
-        Location currentLocation;
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-        // check if we have permission, if not, ask for permission
-        if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED)) {
-            ActivityCompat.requestPermissions(this, new String[] {
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, TAG_CODE_PERMISSION_LOCATION);
-        }
-        currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
-
-        // if no request to show, just relocate camera to current location and zoom out
-        if (recordIdToDataMap.isEmpty()) {
-            gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 13));
-            return;
-        }
-
-        for(Map<String, Object> dataMap: recordIdToDataMap.values()) {
-            ArrayList<GeoPoint> pos = (ArrayList<GeoPoint>) Objects.requireNonNull(dataMap.get("pos"));
-            dataMap.put("state", "multiple");
-
-            // calculate distance between request beginning location and current location
-            Location.distanceBetween(pos.get(0).getLatitude(), pos.get(0).getLongitude(), currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
-            // update request icon on map
-            try {
-                Marker marker = gmap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.available_request_icon_small))
-                    .position(new LatLng(pos.get(0).getLatitude(), pos.get(0).getLongitude()))
-                    .title("Distance: " + Double.valueOf(distance[0]).intValue() + " Meters. " +
-                        "Geolocation: (" + pos.get(0).getLatitude() + ", " + pos.get(0).getLongitude()+ ")"));
-                dataMap.put("marker", marker);
-                marker.setTag(dataMap);
-                builder.include(marker.getPosition());
-            } catch (Exception e){
-               Toast.makeText(getApplicationContext(), "Update request on map failed, due to: " + e.toString(), Toast.LENGTH_SHORT).show();
-            }
-            // https://stackoverflow.com/questions/14828217/android-map-v2-zoom-to-show-all-the-markers answered Feb 12 '13 at 8:53 by andr
-            // https://stackoverflow.com/questions/14828217/android-map-v2-zoom-to-show-all-the-markers answered Jun 24 '16 at 12:19 by Zumry Mohamed
-            // zoom to show all the markers, auto bounding and fitting
-            gmap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), (int) (getResources().getDisplayMetrics().widthPixels * 0.30)));
-        }
-    }
+//    public void updateRequestOnMap() {
+//        float[] distance = new float[1];
+//        Location currentLocation;
+//        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+//
+//        // check if we have permission, if not, ask for permission
+//        if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+//                PackageManager.PERMISSION_GRANTED &&
+//                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+//                        PackageManager.PERMISSION_GRANTED)) {
+//            ActivityCompat.requestPermissions(this, new String[] {
+//                    Manifest.permission.ACCESS_FINE_LOCATION,
+//                    Manifest.permission.ACCESS_COARSE_LOCATION
+//            }, TAG_CODE_PERMISSION_LOCATION);
+//        }
+//        currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
+//
+//        // if no request to show, just relocate camera to current location and zoom out
+//        if (recordIdToDataMap.isEmpty()) {
+//            gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 13));
+//            return;
+//        }
+//
+//        for(Map<String, Object> dataMap: recordIdToDataMap.values()) {
+//            ArrayList<GeoPoint> pos = (ArrayList<GeoPoint>) Objects.requireNonNull(dataMap.get("pos"));
+//            dataMap.put("state", "multiple");
+//
+//            // calculate distance between request beginning location and current location
+//            Location.distanceBetween(pos.get(0).getLatitude(), pos.get(0).getLongitude(), currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
+//            // update request icon on map
+//            try {
+//                Marker marker = gmap.addMarker(new MarkerOptions()
+//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.available_request_icon_small))
+//                    .position(new LatLng(pos.get(0).getLatitude(), pos.get(0).getLongitude()))
+//                    .title("Distance: " + Double.valueOf(distance[0]).intValue() + " Meters. " +
+//                        "Geolocation: (" + pos.get(0).getLatitude() + ", " + pos.get(0).getLongitude()+ ")"));
+//                dataMap.put("marker", marker);
+//                marker.setTag(dataMap);
+//                builder.include(marker.getPosition());
+//            } catch (Exception e){
+//               Toast.makeText(getApplicationContext(), "Update request on map failed, due to: " + e.toString(), Toast.LENGTH_SHORT).show();
+//            }
+//            // https://stackoverflow.com/questions/14828217/android-map-v2-zoom-to-show-all-the-markers answered Feb 12 '13 at 8:53 by andr
+//            // https://stackoverflow.com/questions/14828217/android-map-v2-zoom-to-show-all-the-markers answered Jun 24 '16 at 12:19 by Zumry Mohamed
+//            // zoom to show all the markers, auto bounding and fitting
+//            gmap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), (int) (getResources().getDisplayMetrics().widthPixels * 0.30)));
+//        }
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +164,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     dataMap.put("recordId", documentSnapshot.getId());
                     recordIdToDataMap.put(documentSnapshot.getId(), dataMap);
                     gmap.clear();
-                    updateRequestOnMap();
+                    //updateRequestOnMap();
+                    MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
                 }
 
                 @Override
@@ -173,7 +174,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     try {
                         recordIdToDataMap.remove(documentSnapshot.getId());
                         gmap.clear();
-                        updateRequestOnMap();
+                        //updateRequestOnMap();
+                        MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
                     } catch (Exception ignored) {
                     }
                 }
@@ -365,7 +367,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                         layout_request_accepted.setVisibility(View.GONE);
                                         button_searchNearby_floating.setVisibility(View.VISIBLE);
                                         gmap.clear();
-                                        updateRequestOnMap();
+                                        //updateRequestOnMap();
+                                        MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
                                         return;
                                     }
                                     if (documentSnapshot != null && documentSnapshot.exists()) {
@@ -395,7 +398,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                 layout_request_accepted.setVisibility(View.GONE);
                                 button_searchNearby_floating.setVisibility(View.VISIBLE);
                                 gmap.clear();
-                                updateRequestOnMap();
+                                //updateRequestOnMap();
+                                MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
                             }
                         });
 

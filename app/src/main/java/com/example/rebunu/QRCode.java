@@ -96,7 +96,10 @@ public class QRCode {
      * Getter for content
      * @return content
      */
-//    public String getContent(){ return content; }
+    public String getContent(){
+        return this.driverId + " "
+                + this.riderId + " "
+                + this.price + "";
 
 
     /**
@@ -104,7 +107,7 @@ public class QRCode {
      * @param driverId a positive Integer
      * @throws Exception invalid number
      */
-    public void setDriverId(Integer driverId)throws Exception{
+    public void setDriverId(Integer driverId) throws Exception{
         if (driverId >= 0){
             this.driverId = driverId;
         } else {
@@ -117,7 +120,7 @@ public class QRCode {
      * @param riderId a positive Integer
      * @throws Exception invalid number
      */
-    public void setRiderId(Integer riderId)throws Exception{
+    public void setRiderId(Integer riderId) throws Exception{
         if (riderId >= 0){
             this.riderId = riderId;
         } else {
@@ -130,7 +133,7 @@ public class QRCode {
      * @param price a String
      * @throws Exception null exception or empty exception
      */
-    public void setPrice(Integer price)throws Exception{
+    public void setPrice(Integer price) throws Exception{
         if (price >= 0){
             this.price = price;
         } else {
@@ -139,12 +142,11 @@ public class QRCode {
     }
 
     /**
-     * Getter for content
-     * @return content
+     * Setter for content
      */
-    public String getContent(){
-        return this.driverId + " "
-                + this.riderId + " "
-                + this.price + "";
+    public void setContent() {
+        this.content = this.driverId + " "
+                     + this.riderId + " "
+                     + this.price + "";
     }
 }
