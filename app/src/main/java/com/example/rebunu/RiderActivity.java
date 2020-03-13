@@ -50,7 +50,7 @@ import java.util.Objects;
 
 /**
  * Rider screen
- * @author Zijian Xi, Zihao HUang
+ * @author Zijian Xi, Zihao Huang
  */
 public class RiderActivity extends AppCompatActivity implements OnMapReadyCallback{
     // Reference: https://www.zoftino.com/android-mapview-tutorial posted on November 14, 2017

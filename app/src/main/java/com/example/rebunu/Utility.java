@@ -99,4 +99,14 @@ public class Utility {
         return nearByCars;
     }
 
+    public static void pushMockedRequestsToDatabase() {
+        ArrayList<Location> nearByCars = mockSurrounding();
+        Database db = new Database();
+        for(int i=0; i<5; i++) {
+            try {
+                Request request = new Request(nearByCars.get(i), nearByCars.get(4-i), i+6, "mocked");
+                db.add(request);
+            } catch (Exception ignored){}
+        }
+    }
 }

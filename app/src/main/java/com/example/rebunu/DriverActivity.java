@@ -35,6 +35,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -84,6 +86,12 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         }
         currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
 
+        // if no request to show, just relocate camera to current location and zoom out
+        if (recordIdToDataMap.isEmpty()) {
+            gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 13));
+            return;
+        }
+
         for(Map<String, Object> dataMap: recordIdToDataMap.values()) {
             ArrayList<GeoPoint> pos = (ArrayList<GeoPoint>) Objects.requireNonNull(dataMap.get("pos"));
             dataMap.put("state", "multiple");
@@ -115,6 +123,10 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver);
 
+        // ########### ONLY FOR TEST ###########
+        // Utility.pushMockedRequestsToDatabase();
+        // #####################################
+
         // initialise database for later query
         Database db = new Database();
 
@@ -140,7 +152,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
             // get current location
             Location currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
             // and relocate camera to show current location
-            gmap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+            gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10));
 
             // search all request with center = current location and radius = 5 kilometers
             GeoQuery geoQuery = db.geoFirestore.queryAtLocation(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()), 5.0);
@@ -151,15 +163,16 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     Map<String, Object> dataMap = Objects.requireNonNull(documentSnapshot.getData());
                     dataMap.put("recordId", documentSnapshot.getId());
                     recordIdToDataMap.put(documentSnapshot.getId(), dataMap);
+                    gmap.clear();
                     updateRequestOnMap();
                 }
 
                 @Override
                 public void onDocumentExited(@NonNull DocumentSnapshot documentSnapshot) {
                     // if a request no longer satisfy our requirements, ie, cancelled or out of radius
-                    Toast.makeText(getApplicationContext(), documentSnapshot.getId(), Toast.LENGTH_SHORT).show();
                     try {
                         recordIdToDataMap.remove(documentSnapshot.getId());
+                        gmap.clear();
                         updateRequestOnMap();
                     } catch (Exception ignored) {
                     }
@@ -175,11 +188,14 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
                 @Override
                 public void onGeoQueryReady() {
+                    if(recordIdToDataMap.isEmpty()) {
+                        Toast.makeText(getApplicationContext(), "No request found near your location.", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override
                 public void onGeoQueryError(@NonNull Exception e) {
-                    Toast.makeText(getApplicationContext(), "Searching failed, due to: " + e.toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "A problem occurs during searching, please retry." + e.toString(), Toast.LENGTH_SHORT).show();
                 }
             });
         });
@@ -284,128 +300,169 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         Location currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
 
         // set current location in the middle of the camera, or to say, the visible area's center is user's current location
-        gmap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+        gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10));
         gmap.setOnMarkerClickListener(marker -> {
             Map<String, Object> dataMap = Objects.requireNonNull((Map<String, Object>) marker.getTag());
             String state = Objects.requireNonNull((String) dataMap.get("state"));
-            if(state.equals("multiple")) {
-                // no matter what, we know what marker has been selected :)
-                // and retrieve bind information correspondingly
-                ArrayList<GeoPoint> pos = Objects.requireNonNull((ArrayList<GeoPoint>) dataMap.get("pos"));
-                Integer price = Objects.requireNonNull((Long) dataMap.get("price")).intValue();
-                String recId = Objects.requireNonNull((String) dataMap.get("recordId"));
-                String riderId = Objects.requireNonNull((String) dataMap.get("riderId"));
-                GeoPoint start = pos.get(0);
-                GeoPoint end = pos.get(1);
+            String recordId = Objects.requireNonNull((String) dataMap.get("recordId"));
 
-                Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
-                ConstraintLayout layout_request_accepted = findViewById(R.id.driver_layout_request_accepted);
-                Button button_hide_request_accepted = findViewById(R.id.driver_button_hide_request_accepted);
-                TextView textview_fromWhere_request_accepted = findViewById(R.id.driver_textview_fromWhere_request_accepted);
-                TextView textview_to_request_accepted = findViewById(R.id.driver_textview_to_request_accepted);
-                TextView textview_estimatedRateNumeric_request_accepted = findViewById(R.id.driver_textview_estimatedRateNumeric_request_accepted);
-                Button button_accept_request_accepted = findViewById(R.id.driver_button_accept_request_accepted);
+            new Database().requests.document(recordId).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    // normal request
+                    if(state.equals("multiple")) {
+                        // no matter what, we know what marker has been selected :)
+                        // and retrieve bind information correspondingly
+                        ArrayList<GeoPoint> pos = Objects.requireNonNull((ArrayList<GeoPoint>) dataMap.get("pos"));
+                        Integer price = Objects.requireNonNull((Long) dataMap.get("price")).intValue();
+                        String recId = Objects.requireNonNull((String) dataMap.get("recordId"));
+                        String riderId = Objects.requireNonNull((String) dataMap.get("riderId"));
+                        GeoPoint start = pos.get(0);
+                        GeoPoint end = pos.get(1);
 
-                // this is for driver to accepted request
-                button_accept_request_accepted.setOnClickListener(v -> {
-                    Order order = new Order();
-                    try {
-                        // initialise a new Order object, we do not set status now, because it is not decided by rider to accept
-                        order.setStart(Utility.geoPointToLocation(start));
-                        order.setEnd(Utility.geoPointToLocation(end));
-                        order.setPrice(price);
-                        order.setDriverId((String) Objects.requireNonNull(getIntent().getExtras()).get("profileId"));
-                        order.setRiderId(riderId);
-                        order.setId(recId);
+                        Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
+                        ConstraintLayout layout_request_accepted = findViewById(R.id.driver_layout_request_accepted);
+                        Button button_hide_request_accepted = findViewById(R.id.driver_button_hide_request_accepted);
+                        TextView textview_fromWhere_request_accepted = findViewById(R.id.driver_textview_fromWhere_request_accepted);
+                        TextView textview_to_request_accepted = findViewById(R.id.driver_textview_to_request_accepted);
+                        TextView textview_estimatedRateNumeric_request_accepted = findViewById(R.id.driver_textview_estimatedRateNumeric_request_accepted);
+                        Button button_accept_request_accepted = findViewById(R.id.driver_button_accept_request_accepted);
 
-                        // update the view
-                        button_hide_request_accepted.setVisibility(View.GONE);
-                        button_accept_request_accepted.setVisibility(View.GONE);
-                        ProgressBar progressbar_request_accepted = findViewById(R.id.driver_progressbar_request_accepted);
-                        TextView textview_confirming_request_accepted = findViewById(R.id.driver_textview_confirming_request_accepted);
-                        progressbar_request_accepted.setVisibility(View.VISIBLE);
-                        textview_confirming_request_accepted.setVisibility(View.VISIBLE);
 
-                        Database db = new Database();
-                        // add correspond order
-                        String realId = db.add(order);
-                        Toast.makeText(getApplicationContext(), recId + " <-> " + realId, Toast.LENGTH_SHORT).show();
-                        // delete correspond request
-                        db.deleteById(recId, 2);
-                        // and monitor document
-                        // a DocumentSnapshot listener, this is how we can monitor a specific record
-                        db.orders.document(recId).addSnapshotListener((documentSnapshot, e) -> {
-                            if(e != null){
-                                //
-                                return;
-                            }
-                            if (documentSnapshot != null && documentSnapshot.exists()) {
-                                int status = ((Long) Objects.requireNonNull(Objects.requireNonNull(documentSnapshot.getData()).get("status"))).intValue();
-                                if(status == 3) {
-                                    // proceed
-                                    Toast.makeText(getApplicationContext(), "Both agreed", Toast.LENGTH_SHORT).show();
-                                } else if (status == 2) {
-                                    // user cancelled the order
-                                    Toast.makeText(getApplicationContext(), "User cancelled", Toast.LENGTH_SHORT).show();
-                                }
+
+                        // this is for driver to accepted request
+                        button_accept_request_accepted.setOnClickListener(v -> {
+                            Order order = new Order();
+                            try {
+                                // initialise a new Order object, we do not set status now, because it is not decided by rider to accept
+                                order.setStart(Utility.geoPointToLocation(start));
+                                order.setEnd(Utility.geoPointToLocation(end));
+                                order.setPrice(price);
+                                order.setDriverId((String) Objects.requireNonNull(getIntent().getExtras()).get("profileId"));
+                                order.setRiderId(riderId);
+                                order.setId(recId);
+
+                                // update the view
+                                button_hide_request_accepted.setVisibility(View.GONE);
+                                button_accept_request_accepted.setVisibility(View.GONE);
+                                ProgressBar progressbar_request_accepted = findViewById(R.id.driver_progressbar_request_accepted);
+                                TextView textview_confirming_request_accepted = findViewById(R.id.driver_textview_confirming_request_accepted);
+                                progressbar_request_accepted.setVisibility(View.VISIBLE);
+                                textview_confirming_request_accepted.setVisibility(View.VISIBLE);
+
+                                Database db = new Database();
+                                // add correspond order
+                                String realId = db.add(order);
+                                // delete correspond request and monitor document
+                                db.deleteById(recId, 2);
+                                // a DocumentSnapshot listener, this is how we can monitor a specific record
+                                db.orders.document(recId).addSnapshotListener((documentSnapshot, e) -> {
+                                    if(e != null){
+                                        Toast.makeText(getApplicationContext(),
+                                                "A problem occurs during placing your order, please retry.",
+                                                Toast.LENGTH_SHORT).show();
+                                        layout_request_accepted.setVisibility(View.GONE);
+                                        button_searchNearby_floating.setVisibility(View.VISIBLE);
+                                        gmap.clear();
+                                        updateRequestOnMap();
+                                        return;
+                                    }
+                                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                                        int status = ((Long) Objects.requireNonNull(Objects.requireNonNull(documentSnapshot.getData()).get("status"))).intValue();
+                                        if(status == 3) {
+                                            // proceed
+                                            Toast.makeText(getApplicationContext(), "Both agreed", Toast.LENGTH_SHORT).show();
+                                        } else if (status == 2) {
+                                            // user cancelled the order
+                                            Toast.makeText(getApplicationContext(), "User cancelled", Toast.LENGTH_SHORT).show();
+                                        } else if (status == 4) {
+                                            // do something
+                                        } else if (status == 5) {
+                                            // do something
+                                        }
+                                    }
+                                });
+                            } catch (Exception e){
+                                Toast.makeText(getApplicationContext(), "A problem occurs during accept request, please retry." , Toast.LENGTH_SHORT).show();
                             }
                         });
-                    } catch (Exception e){
-                        Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
-                    }
-                });
 
-                button_hide_request_accepted.setOnClickListener(v -> {
-                    if(floatingButtonStatus.equals("SHOW_ALL_REQUEST")) {
+                        button_hide_request_accepted.setOnClickListener(v -> {
+                            // when click the cross
+                            if(floatingButtonStatus.equals("SHOW_ALL_REQUEST")) {
+                                // update the view
+                                layout_request_accepted.setVisibility(View.GONE);
+                                button_searchNearby_floating.setVisibility(View.VISIBLE);
+                                gmap.clear();
+                                updateRequestOnMap();
+                            }
+                        });
+
                         // update the view
-                        layout_request_accepted.setVisibility(View.GONE);
-                        button_searchNearby_floating.setVisibility(View.VISIBLE);
-                        button_searchNearby_floating.performClick();
+                        button_searchNearby_floating.setVisibility(View.GONE);
+                        layout_request_accepted.setVisibility(View.VISIBLE);
+                        // https://stackoverflow.com/questions/9409195/how-to-get-complete-address-from-latitude-and-longitude answered Feb 23 '12 at 8:09 by user370305
+                        Geocoder geocoder = new Geocoder(DriverActivity.this, Locale.getDefault());
+                        try {
+                            List<Address> addresses = geocoder.getFromLocation(start.getLatitude(), start.getLongitude(), 1);
+                            String startAddress = addresses.get(0).getAddressLine(0);
+                            addresses = geocoder.getFromLocation(end.getLatitude(), end.getLongitude(), 1);
+                            String endAddress = addresses.get(0).getAddressLine(0);
+                            String[] splitedStartAddress = Objects.requireNonNull(startAddress.split(","));
+                            String[] splitedEndAddress = Objects.requireNonNull(endAddress.split(","));
+                            // show only street address and province
+                            textview_fromWhere_request_accepted.setText(splitedStartAddress[0] + ", " + splitedStartAddress[1]);
+                            textview_to_request_accepted.setText(splitedEndAddress[0] + ", " + splitedEndAddress[1]);
+                        } catch (Exception ignored){
+                            // fail-safe
+                            try {
+                                List<Address> addresses = geocoder.getFromLocation(start.getLatitude(), start.getLongitude(), 1);
+                                String startAddress = addresses.get(0).getAddressLine(0);
+                                addresses = geocoder.getFromLocation(end.getLatitude(), end.getLongitude(), 1);
+                                String endAddress = addresses.get(0).getAddressLine(0);
+                                String[] splitedStartAddress = Objects.requireNonNull(startAddress.split(","));
+                                String[] splitedEndAddress = Objects.requireNonNull(endAddress.split(","));
+                                // show only street address and province
+                                textview_fromWhere_request_accepted.setText(splitedStartAddress[0] + ", " + splitedStartAddress[1]);
+                                textview_to_request_accepted.setText(splitedEndAddress[0] + ", " + splitedEndAddress[1]);
+                            } catch (Exception failsafe){
+                                // if error occurs, will show coordinates instead
+                                String from = "(" + start.getLatitude() + ", " + start.getLongitude() + ")";
+                                String to = "(" + end.getLatitude() + ", " + end.getLongitude() + ")";
+                                textview_fromWhere_request_accepted.setText(from);
+                                textview_to_request_accepted.setText(to);
+                            }
+                        }
+                        textview_estimatedRateNumeric_request_accepted.setText(price.toString());
+
+                        // before we show pick up and drop locations, we want to make sure there is no other request marker(car icon)
+                        // so we clear the map view
+                        gmap.clear();
+                        Marker startMarker = gmap.addMarker(new MarkerOptions()
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pick))
+                                .position(new LatLng(pos.get(0).getLatitude(), pos.get(0).getLongitude()))
+                                .title("start"));
+                        Marker endMarker = gmap.addMarker(new MarkerOptions()
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.drop))
+                                .position(new LatLng(pos.get(1).getLatitude(), pos.get(1).getLongitude()))
+                                .title("end"));
+                        Map<String, Object> tag = new HashMap<>();
+                        tag.put("state", "two");
+                        startMarker.setTag(tag);
+                        endMarker.setTag(tag);
+                        LatLngBounds.Builder latLngBuilder = new LatLngBounds.Builder();
+                        latLngBuilder.include(startMarker.getPosition());
+                        latLngBuilder.include(endMarker.getPosition());
+                        gmap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBuilder.build(),
+                                (int) (getResources().getDisplayMetrics().widthPixels * 0.30)));
+                    } else {
+                        marker.showInfoWindow();
                     }
-                });
-
-                // update the view
-                button_searchNearby_floating.setVisibility(View.GONE);
-                layout_request_accepted.setVisibility(View.VISIBLE);
-                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-                try {
-                    List<Address> addresses = geocoder.getFromLocation(start.getLatitude(), start.getLongitude(), 1);
-                    String startAddress = addresses.get(0).getAddressLine(0);
-                    addresses = geocoder.getFromLocation(end.getLatitude(), end.getLongitude(), 1);
-                    String endAddress = addresses.get(0).getAddressLine(1);
-                    textview_fromWhere_request_accepted.setText(startAddress);
-                    textview_to_request_accepted.setText(endAddress);
-                } catch (Exception ignored){
-                    String from = "(" + start.getLatitude() + ", " + start.getLongitude() + ")";
-                    String to = "(" + end.getLatitude() + ", " + end.getLongitude() + ")";
-                    textview_fromWhere_request_accepted.setText(from);
-                    textview_to_request_accepted.setText(to);
+                } else {
+                    // abnormal request, actually cancelled by rider, but due to network latency,
+                    // the driver clicked that one
+                    Toast.makeText(getApplicationContext(), "Request has already been cancelled by rider.", Toast.LENGTH_SHORT).show();
                 }
-                textview_estimatedRateNumeric_request_accepted.setText(price.toString());
-
-                // before we show pick up and drop locations, we want to make sure there is no other request marker(car icon)
-                // so we clear the map view
-                gmap.clear();
-                Marker startMarker = gmap.addMarker(new MarkerOptions()
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.pick))
-                        .position(new LatLng(pos.get(0).getLatitude(), pos.get(0).getLongitude()))
-                        .title("start"));
-                Marker endMarker = gmap.addMarker(new MarkerOptions()
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.drop))
-                        .position(new LatLng(pos.get(1).getLatitude(), pos.get(1).getLongitude()))
-                        .title("end"));
-                Map<String, Object> tag = new HashMap<>();
-                tag.put("state", "two");
-                startMarker.setTag(tag);
-                endMarker.setTag(tag);
-                LatLngBounds.Builder latLngBuilder = new LatLngBounds.Builder();
-                latLngBuilder.include(startMarker.getPosition());
-                latLngBuilder.include(endMarker.getPosition());
-                gmap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBuilder.build(),
-                        (int) (getResources().getDisplayMetrics().widthPixels * 0.30)));
-            } else {
-                marker.showInfoWindow();
-            }
+            });
             return true;
         });
     }
