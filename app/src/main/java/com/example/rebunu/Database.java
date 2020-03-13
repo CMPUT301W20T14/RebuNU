@@ -41,14 +41,34 @@ public class Database {
     //                        orders contains all the deleted or accepted requests
     //                        auth contains all the match of username and password
 
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-    CollectionReference profiles = db.collection("profiles");
-    CollectionReference requests = db.collection("requests");
-    CollectionReference orders = db.collection("orders");
-    CollectionReference auth= db.collection("auth");
-    GeoFirestore geoFirestore = new GeoFirestore(requests);
+    FirebaseFirestore db;
+    CollectionReference profiles;
+    CollectionReference requests;
+    CollectionReference orders;
+    CollectionReference auth;
+    GeoFirestore geoFirestore;
 
     String TAG = "RebuNu";
+
+    public Database(){
+        db = FirebaseFirestore.getInstance();
+        profiles = db.collection("profiles");
+        requests = db.collection("requests");
+        orders = db.collection("orders");
+        auth= db.collection("auth");
+        geoFirestore = new GeoFirestore(requests);
+    }
+    public Database(FirebaseFirestore firestore){
+
+        db = firestore.getInstance();
+        profiles = db.collection("profiles");
+        requests = db.collection("requests");
+        orders = db.collection("orders");
+        auth= db.collection("auth");
+        geoFirestore = new GeoFirestore(requests);
+
+    }
+
 
     /**
      * pass a Hashmap with all information of the user

@@ -1,7 +1,5 @@
 package com.example.rebunu;
 
-
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -15,13 +13,8 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Zijian Xi, Zihao Huang
- * UI Test for MainActivity, SignupActivity, LoginActivity, RiderActivity, DriverActivity
- */
-
 @RunWith(AndroidJUnit4.class)
-public class MainActivityTest {
+public class LoginActivityTest {
     private Solo solo;
 
     @Rule
@@ -34,24 +27,21 @@ public class MainActivityTest {
     }
 
     /**
-     * See if login button working
+     * See if q customer can login
      */
     @Test
     public void checkLogin() {
-        // assert that the current activity is MainActivity
         solo.assertCurrentActivity("Wrong city", MainActivity.class);
         solo.clickOnButton("LOG IN");
         assertTrue(solo.waitForText("PASSWORD", 1, 2000));
-    }
 
-    /**
-     * See if sign up button working
-     */
-    @Test
-    public void checkSignUp() {
-        solo.assertCurrentActivity("Wrong city",MainActivity.class);
-        solo.clickOnButton("SIGN UP");
-        assertTrue(solo.waitForText("CONFIRM PASSWORD"));
-        assertTrue(solo.waitForText("", 1, 2000));
+        solo.enterText(0, "123");
+        solo.enterText(1, "111");
+        solo.clickOnButton("LOG IN");
+        solo.assertCurrentActivity("Wrong city", RiderActivity.class);
     }
 }
+
+
+
+
