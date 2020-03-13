@@ -297,13 +297,10 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
         rider_button_payYourTrip_rating.setOnClickListener(v -> {
             rider_layout_rating.setVisibility(ConstraintLayout.GONE);
-            QRCode qrCode = new QRCode();
+            QRCode qrCode = new QRCode(123,234,345);
             try {
-                qrCode.setDriverId(666);
-                qrCode.setRiderId(777);
-                qrCode.setPrice(888);
-                qrCode.setContent();
-                rider_imageview_qrcode.setImageBitmap(qrCode.QRCode(qrCode.getContent()));
+
+                rider_imageview_qrcode.setImageBitmap(qrCode.getBitmap());
             }catch (Exception ignored){}
             rider_layout_qrcode.setVisibility(ConstraintLayout.VISIBLE);
             // maybe add status change
