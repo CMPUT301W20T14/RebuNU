@@ -7,6 +7,11 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.BarcodeFormat;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 
 /**
  * This is the QRCode class implementation.
@@ -16,42 +21,43 @@ public class QRCode {
     private Integer driverId;
     private Integer riderId;
     private Integer price;
-    private String content;
+    private String transactionID;
+    private Bitmap bitmap;
 
-    /**
-     * Constructor for QRCode
-     * @param content a string
-     */
-    public Bitmap QRCode(String content){
+    // private String content;
 
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+    public QRCode(Integer driverId, Integer riderId, Integer price){
+        String pattern = "MM/dd/yyyy HH:mm:ss";
+        DateFormat df = new SimpleDateFormat(pattern);
+        Date today = Calendar.getInstance().getTime();
+        String todayAsString = df.format(today);
 
-
+        System.out.println("Today is: " + todayAsString);
+        this.driverId = driverId;
+        this.riderId = riderId;
+        this.price = price;
+        this.transactionID = driverId+riderId+todayAsString;
         try {
-            BitMatrix bitMatrix = qrCodeWriter.encode(this.content, BarcodeFormat.QR_CODE, 700, 700);
-            Bitmap bitmap = Bitmap.createBitmap(700, 700, Bitmap.Config.RGB_565);
-
-            for (int x = 0; x < 700; x++){
-                for (int y = 0; y < 700; y++){
-                    bitmap.setPixel(x,y,bitMatrix.get(x,y)? Color.BLACK : Color.WHITE);
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrCodeWriter.encode(getContent(), BarcodeFormat.QR_CODE, 700, 700);
+            this.bitmap = Bitmap.createBitmap(700, 700, Bitmap.Config.RGB_565);
+            for (int x = 0; x < 700; x++) {
+                for (int y = 0; y < 700; y++) {
+                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
                 }
             }
-
-            return bitmap;
-
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return null;
     }
 
     /**
-     * Getter for driverId
-     * @return driverId
+     * Getter for transcationID
+     * @return transcationID
      */
-    public Integer getDriverId(){
-        return driverId;
+    public String transcationID(){
+        return transactionID;
     }
 
     /**
@@ -71,10 +77,26 @@ public class QRCode {
     }
 
     /**
+     * Getter for bitmap
+     * @return bitmap
+     */
+    public Bitmap getBitmap(){
+        return bitmap;
+    }
+
+    /**
+     * Getter for driverId
+     * @return driverId
+     */
+    public Integer getDriverId(){
+        return driverId;
+    }
+
+    /**
      * Getter for content
      * @return content
      */
-    public String getContent(){ return content; }
+//    public String getContent(){ return content; }
 
 
     /**
@@ -117,12 +139,12 @@ public class QRCode {
     }
 
     /**
-     * Setter for content
-     * @throws NullPointerException null exception or empty exception
+     * Getter for content
+     * @return content
      */
-    public void setContent(){
-        this.content = this.driverId + " "
-                     + this.riderId + " "
-                     + this.price + "";
+    public String getContent(){
+        return this.driverId + " "
+                + this.riderId + " "
+                + this.price + "";
     }
 }
