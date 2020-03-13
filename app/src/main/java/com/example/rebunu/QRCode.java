@@ -96,11 +96,11 @@ public class QRCode {
      * Getter for content
      * @return content
      */
-    public String getContent(){
+    public String getContent() {
         return this.driverId + " "
                 + this.riderId + " "
                 + this.price + "";
-
+    }
 
     /**
      * Setter for driverId
@@ -139,14 +139,5 @@ public class QRCode {
         } else {
             throw new Exception("Invalid price.");
         }
-    }
-
-    /**
-     * Setter for content
-     */
-    public void setContent() {
-        this.content = this.driverId + " "
-                     + this.riderId + " "
-                     + this.price + "";
     }
 }
