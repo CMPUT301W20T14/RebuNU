@@ -1,2 +1,3 @@
 # RebuNU
-RebuNU is a recursive acronym for "RebuNU's Not Uber"
+
+## RebuNU is a recursive acronym for "RebuNU's Not Uber"
