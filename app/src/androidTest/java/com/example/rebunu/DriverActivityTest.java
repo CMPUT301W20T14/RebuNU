@@ -14,6 +14,9 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertTrue;
 
+/**
+ * UI test for DriverActivity
+ */
 @RunWith(AndroidJUnit4.class)
 public class DriverActivityTest {
     private Solo solo;
@@ -27,9 +30,12 @@ public class DriverActivityTest {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
     }
 
+    /**
+     * check if our jumping logic is correct
+     */
     @Test
     public void checkDriver() {
-        solo.assertCurrentActivity("Wrong city", MainActivity.class);
+        solo.assertCurrentActivity("Wrong activity", MainActivity.class);
         solo.clickOnButton("LOG IN");
         assertTrue(solo.waitForText("PASSWORD", 1, 2000));
 

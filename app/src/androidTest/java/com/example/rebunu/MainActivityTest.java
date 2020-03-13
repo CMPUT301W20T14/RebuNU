@@ -16,8 +16,8 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Zijian Xi, Zihao Huang
- * UI Test for MainActivity, SignupActivity, LoginActivity, RiderActivity, DriverActivity
+ * @author Zijian Xi
+ * UI Test for MainActivity
  */
 
 @RunWith(AndroidJUnit4.class)
@@ -39,7 +39,7 @@ public class MainActivityTest {
     @Test
     public void checkLogin() {
         // assert that the current activity is MainActivity
-        solo.assertCurrentActivity("Wrong city", MainActivity.class);
+        solo.assertCurrentActivity("Wrong activity", MainActivity.class);
         solo.clickOnButton("LOG IN");
         assertTrue(solo.waitForText("PASSWORD", 1, 2000));
     }
@@ -49,7 +49,7 @@ public class MainActivityTest {
      */
     @Test
     public void checkSignUp() {
-        solo.assertCurrentActivity("Wrong city",MainActivity.class);
+        solo.assertCurrentActivity("Wrong activity",MainActivity.class);
         solo.clickOnButton("SIGN UP");
         assertTrue(solo.waitForText("CONFIRM PASSWORD"));
         assertTrue(solo.waitForText("", 1, 2000));
