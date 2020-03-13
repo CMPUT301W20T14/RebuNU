@@ -58,39 +58,13 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
     private GoogleMap gmap;
     private static final int TAG_CODE_PERMISSION_LOCATION = 1;
 //    private String floatingButtonStatus = "VISIBLE";
-    Boolean cancell_clicked = false;
+    private Boolean cancel_clicked = false;
     private LocationManager locationManager;
     private Criteria criteria;
-    Integer flag = 0;
-    Request myRequest = null;
-    String driverId = null;
+    private Integer flag = 0;
+    private Request myRequest = null;
+    private String driverId = null;
 
-
-
-    public void updateMap(ArrayList<Location> locations) {
-        gmap.clear();
-        if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED)) {
-            ActivityCompat.requestPermissions(this, new String[] {
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, TAG_CODE_PERMISSION_LOCATION);
-        }
-
-        Location currentLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false)));
-        float[] distance = new float[1];
-
-       for(Location l: locations) {
-           try {
-               Location.distanceBetween(l.getLatitude(), l.getLongitude(), currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
-               gmap.addMarker(new MarkerOptions()
-                       .position(Utility.locationToLatLng(l))
-                       .title(String.valueOf(distance[0]) + "Meters"));
-           } catch (Exception ignored){};
-       }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -371,7 +345,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         button_postRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancell_clicked = false;
+                cancel_clicked = false;
 
                 try {
                     if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
@@ -408,7 +382,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                             } else {
 //                                    Toast.makeText(getApplicationContext(),"Accepted!!", Toast.LENGTH_SHORT).show();
 
-                                if(!cancell_clicked){
+                                if(!cancel_clicked){
                                     postRequest_layout.setVisibility(ConstraintLayout.GONE);
                                     rider_layout_request_confirmed.setVisibility(ConstraintLayout.VISIBLE);
 
@@ -476,6 +450,10 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
                             }
                         });
+
+
+                        button_postRequest.setVisibility(Button.GONE);
+                        wait_responding_layout.setVisibility(ConstraintLayout.VISIBLE);
 
 
 
@@ -603,17 +581,15 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 //                    button_postRequest_floating.setVisibility(Button.VISIBLE);
 //                    floatingButtonStatus = "VISIBLE";
 //                }
-                button_postRequest.setVisibility(Button.GONE);
-                wait_responding_layout.setVisibility(ConstraintLayout.VISIBLE);
+
                 ArrayList<Location> location = Utility.mockSurrounding();
-                updateMap(location);
             }
         });
 
         rider_button_cancel_post_request.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancell_clicked = true;
+                cancel_clicked = true;
                 Database db = new Database();
                 db.delete(myRequest);
                 db.modifyOrderStatus(myRequest.getId(), 1);
@@ -669,7 +645,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         rider_button_decline_request_confirmed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancell_clicked = true;
+                cancel_clicked = true;
                 Database db = new Database();
                 db.modifyOrderStatus(myRequest.getId(), 2);
 
@@ -690,7 +666,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         rider_button_decline_request_accepted.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancell_clicked = true;
+                cancel_clicked = true;
                 Database db = new Database();
                 db.modifyOrderStatus(myRequest.getId(), 4);
 
