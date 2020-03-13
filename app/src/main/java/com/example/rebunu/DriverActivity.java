@@ -124,7 +124,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         setContentView(R.layout.activity_driver);
 
         // ########### ONLY FOR TEST ###########
-        // Utility.pushMockedRequestsToDatabase();
+         Utility.pushMockedRequestsToDatabase();
         // #####################################
 
         // initialise database for later query
@@ -270,20 +270,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     @SuppressLint("SetTextI18n")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        gmap = googleMap;
-        // minimal zoom out scale
-        gmap.setMinZoomPreference(10);
-        gmap.setMyLocationEnabled(true);
-        UiSettings uiSettings = gmap.getUiSettings();
-        uiSettings.setAllGesturesEnabled(true);
-        // compass will only show if map has been rotated
-        uiSettings.setCompassEnabled(true);
-        uiSettings.setMyLocationButtonEnabled(true);
-        uiSettings.setZoomControlsEnabled(true);
-
-        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        criteria = new Criteria();
-
         // check if we have permission, if not, ask for permission
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
@@ -294,6 +280,22 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     Manifest.permission.ACCESS_COARSE_LOCATION
             }, TAG_CODE_PERMISSION_LOCATION);
         }
+
+        gmap = googleMap;
+        // minimal zoom out scale
+        gmap.setMinZoomPreference(10);
+        gmap.setMyLocationEnabled(true);
+
+        // ui setting for google map view
+        UiSettings uiSettings = gmap.getUiSettings();
+        uiSettings.setAllGesturesEnabled(true);
+        // compass will only show if map has been rotated
+        uiSettings.setCompassEnabled(true);
+        uiSettings.setMyLocationButtonEnabled(true);
+        uiSettings.setZoomControlsEnabled(true);
+
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        criteria = new Criteria();
 
         // get current location
         // Reference: https://stackoverflow.com/questions/36878087/get-current-location-lat-long-in-android-google-map-when-app-start Posted on Apr 27 '16 at 21:04 by Dijkstra
