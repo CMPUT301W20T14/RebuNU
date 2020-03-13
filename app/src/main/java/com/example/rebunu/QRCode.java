@@ -128,7 +128,7 @@ public class QRCode {
     /**
      * Setter for price
      * @param price a String
-     * @throws NullPointerException null exception or empty exception
+     * @throws Exception null exception or empty exception
      */
     public void setPrice(Integer price)throws Exception{
         if (price >= 0){
