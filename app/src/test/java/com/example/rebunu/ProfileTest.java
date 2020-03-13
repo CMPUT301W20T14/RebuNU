@@ -1,11 +1,8 @@
 package com.example.rebunu;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 
 /**
  * Unit test for Profile
@@ -56,35 +53,35 @@ public class ProfileTest {
             assertEquals("f@f.f", profile.getEmail());
             assertEquals("fakeusername", profile.getName());
             assertEquals((Integer) 100, profile.getBalance());
-            assertEquals("driver", profile.getRole());
+            assertEquals(true, profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 10 && profile.getRating().getThumbsDown() == 20));
             profile.setName("usernamef");
             assertEquals("2222222222", profile.getPhone());
             assertEquals("f@f.f", profile.getEmail());
             assertEquals("usernamef", profile.getName());
             assertEquals((Integer) 100, profile.getBalance());
-            assertEquals("driver", profile.getRole());
+            assertEquals(true, profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 10 && profile.getRating().getThumbsDown() == 20));
             profile.setBalance(200);
             assertEquals("2222222222", profile.getPhone());
             assertEquals("f@f.f", profile.getEmail());
             assertEquals("usernamef", profile.getName());
             assertEquals((Integer) 200, profile.getBalance());
-            assertEquals("driver", profile.getRole());
+            assertEquals(true, profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 10 && profile.getRating().getThumbsDown() == 20));
             profile.setRole(false);
             assertEquals("2222222222", profile.getPhone());
             assertEquals("f@f.f", profile.getEmail());
             assertEquals("usernamef", profile.getName());
             assertEquals((Integer) 200, profile.getBalance());
-            assertEquals("customer", profile.getRole());
+            assertEquals(false, profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 10 && profile.getRating().getThumbsDown() == 20));
             profile.setRating(new Rating(20, 10));
             assertEquals("2222222222", profile.getPhone());
             assertEquals("f@f.f", profile.getEmail());
             assertEquals("usernamef", profile.getName());
             assertEquals((Integer) 200, profile.getBalance());
-            assertEquals("customer", profile.getRole());
+            assertEquals(false, profile.getRole());
             assertTrue((profile.getRating().getThumbsUp() == 20 && profile.getRating().getThumbsDown() == 10));
         }
         catch (Exception ignored){}
@@ -109,44 +106,17 @@ public class ProfileTest {
         Boolean nullRole = null;
         Rating nullRating = null;
 
-        assertThrows(NullPointerException.class, ()->{
-            profile.setPhone(nullPhone);
-        });
-        assertThrows(Exception.class, ()->{
-            profile.setPhone(emptyPhone);
-        });
-        assertThrows(Exception.class, ()->{
-            profile.setPhone(invalidPhone);
-        });
-        assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws Throwable {
-                profile.setEmail(nullEmail);
-            }
-        });
-        assertThrows(Exception.class, ()->{
-            profile.setEmail(emptyEmail);
-        });
-        assertThrows(Exception.class, ()->{
-            profile.setEmail(invalidEmail);
-        });
-        assertThrows(NullPointerException.class, ()->{
-            profile.setName(nullUserName);
-        });
-        assertThrows(Exception.class, ()->{
-            profile.setName(emptyUserName);
-        });
-        assertThrows(NullPointerException.class, ()->{
-            profile.setBalance(nullBalance);
-        });
-        assertThrows(Exception.class, ()->{
-           profile.setBalance(invalidBalance);
-        });
-        assertThrows(NullPointerException.class, ()->{
-            profile.setRole(nullRole);
-        });
-        assertThrows(NullPointerException.class, ()->{
-            profile.setRating(nullRating);
-        });
+        assertThrows(NullPointerException.class, ()-> profile.setPhone(nullPhone));
+        assertThrows(Exception.class, ()-> profile.setPhone(emptyPhone));
+        assertThrows(Exception.class, ()-> profile.setPhone(invalidPhone));
+        assertThrows(NullPointerException.class, () -> profile.setEmail(nullEmail));
+        assertThrows(Exception.class, ()-> profile.setEmail(emptyEmail));
+        assertThrows(Exception.class, ()-> profile.setEmail(invalidEmail));
+        assertThrows(NullPointerException.class, ()-> profile.setName(nullUserName));
+        assertThrows(Exception.class, ()-> profile.setName(emptyUserName));
+        assertThrows(NullPointerException.class, ()-> profile.setBalance(nullBalance));
+        assertThrows(Exception.class, ()-> profile.setBalance(invalidBalance));
+        assertThrows(NullPointerException.class, ()-> profile.setRole(nullRole));
+        assertThrows(NullPointerException.class, ()-> profile.setRating(nullRating));
     }
 }
