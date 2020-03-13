@@ -97,9 +97,9 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rider);
 
+//        Toast.makeText(getApplicationContext(), (String) getIntent().getExtras().get("profileId"), Toast.LENGTH_SHORT).show();
 
-        Toast.makeText(getApplicationContext(), (String) getIntent().getExtras().get("profileId") + getIntent().getExtras().get("role").toString(), Toast.LENGTH_SHORT).show();
-
+        //All the layout
         ConstraintLayout postRequest_layout;
         LinearLayout postRequest_estimated_rate_layout;
         ConstraintLayout wait_responding_layout;
@@ -109,26 +109,26 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         ConstraintLayout rider_layout_qrcode;
         ConstraintLayout rider_layout_rating;
 
-
+        //All the buttons
         Button button_postRequest;
         Button button_postRequest_floating;
         Button button_hide;
         Button button_tips;
         Button rider_button_tips_request_confirmed;
         Button rider_button_cancel_post_request;
-        Button rider_button_hide_request_confirmed = findViewById(R.id.rider_button_hide_request_confirmed);
-        Button rider_button_accept_request_confirmed = findViewById(R.id.rider_button_accept_request_confirmed);
-        Button rider_button_decline_request_confirmed = findViewById(R.id.rider_button_decline_request_confirmed);
-        Button rider_button_hide_request_accepted = findViewById(R.id.rider_button_hide_request_accepted);
-        Button rider_button_decline_request_accepted = findViewById(R.id.rider_button_decline_request_accepted);
-        Button rider_button_tips_request_accepted = findViewById(R.id.rider_button_tips_request_accepted);
-        Button rider_button_contact_request_accepted = findViewById(R.id.rider_button_contact_request_accepted);
-        Button rider_button_hide_information = findViewById(R.id.rider_button_hide_information);
-        Button rider_button_hide_qrcode = findViewById(R.id.rider_button_hide_qrcode);
-        Button rider_button_payYourTrip_rating = findViewById(R.id.rider_button_payYourTrip_rating);
-        Button rider_button_hide_rating = findViewById(R.id.rider_button_hide_rating);
+        Button rider_button_hide_request_confirmed;
+        Button rider_button_accept_request_confirmed;
+        Button rider_button_decline_request_confirmed;
+        Button rider_button_hide_request_accepted;
+        Button rider_button_decline_request_accepted;
+        Button rider_button_tips_request_accepted;
+        Button rider_button_contact_request_accepted;
+        Button rider_button_hide_information;
+        Button rider_button_hide_qrcode;
+        Button rider_button_payYourTrip_rating;
+        Button rider_button_hide_rating;
 
-
+        // All the TextView
         TextView postRequest_textview_estimatedRateNumeric;
         TextView rider_textview_estimatedRateNumeric_request_confirmed;
         TextView rider_textview_estimatedRateNumeric_request_accepted;
@@ -144,7 +144,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 //        TextView rider_textview_email;
         ImageView rider_imageview_qrcode;
 
-
+        //All the editText
         EditText postRequest_edittext_from;
         EditText postRequest_edittext_to;
         EditText rider_edittext_from_request_confirmed;
@@ -171,6 +171,18 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         rider_button_tips_request_confirmed = findViewById(R.id.rider_button_tips_request_confirmed);
 //        button_accept = findViewById(R.id.rider_button_accept_request_accepted);
         rider_button_cancel_post_request = findViewById(R.id.rider_button_cancel_post_request);
+        rider_button_hide_request_confirmed = findViewById(R.id.rider_button_hide_request_confirmed);
+        rider_button_accept_request_confirmed = findViewById(R.id.rider_button_accept_request_confirmed);
+        rider_button_decline_request_confirmed = findViewById(R.id.rider_button_decline_request_confirmed);
+        rider_button_hide_request_accepted = findViewById(R.id.rider_button_hide_request_accepted);
+        rider_button_decline_request_accepted = findViewById(R.id.rider_button_decline_request_accepted);
+        rider_button_tips_request_accepted = findViewById(R.id.rider_button_tips_request_accepted);
+        rider_button_contact_request_accepted = findViewById(R.id.rider_button_contact_request_accepted);
+        rider_button_hide_information = findViewById(R.id.rider_button_hide_information);
+        rider_button_hide_qrcode = findViewById(R.id.rider_button_hide_qrcode);
+        rider_button_payYourTrip_rating = findViewById(R.id.rider_button_payYourTrip_rating);
+        rider_button_hide_rating = findViewById(R.id.rider_button_hide_rating);
+
 
 
         postRequest_textview_estimatedRateNumeric = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
@@ -385,100 +397,83 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         Database db = new Database();
                         final DocumentReference reqRef = db.requests.document(myRequest.getId());
 
-                        ListenerRegistration LG = reqRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                                @Nullable FirebaseFirestoreException e) {
-                                if (e != null) {
-                                    Log.w("", "Listen failed.", e);
-                                    return;
-                                }
+                        ListenerRegistration LG = reqRef.addSnapshotListener((snapshot, e) -> {
+                            if (e != null) {
+                                Log.w("", "Listen failed.", e);
+                                return;
+                            }
 
-                                if (snapshot != null && snapshot.exists()) {
-//                                    if (flag){
-//                                        Toast.makeText(getApplicationContext(),"Changed!!", Toast.LENGTH_SHORT).show();
-//                                        flag = false;
+                            if (snapshot != null && snapshot.exists()) {
 //
-//
-//                                    }
-//                                    flag = true;
-//                                    Log.d("", "Current data: " + snapshot.getData());
-                                } else {
+                            } else {
 //                                    Toast.makeText(getApplicationContext(),"Accepted!!", Toast.LENGTH_SHORT).show();
 
-                                    if(!cancell_clicked){
-                                        postRequest_layout.setVisibility(ConstraintLayout.GONE);
-                                        rider_layout_request_confirmed.setVisibility(ConstraintLayout.VISIBLE);
+                                if(!cancell_clicked){
+                                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
+                                    rider_layout_request_confirmed.setVisibility(ConstraintLayout.VISIBLE);
 
-                                        rider_edittext_from_request_confirmed.setText(postRequest_edittext_from.getText().toString());
-                                        rider_edittext_to_request_confirmed.setText(postRequest_edittext_to.getText().toString());
-                                        rider_textview_estimatedRateNumeric_request_confirmed.setText(postRequest_textview_estimatedRateNumeric.getText().toString());
+                                    rider_edittext_from_request_confirmed.setText(postRequest_edittext_from.getText().toString());
+                                    rider_edittext_to_request_confirmed.setText(postRequest_edittext_to.getText().toString());
+                                    rider_textview_estimatedRateNumeric_request_confirmed.setText(postRequest_textview_estimatedRateNumeric.getText().toString());
 
-                                        Database dbo = new Database();
-                                        DocumentReference ordRef = dbo.orders.document(myRequest.getId());
-                                        ordRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    DocumentSnapshot document = task.getResult();
-                                                    if (document.exists()) {
-                                                        driverId = (String) document.get("driverId");
-                                                        Database dbp = new Database();
-                                                        DocumentReference proRef = dbp.profiles.document(driverId);
-                                                        proRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                if (task.isSuccessful()) {
-                                                                    DocumentSnapshot document = task.getResult();
-                                                                    if (document.exists()) {
-                                                                        TextView rider_textview_name_request_confirmed = findViewById(R.id.rider_textview_name_request_confirmed);
-                                                                        TextView rider_textview_like_request_confirmed = findViewById(R.id.rider_textview_like_request_confirmed);
-                                                                        TextView rider_textview_dislike_request_confirmed = findViewById(R.id.rider_textview_dislike_request_confirmed);
+                                    Database dbo = new Database();
+                                    DocumentReference ordRef = dbo.orders.document(myRequest.getId());
+                                    ordRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                DocumentSnapshot document = task.getResult();
+                                                if (document.exists()) {
+                                                    driverId = (String) document.get("driverId");
+                                                    Database dbp = new Database();
+                                                    DocumentReference proRef = dbp.profiles.document(driverId);
+                                                    proRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                            if (task.isSuccessful()) {
+                                                                DocumentSnapshot document = task.getResult();
+                                                                if (document.exists()) {
+                                                                    TextView rider_textview_name_request_confirmed = findViewById(R.id.rider_textview_name_request_confirmed);
+                                                                    TextView rider_textview_like_request_confirmed = findViewById(R.id.rider_textview_like_request_confirmed);
+                                                                    TextView rider_textview_dislike_request_confirmed = findViewById(R.id.rider_textview_dislike_request_confirmed);
 
-                                                                        ArrayList<Long> rating = new ArrayList<>();
-                                                                        rating = (ArrayList<Long>)document.get("rating");
+                                                                    ArrayList<Long> rating = new ArrayList<>();
+                                                                    rating = (ArrayList<Long>)document.get("rating");
 
-                                                                        rider_textview_name_request_confirmed.setText((String)document.get("name"));
-                                                                        rider_textview_like_request_confirmed.setText(rating.get(0).toString());
-                                                                        rider_textview_dislike_request_confirmed.setText(rating.get(1).toString());
-
-
-//                                                                        Toast.makeText(getApplicationContext(),(String)document.get("name"), Toast.LENGTH_SHORT).show();
-//                                                                        Toast.makeText(getApplicationContext(),((ArrayList<Integer>)document.get("rating")).get(0).toString(), Toast.LENGTH_SHORT).show();
+                                                                    rider_textview_name_request_confirmed.setText((String)document.get("name"));
+                                                                    rider_textview_like_request_confirmed.setText(rating.get(0).toString());
+                                                                    rider_textview_dislike_request_confirmed.setText(rating.get(1).toString());
 
 
+//                                                                    Toast.makeText(getApplicationContext(),(String)document.get("name"), Toast.LENGTH_SHORT).show();
+//                                                                    Toast.makeText(getApplicationContext(),((ArrayList<Integer>)document.get("rating")).get(0).toString(), Toast.LENGTH_SHORT).show();
 
-                                                                        Log.d("", " Success");
-                                                                    } else {
-                                                                        Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
-                                                                        Log.d("", "No such document");
-                                                                        return;
-                                                                    }
                                                                 } else {
-                                                                    Log.d("", "get failed with ", task.getException());
-                                                                    Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                                                    Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
                                                                     return;
                                                                 }
+                                                            } else {
+                                                                Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                                                return;
                                                             }
-                                                        });
+                                                        }
+                                                    });
 
-                                                        Log.d("", " Success");
-                                                    } else {
-                                                        Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
-                                                        Log.d("", "No such document");
-                                                        return;
-                                                    }
                                                 } else {
-                                                    Log.d("", "get failed with ", task.getException());
-                                                    Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
+                                                    Log.d("", "No such document");
                                                     return;
                                                 }
+                                            } else {
+                                                Log.d("", "get failed with ", task.getException());
+                                                Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                                return;
                                             }
-                                        });
-                                    }
-
-
+                                        }
+                                    });
                                 }
+
+
                             }
                         });
 
@@ -492,6 +487,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 }catch (Exception ignored){
                     Toast.makeText(getApplicationContext(), ignored.toString(), Toast.LENGTH_SHORT).show();
                 }
+
+                //Commits below are tests for database functionality
 
 //                double[] lat = {53.525564, 53.525296, 53.525695, 53.526441, 53.525612};
 //                double[] lng = {-113.521412, -113.520166, -113.521335, -113.519962, -113.521459};
@@ -739,8 +736,6 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
 
-//                                rider_textview_phone;
-//                                rider_textview_email;
                                 TextView rider_textview_phone = findViewById(R.id.rider_textview_phone);
                                 TextView rider_textview_email = findViewById(R.id.rider_textview_email);
                                 rider_textview_phone.setText((String) document.get("phone"));

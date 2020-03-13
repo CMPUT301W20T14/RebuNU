@@ -1,6 +1,8 @@
 package com.example.rebunu;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -116,8 +118,11 @@ public class ProfileTest {
         assertThrows(Exception.class, ()->{
             profile.setPhone(invalidPhone);
         });
-        assertThrows(NullPointerException.class, ()->{
-            profile.setEmail(nullEmail);
+        assertThrows(NullPointerException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                profile.setEmail(nullEmail);
+            }
         });
         assertThrows(Exception.class, ()->{
             profile.setEmail(emptyEmail);

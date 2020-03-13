@@ -7,7 +7,7 @@ import android.location.Location;
  * @author Bofeng Chen, Zihao Huang
  */
 public class Order extends Record{
-    private QRCode qr;
+//    private QRCode qr;
     private Boolean ratingOfThisOrder; //True for thumbsUp, False for thumbsDown
     private String driverId;
     private Location start;
@@ -23,7 +23,6 @@ public class Order extends Record{
      */
 
     public Order(){
-        this.qr = null;
         this.ratingOfThisOrder = null;
         this.driverId = "";
         this.riderId = "";
@@ -55,10 +54,6 @@ public class Order extends Record{
 
     public Integer getStatus(){ return  status;}
 
-    public QRCode getQRCode() {
-        return qr;
-    }
-
     public Boolean getRating() {
         return ratingOfThisOrder;
     }
@@ -70,42 +65,18 @@ public class Order extends Record{
 
 
     /**
-     * Setter for qr
-     * @param qr a two-dimensional array
-     * @throws NullPointerException null exception
-     */
-    public void setQRCode(QRCode qr) throws Exception {
-        if (qr != null) {
-            this.qr = qr;
-            return;
-        }
-        throw new NullPointerException("qr is null.");
-    }
-
-    /**
      * Setter for rating
      * @param ratingOfThisOrder (true or false for thumbsUp)
+     * @throws NullPointerException
      */
-//    public void setRating(Boolean ratingOfThisOrder){
-//        this.ratingOfThisOrder = ratingOfThisOrder;
-//        Profile driverProfile = (Profile) db.queryById(driverId, 1);
-//        Rating rating = driverProfile.getRating();
-//        if(ratingOfThisOrder == null){
-//            return;
-//        }
-//        if(ratingOfThisOrder){
-//            rating.thumbsUpPlus();
-//            driverProfile.setRating(rating);
-//            db.modify(driverProfile);
-//
-//        }else{
-//            rating.thumbsDownPlus();
-//            driverProfile.setRating(rating);
-//            db.modify(driverProfile);
-//
-//        }
-//
-//    }
+
+    public void setRating(Boolean ratingOfThisOrder){
+        if(ratingOfThisOrder == null){
+            throw new NullPointerException();
+        }
+        this.ratingOfThisOrder = ratingOfThisOrder;
+
+    }
 
     /**
      * Setter for driverId
@@ -188,10 +159,18 @@ public class Order extends Record{
         }
     }
 
+    /**
+     * setter for setRiderId
+     * @param status
+     * @throws Exception null or negative exceptions
+     */
+
 
     public void setStatus(Integer status){
-        if(status != 1 && status != 2 && status != 3){
+        if(status == 1 || status == 2 || status == 3 || status == 4 || status == 5){
             this.status = status;
+        }else{
+            throw new IllegalArgumentException();
         }
     }
 

@@ -12,9 +12,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * utility method
+ * @author zijian xi
+ */
+
 public class Utility {
     public static Map<String, Object> dataMap = null;
     public static String dataId = null;
+
+    /**
+     * estimate price based on distance
+     * @param start
+     * @param end
+     * @param priceFactor
+     * @return price
+     */
 
     public static Integer getEstimatePrice(Location start, Location end, @Nullable Integer priceFactor) {
         float[] dis = new float[1];
@@ -30,6 +43,12 @@ public class Utility {
         return 6 + price;
     }
 
+    /**
+     * convert latlng to location
+     * @param latLng
+     * @return location
+     */
+
     public static Location latLngToLocation(LatLng latLng) {
         Location location = new Location("");
         location.setLatitude(latLng.latitude);
@@ -37,9 +56,21 @@ public class Utility {
         return location;
     }
 
+    /**
+     * convert location to latlng
+     * @param location
+     * @return latlng
+     */
+
     public static LatLng locationToLatLng(Location location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
+
+    /**
+     * convert GeoPoint to location
+     * @param geoPoint
+     * @return location
+     */
 
     public static Location geoPointToLocation(GeoPoint geoPoint) {
         Location location = new Location("");
@@ -47,6 +78,11 @@ public class Utility {
         location.setLongitude(geoPoint.getLongitude());
         return location;
     }
+
+    /**
+     * get nearby cars
+     * @return nearByCars
+     */
 
     public static ArrayList<Location> mockSurrounding(){
         ArrayList<Location> nearByCars = new ArrayList<>();
