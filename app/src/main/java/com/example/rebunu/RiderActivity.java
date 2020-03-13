@@ -370,10 +370,13 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
                         Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
 
-                        User myRider = new Rider(true);
-                        String riderId = getIntent().getExtras().get("profileId").toString();
-                        myRequest = ((Rider)myRider).CreateRequest(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
 
+                        String riderId = getIntent().getExtras().get("profileId").toString();
+
+                        myRequest = new Request(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
+                        Database dbr = new Database();
+                        String id = dbr.add(myRequest);
+                        myRequest.setId(id);
 
 //                        Toast.makeText(getApplicationContext(),myRequest.getId(),Toast.LENGTH_SHORT).show();
 
