@@ -13,6 +13,10 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertTrue;
 
+/**
+ * @author Zihao Huang
+ * UI test for LoginActivity
+ */
 @RunWith(AndroidJUnit4.class)
 public class LoginActivityTest {
     private Solo solo;
@@ -27,18 +31,18 @@ public class LoginActivityTest {
     }
 
     /**
-     * See if q customer can login
+     * See if a customer can login
      */
     @Test
     public void checkLogin() {
-        solo.assertCurrentActivity("Wrong city", MainActivity.class);
+        solo.assertCurrentActivity("Wrong activity", MainActivity.class);
         solo.clickOnButton("LOG IN");
         assertTrue(solo.waitForText("PASSWORD", 1, 2000));
 
         solo.enterText(0, "123");
         solo.enterText(1, "111");
         solo.clickOnButton("LOG IN");
-        solo.assertCurrentActivity("Wrong city", RiderActivity.class);
+        solo.assertCurrentActivity("Wrong activity", RiderActivity.class);
     }
 }
 

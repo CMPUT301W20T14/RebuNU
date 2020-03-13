@@ -13,7 +13,10 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertTrue;
 
-
+/**
+ * @author Zihao Huang
+ * UI test for SignUpActivity
+ */
 @RunWith(AndroidJUnit4.class)
 public class SignUpActivityTest {
     private Solo solo;
@@ -28,7 +31,7 @@ public class SignUpActivityTest {
     }
 
     /**
-     * See if sign up button working
+     * See if we can sign up
      */
     @Test
     public void checkSignUp() {
