@@ -2,10 +2,13 @@ package com.example.rebunu;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -36,6 +39,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -82,6 +86,16 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         ConstraintLayout rider_layout_information;
         ConstraintLayout rider_layout_qrcode;
         ConstraintLayout rider_layout_rating;
+        DrawerLayout drawerLayout;
+
+        // All the toolbar
+        Toolbar toolbar;
+
+        // All the navigation view
+        NavigationView navigationView;
+
+        // All the action bar toogle
+        ActionBarDrawerToggle toggle;
 
         //All the buttons
         Button button_postRequest;
@@ -172,6 +186,29 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         rider_edittext_from_request_confirmed = findViewById(R.id.rider_edittext_from_request_confirmed);
         rider_edittext_to_request_confirmed = findViewById(R.id.rider_edittext_to_request_confirmed);
 
+        // drawer
+        drawerLayout = findViewById(R.id.drawer);
+        toolbar = findViewById(R.id.toolbar);
+        navigationView = findViewById(R.id.navigationView);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+        toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawerOpen,R.string.drawerClose) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                button_postRequest_floating.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                button_postRequest_floating.setVisibility(View.VISIBLE);
+            }
+        };
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        //navigationView.setNavigationItemSelectedListener(this);
 
         // Reference: https://developer.android.com/training/permissions/requesting.html Posted on 2019-12-27.
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -761,11 +798,17 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         }
         // get current location
         // Reference: https://stackoverflow.com/questions/36878087/get-current-location-lat-long-in-android-google-map-when-app-start Posted on Apr 27 '16 at 21:04 by Dijkstra
-        Location currentLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false)));
-        assert currentLocation != null;
-        double lat = currentLocation.getLatitude();
-        double lon = currentLocation.getLongitude();
-        LatLng cur = new LatLng(lat, lon);
-        gmap.moveCamera(CameraUpdateFactory.newLatLng(cur));
+        Location currentLocation;
+        try {
+            currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
+        } catch (Exception ignored) {
+            currentLocation = Utility.currentLocation;
+        }
+        if(currentLocation != null) {
+            double lat = currentLocation.getLatitude();
+            double lon = currentLocation.getLongitude();
+            LatLng cur = new LatLng(lat, lon);
+            gmap.moveCamera(CameraUpdateFactory.newLatLng(cur));
+        }
     }
 }

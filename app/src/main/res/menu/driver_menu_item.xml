@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/driver_profile"
+        android:title="@string/profile"/>
+
+    <item
+        android:id="@+id/driver_order_history"
+        android:title="@string/order"/>
+
+    <item
+        android:id="@+id/about"
+        android:title="@string/about_us"/>
+    <item
+        android:id="@+id/logout"
+        android:title="@string/logout"/>
+
+</menu>

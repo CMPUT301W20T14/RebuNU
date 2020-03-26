@@ -20,10 +20,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,6 +40,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -68,21 +72,53 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private LocationManager locationManager;
     private Criteria criteria;
     private Map<String, Map<String, Object>> recordIdToDataMap = new HashMap<>();
-
+    private Location currentLocation = Utility.currentLocation;
+    //DrawerLayout
+    DrawerLayout drawerLayout;
+    Toolbar toolbar;
+    NavigationView navigationView;
+    ActionBarDrawerToggle toggle;
+    //DrawerLayout
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver);
 
         // ########### ONLY FOR TEST ###########
-         Utility.pushMockedRequestsToDatabase();
+        // Utility.pushMockedRequestsToDatabase();
         // #####################################
+
+        //DrawerLayout
+        drawerLayout = findViewById(R.id.drawer);
+        toolbar = findViewById(R.id.toolbar);
+        navigationView = findViewById(R.id.navigationView);
+        Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
+        mapView = findViewById(R.id.driver_mapView);
 
         // initialise database for later query
         Database db = new Database();
 
-        Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
-        mapView = findViewById(R.id.driver_mapView);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+        toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawerOpen,R.string.drawerClose) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                button_searchNearby_floating.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                button_searchNearby_floating.setVisibility(View.VISIBLE);
+            }
+        };
+
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        //navigationView.setNavigationItemSelectedListener(this);
+        //DrawerLayout
 
         button_searchNearby_floating.setOnClickListener(v -> {
             // before update, clear all current markers on the map
@@ -101,7 +137,11 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 }, TAG_CODE_PERMISSION_LOCATION);
             }
             // get current location
-            Location currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
+            try {
+                currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
+            } catch (Exception ignored) {
+                currentLocation = Utility.currentLocation;
+            }
             // and relocate camera to show current location
             gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10));
 
@@ -252,8 +292,11 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
         // get current location
         // Reference: https://stackoverflow.com/questions/36878087/get-current-location-lat-long-in-android-google-map-when-app-start Posted on Apr 27 '16 at 21:04 by Dijkstra
-        Location currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
-
+        try {
+            currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
+        } catch (Exception e) {
+            currentLocation = Utility.currentLocation;
+        }
         // set current location in the middle of the camera, or to say, the visible area's center is user's current location
         gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10));
         gmap.setOnMarkerClickListener(marker -> {
