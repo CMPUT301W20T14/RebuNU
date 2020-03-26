@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/rider_profile"
-        android:title="Profile"/>
+        android:title="@string/profile"/>
 
     <item
         android:id="@+id/rider_order_history"
-        android:title="Order"/>
+        android:title="@string/order"/>
 
     <item
         android:id="@+id/about"
-        android:title="About us"/>
+        android:title="@string/about_us"/>
     <item
         android:id="@+id/logout"
-        android:title="Logout"/>
+        android:title="@string/logout"/>
 
 </menu>
