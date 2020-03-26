@@ -110,17 +110,10 @@
     <string name="menu_send">Send</string>
     <string name="drawerOpen" />
     <string name="drawerClose" />
-    <string name="profile">Profile</string>
-    <string name="about_us">About us</string>
-    <string name="logout">Logout</string>
     <string name="order_history">Order History</string>
-    <string name="profile">Profile</string>
-    <string name="order">Order</string>
     <string name="about_us">About us</string>
-    <string name="logout">Logout</string>
     <string name="order">Order</string>
     <string name="profile">Profile</string>
-    <string name="about_us">About us</string>
     <string name="logout">Logout</string>
 
 </resources>
