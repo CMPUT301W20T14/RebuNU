@@ -6,6 +6,49 @@
     android:layout_height="match_parent"
     tools:context=".RiderActivity">
 
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/rebunu_grey"
+        tools:openDrawer="end">
+
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/postRequest_mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#00000000" />
+
+        </RelativeLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigationView"
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="#fff"
+            android:fontFamily="@font/yahei"
+            app:headerLayout="@layout/header"
+            app:menu="@menu/rider_menu_item" />
+
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
     <Button
         android:id="@+id/postRequest_button_postRequest_floating"
         android:layout_width="wrap_content"
@@ -26,19 +69,6 @@
         app:layout_constraintBottom_toTopOf="@+id/postRequest_mapView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/postRequest_mapView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginBottom="0dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/postRequest_layout"
