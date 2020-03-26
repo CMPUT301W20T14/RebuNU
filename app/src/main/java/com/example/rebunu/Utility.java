@@ -20,6 +20,7 @@ import java.util.Map;
 public class Utility {
     public static Map<String, Object> dataMap = null;
     public static String dataId = null;
+    public static Location currentLocation = null;
 
     /**
      * estimate price based on distance

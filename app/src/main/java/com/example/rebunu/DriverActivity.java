@@ -72,6 +72,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private LocationManager locationManager;
     private Criteria criteria;
     private Map<String, Map<String, Object>> recordIdToDataMap = new HashMap<>();
+    private Location currentLocation = Utility.currentLocation;
     //DrawerLayout
     DrawerLayout drawerLayout;
     Toolbar toolbar;
@@ -84,25 +85,40 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         setContentView(R.layout.activity_driver);
 
         // ########### ONLY FOR TEST ###########
-         Utility.pushMockedRequestsToDatabase();
+        // Utility.pushMockedRequestsToDatabase();
         // #####################################
+
         //DrawerLayout
         drawerLayout = findViewById(R.id.drawer);
         toolbar = findViewById(R.id.toolbar);
         navigationView = findViewById(R.id.navigationView);
+        Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
+        mapView = findViewById(R.id.driver_mapView);
+
+        // initialise database for later query
+        Database db = new Database();
+
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawerOpen,R.string.drawerClose);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+        toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawerOpen,R.string.drawerClose) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                button_searchNearby_floating.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                button_searchNearby_floating.setVisibility(View.VISIBLE);
+            }
+        };
+
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         //navigationView.setNavigationItemSelectedListener(this);
         //DrawerLayout
-        // initialise database for later query
-        Database db = new Database();
-
-        Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
-        mapView = findViewById(R.id.driver_mapView);
 
         button_searchNearby_floating.setOnClickListener(v -> {
             // before update, clear all current markers on the map
@@ -121,7 +137,11 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 }, TAG_CODE_PERMISSION_LOCATION);
             }
             // get current location
-            Location currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
+            try {
+                currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
+            } catch (Exception ignored) {
+                currentLocation = Utility.currentLocation;
+            }
             // and relocate camera to show current location
             gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10));
 
@@ -272,8 +292,11 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
         // get current location
         // Reference: https://stackoverflow.com/questions/36878087/get-current-location-lat-long-in-android-google-map-when-app-start Posted on Apr 27 '16 at 21:04 by Dijkstra
-        Location currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
-
+        try {
+            currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
+        } catch (Exception e) {
+            currentLocation = Utility.currentLocation;
+        }
         // set current location in the middle of the camera, or to say, the visible area's center is user's current location
         gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10));
         gmap.setOnMarkerClickListener(marker -> {
