@@ -47,6 +47,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.w3c.dom.Text;
 
@@ -267,6 +269,15 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         Intent userInformationIntent = new Intent(RiderActivity.this, UserInformationActivity.class);
                         userInformationIntent.putExtra("userId", riderId);
                         startActivity(userInformationIntent);
+                        break;
+
+                    case "Order":
+
+                        Intent orderListActivity = new Intent(RiderActivity.this, OrderListActivity.class);
+                        orderListActivity.putExtra("userId",riderId);
+                        orderListActivity.putExtra("role", false);
+                        startActivity(orderListActivity);
+
                         break;
 
                     case "Logout":
