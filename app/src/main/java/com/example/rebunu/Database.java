@@ -1,6 +1,7 @@
 package com.example.rebunu;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -114,6 +115,7 @@ public class Database {
 
     }
 
+
     /**
      * add the password and username to this collection, used for check password when log in
      * @param phone
@@ -163,6 +165,19 @@ public class Database {
                     }
                 });
 
+    }
+    public void deleteAuth(String phone, String email){
+        if(phone == null || email == null){
+            throw new IllegalArgumentException("phone/email cannot be null");
+        }
+        try{
+            auth
+                    .document(phone)
+                    .delete();
+            auth
+                    .document(email)
+                    .delete();
+        }catch (Exception e){throw new IllegalArgumentException("No such auth");}
     }
 
     /**

@@ -22,6 +22,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -70,12 +72,15 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
     Integer flag = 0;
     Request myRequest = null;
     String driverId = null;
+    String riderId = null;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rider);
+
+        riderId = Objects.requireNonNull(Objects.requireNonNull(getIntent().getExtras()).get("profileId")).toString();
 
         //All the layout
         ConstraintLayout postRequest_layout;
@@ -96,6 +101,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
         // All the action bar toogle
         ActionBarDrawerToggle toggle;
+
 
         //All the buttons
         Button button_postRequest;
@@ -128,6 +134,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         TextView rider_textview_name_information;
         TextView rider_textview_like_information;
         TextView rider_textview_dislike_information;
+        TextView drawer_header_textview_username;
 //        TextView rider_textview_phone;
 //        TextView rider_textview_email;
         ImageView rider_imageview_qrcode;
@@ -178,6 +185,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         rider_textview_name_information = findViewById(R.id.rider_textview_name_information);
         rider_textview_like_information = findViewById(R.id.rider_textview_like_information);
         rider_textview_dislike_information = findViewById(R.id.rider_textview_dislike_information);
+//        drawer_header_textview_username = findViewById(R.id.drawer_header_textview_username);
 
         rider_imageview_qrcode = findViewById(R.id.rider_imageview_qrcode);
 
@@ -198,6 +206,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 button_postRequest_floating.setVisibility(View.GONE);
+
             }
 
             @Override
@@ -208,7 +217,67 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         };
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        //navigationView.setNavigationItemSelectedListener(this);
+        //get header
+        View harderLayout = navigationView.getHeaderView(0);
+        //get TextView
+        drawer_header_textview_username = harderLayout.findViewById(R.id.drawer_header_textview_username);
+
+        // get username
+        Database dbpro = new Database();
+
+        dbpro.profiles.document(riderId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if(e != null){
+                    return;
+                }
+                if (documentSnapshot != null && documentSnapshot.exists()){
+                    drawer_header_textview_username.setText((String) documentSnapshot.get("name"));
+                }
+            }
+        });
+
+
+//        dbpro.profiles.document(riderId).get().addOnCompleteListener(task -> {
+//            if (task.isSuccessful()) {
+//                DocumentSnapshot document = Objects.requireNonNull(task.getResult());
+//                if (document.exists()) {
+////                    Toast.makeText(getApplicationContext(),(String) document.get("name"),Toast.LENGTH_SHORT).show();
+//                    drawer_header_textview_username.setText((String) document.get("name"));
+//                    Log.d("", " Success");
+//                } else {
+//                    Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
+//                    Log.d("", "No such document");
+//                    return;
+//                }
+//            } else {
+//                Log.d("", "get failed with ", task.getException());
+//                Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//        });
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch(item.getTitle().toString()){
+                    case "Profile":
+//                        Toast.makeText(getApplicationContext(), item.getTitle().toString(), Toast.LENGTH_SHORT).show();
+                        Intent userInformationIntent = new Intent(RiderActivity.this, UserInformationActivity.class);
+                        userInformationIntent.putExtra("userId", riderId);
+                        startActivity(userInformationIntent);
+                        break;
+
+                    case "Logout":
+//                        Intent mainActivity = new Intent(RiderActivity.this, MainActivity.class);
+//                        startActivity(mainActivity);
+                        finish();
+                }
+                return false;
+            }
+        });
+
 
         // Reference: https://developer.android.com/training/permissions/requesting.html Posted on 2019-12-27.
         if (!(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -354,9 +423,6 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                     String[] splitedEnd = rawEnd.split(",");
                     Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
                     Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
-
-
-                    String riderId = Objects.requireNonNull(Objects.requireNonNull(getIntent().getExtras()).get("profileId")).toString();
 
                     myRequest = new Request(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
                     Database dbr = new Database();
@@ -739,6 +805,17 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         // not sure working yet..
         mapView.setOnClickListener(v -> postRequest_layout.setVisibility(ConstraintLayout.VISIBLE));
     }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu){
+//        MenuItem menuItem_rider_profile;
+//        menuItem_rider_profile = findViewById(R.id.rider_profile);
+//        menuItem_rider_profile.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                return false;
+//            }
+//        })
+//    }
 
     @Override
     protected void onResume() {
