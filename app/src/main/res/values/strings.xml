@@ -8,6 +8,7 @@
     <string name="post_request">POST REQUEST</string>
     <string name="tips">TIPS</string>
     <string name="accept">ACCEPT</string>
+    <string name="apply">APPLY</string>
     <string name="decline">DECLINE</string>
     <string name="pay_your_trip">PAY YOUR TRIP</string>
     <string name="search_nearby">SEARCH NEARBY</string>
@@ -89,6 +90,7 @@
     <string name="not_select_role">SELECT YOUR ROLE""</string>
     <string name="invalid_input">INVALID INPUT""</string>
     <string name="invalid_email_address">INVALID EMAIL ADDRESS""</string>
+    <string name="invalid_phone_length">INVALID PHONE LENGTH""</string>
     <string name="email_address_exists">EMAIL ADDRESS ALREADY EXISTS""</string>
     <string name="phone_exists">PHONE ALREADY EXISTS""</string>
 

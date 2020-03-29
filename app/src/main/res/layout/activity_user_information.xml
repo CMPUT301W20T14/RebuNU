@@ -8,16 +8,6 @@
     tools:context=".UserInformationActivity">
 
     <Button
-        android:id="@+id/userInformation_button_setting"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="15dp"
-        android:background="@drawable/setting_icon"
-        app:layout_constraintBottom_toBottomOf="@+id/userInformation_textview_username_large"
-        app:layout_constraintStart_toEndOf="@+id/userInformation_textview_username_large"
-        app:layout_constraintTop_toTopOf="@+id/userInformation_textview_username_large" />
-
-    <Button
         android:id="@+id/userInformation_button_return"
         android:layout_width="35dp"
         android:layout_height="40dp"
@@ -37,8 +27,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/userInformation_textview_username_small"
+        <EditText
+            android:id="@+id/userInformation_edittext_username_small"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/yahei"
@@ -57,12 +47,12 @@
             android:textSize="12sp"
             android:textStyle="bold" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="12dp" />
+<!--        <Space-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="12dp" />-->
 
-        <TextView
-            android:id="@+id/userInformation_textview_userEmail"
+        <EditText
+            android:id="@+id/userInformation_edittext_userEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/yahei"
@@ -81,12 +71,12 @@
             android:textSize="12sp"
             android:textStyle="bold" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="12dp" />
+<!--        <Space-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="12dp" />-->
 
-        <TextView
-            android:id="@+id/userInformation_textview_userPhone"
+        <EditText
+            android:id="@+id/userInformation_edittext_userPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/yahei"
@@ -166,12 +156,30 @@
         <TextView
             android:id="@+id/userInformation_textview_balance"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="93dp"
             android:layout_weight="1"
             android:fontFamily="@font/yahei"
             android:text="@string/user_balance"
             android:textColor="@color/rebunu_grey"
             android:textSize="12sp"
+            android:textStyle="bold" />
+
+<!--        <Button-->
+<!--            android:id="@+id/userInformation_button_setting"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginStart="32dp"-->
+<!--            android:background="@drawable/setting_icon" />-->
+        <Button
+            android:id="@+id/userInformation_button_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_tips"
+            android:fontFamily="@font/yahei"
+            android:text="@string/apply"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
     </LinearLayout>

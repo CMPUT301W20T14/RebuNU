@@ -89,6 +89,14 @@ public class SignUpActivity extends AppCompatActivity {
                     editText_phone.setError(getResources().getString(R.string.phone_empty));
                     check = false;
                 }
+                if (editText_phone.getText().toString().length()!= 10) {
+                    editText_phone.setError(getResources().getString(R.string.invalid_phone_length));
+                    check = false;
+                }
+                if(! editText_phone.getText().toString().matches("^[0-9]+$")){
+                    editText_phone.setError(getResources().getString(R.string.invalid_email_address));
+                    check = false;
+                }
                 if (editText_password.getText().toString().isEmpty()) {
                     editText_password.setError(getResources().getString(R.string.password_empty));
                     check = false;
