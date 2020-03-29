@@ -12,6 +12,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -76,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
                         public void onProviderDisabled(String provider) {}
                     });
                 } catch (Exception ignored) {}
+//                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+//                emailIntent.setData(Uri.parse("mailto:abc@xyz.com"));
+//                startActivity(Intent.createChooser(emailIntent, "Send feedback"));
+//                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + "1234567891"));
+//                startActivity(intent);
                 Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(loginIntent);
             }

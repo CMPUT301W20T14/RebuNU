@@ -142,9 +142,33 @@ public class UserInformationActivity extends AppCompatActivity {
         userInformation_button_apply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Boolean check = true;
+                if (edittext_username_small.getText().toString().isEmpty()) {
+                    edittext_username_small.setError(getResources().getString(R.string.username_empty));
+                    check = false;
+                }
+                if (edittext_userEmail.getText().toString().isEmpty()) {
+                    edittext_userEmail.setError(getResources().getString(R.string.email_empty));
+                    check = false;
+                }
+                if(! edittext_userEmail.getText().toString().matches("^[\\w-+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$")){
+                    edittext_userEmail.setError(getResources().getString(R.string.invalid_email_address));
+                    check = false;
+                }
+                if (edittext_userPhone.getText().toString().isEmpty()) {
+                    edittext_userPhone.setError(getResources().getString(R.string.phone_empty));
+                    check = false;
+                }
+                if (edittext_userPhone.getText().toString().length()!= 10) {
+                    edittext_userPhone.setError(getResources().getString(R.string.invalid_phone_length));
+                    check = false;
+                }
+                if(! edittext_userPhone.getText().toString().matches("^[0-9]+$")){
+                    edittext_userPhone.setError(getResources().getString(R.string.invalid_email_address));
+                    check = false;
+                }
 
-
-
+                if(check){
                     final DocumentReference proDocRef = db.profiles.document(userId);
 
                     proDocRef
@@ -166,18 +190,12 @@ public class UserInformationActivity extends AppCompatActivity {
                     db.addAuth(edittext_userPhone.getText().toString(),edittext_userEmail.getText().toString(), password,userId,role);
 
                     finish();
+                }else return;
 
 
 
             }
         });
 
-        // then update
-//        textview_username_large.setText();
-//        textview_username_small.setText();
-//        textview_userEmail.setText();
-//        textview_userPhone.setText();
-//        textview_userRole.setText();
-//        textview_userBalance.setText();
     }
 }
