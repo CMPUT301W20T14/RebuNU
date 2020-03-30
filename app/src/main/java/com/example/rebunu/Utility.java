@@ -110,4 +110,32 @@ public class Utility {
             } catch (Exception ignored){}
         }
     }
+
+    public static String parseOrderStatus(Integer status, Boolean isVerbose) {
+        String stat = "complete";
+        if(isVerbose){
+            if(status != 5) {
+                stat = "Complete";
+            } else {
+                stat = "Incomplete";
+            }
+        } else {
+            if(status == -1) {
+                stat = "Order accepted, but no further action taken.";
+            } else if(status == 1) {
+                stat = "Order canceled by rider before driver pick up.";
+            } else if(status == 2) {
+                stat = "Order canceled by rider after confirmed by driver.";
+            } else if (status == 3) {
+                stat = "Order confirmed by rider and driver.";
+            } else if (status == 4) {
+                stat = "Order canceled by rider after order confirmed by rider and driver.";
+            } else if (status == 5) {
+                stat = "Order complete successfully.";
+            } else {
+                stat = "Order incomplete.";
+            }
+        }
+        return stat;
+    }
 }
