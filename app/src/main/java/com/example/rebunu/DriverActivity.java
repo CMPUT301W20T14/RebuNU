@@ -12,6 +12,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -42,6 +43,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -94,6 +97,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         navigationView = findViewById(R.id.navigationView);
         Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
         mapView = findViewById(R.id.driver_mapView);
+        TextView drawer_header_textview_username;
 
         // initialise database for later query
         Database db = new Database();
@@ -119,6 +123,52 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         toggle.syncState();
         //navigationView.setNavigationItemSelectedListener(this);
         //DrawerLayout
+
+        //get header
+        View harderLayout = navigationView.getHeaderView(0);
+        //get TextView
+        drawer_header_textview_username = harderLayout.findViewById(R.id.drawer_header_textview_username);
+
+        // get username
+        Database dbPro = new Database();
+        String driverId = (String) Objects.requireNonNull(getIntent().getExtras()).get("profileId");
+        dbPro.profiles.document(driverId).addSnapshotListener((documentSnapshot, e) -> {
+            if(e != null){
+                return;
+            }
+            if (documentSnapshot != null && documentSnapshot.exists()){
+                drawer_header_textview_username.setText((String) documentSnapshot.get("name"));
+            }
+        });
+        // Menu
+        navigationView.setNavigationItemSelectedListener(item -> {
+
+            switch(item.getTitle().toString()){
+                case "Profile":
+//                        Toast.makeText(getApplicationContext(), item.getTitle().toString(), Toast.LENGTH_SHORT).show();
+                    Intent userInformationIntent = new Intent(DriverActivity.this, UserInformationActivity.class);
+                    userInformationIntent.putExtra("userId", driverId);
+                    startActivity(userInformationIntent);
+                    break;
+
+                case "Order":
+
+                    Intent orderListActivity = new Intent(DriverActivity.this, OrderListActivity.class);
+                    orderListActivity.putExtra("userId",driverId);
+                    orderListActivity.putExtra("role", true);
+                    startActivity(orderListActivity);
+
+                    break;
+
+                case "Logout":
+//                        Intent mainActivity = new Intent(RiderActivity.this, MainActivity.class);
+//                        startActivity(mainActivity);
+                    finish();
+            }
+            return false;
+        });
+
+
 
         button_searchNearby_floating.setOnClickListener(v -> {
             // before update, clear all current markers on the map

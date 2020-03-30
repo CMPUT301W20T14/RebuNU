@@ -18,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -225,17 +226,14 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         drawer_header_textview_username = harderLayout.findViewById(R.id.drawer_header_textview_username);
 
         // get username
-        Database dbpro = new Database();
+        Database dbPro = new Database();
 
-        dbpro.profiles.document(riderId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if(e != null){
-                    return;
-                }
-                if (documentSnapshot != null && documentSnapshot.exists()){
-                    drawer_header_textview_username.setText((String) documentSnapshot.get("name"));
-                }
+        dbPro.profiles.document(riderId).addSnapshotListener((documentSnapshot, e) -> {
+            if(e != null){
+                return;
+            }
+            if (documentSnapshot != null && documentSnapshot.exists()){
+                drawer_header_textview_username.setText((String) documentSnapshot.get("name"));
             }
         });
 
@@ -259,34 +257,31 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 //            }
 //        });
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        navigationView.setNavigationItemSelectedListener(item -> {
 
-                switch(item.getTitle().toString()){
-                    case "Profile":
+            switch(item.getTitle().toString()){
+                case "Profile":
 //                        Toast.makeText(getApplicationContext(), item.getTitle().toString(), Toast.LENGTH_SHORT).show();
-                        Intent userInformationIntent = new Intent(RiderActivity.this, UserInformationActivity.class);
-                        userInformationIntent.putExtra("userId", riderId);
-                        startActivity(userInformationIntent);
-                        break;
+                    Intent userInformationIntent = new Intent(RiderActivity.this, UserInformationActivity.class);
+                    userInformationIntent.putExtra("userId", riderId);
+                    startActivity(userInformationIntent);
+                    break;
 
-                    case "Order":
+                case "Order":
 
-                        Intent orderListActivity = new Intent(RiderActivity.this, OrderListActivity.class);
-                        orderListActivity.putExtra("userId",riderId);
-                        orderListActivity.putExtra("role", false);
-                        startActivity(orderListActivity);
+                    Intent orderListActivity = new Intent(RiderActivity.this, OrderListActivity.class);
+                    orderListActivity.putExtra("userId",riderId);
+                    orderListActivity.putExtra("role", false);
+                    startActivity(orderListActivity);
 
-                        break;
+                    break;
 
-                    case "Logout":
+                case "Logout":
 //                        Intent mainActivity = new Intent(RiderActivity.this, MainActivity.class);
 //                        startActivity(mainActivity);
-                        finish();
-                }
-                return false;
+                    finish();
             }
+            return false;
         });
 
 
@@ -500,6 +495,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                                 }
                                             });
 
+
                                         } else {
                                             Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
                                             Log.d("", "No such document");
@@ -511,6 +507,26 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                         return;
                                     }
                                 });
+
+                                // Successfully Done!!
+//                                ordRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//                                    @Override
+//                                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+//                                        if(e != null){
+//                                            return;
+//                                        }
+//                                        if (documentSnapshot != null && documentSnapshot.exists()){
+//                                            if((Long)documentSnapshot.get("status") == 5){
+//                                                rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
+//                                                rider_layout_information.setVisibility(ConstraintLayout.GONE);
+//                                                rider_layout_rating.setVisibility(ConstraintLayout.VISIBLE);
+//                                                TextView rider_textview_name_rating = findViewById(R.id.rider_textview_name_rating);
+//
+//
+//                                            }
+//                                        }
+//                                    }
+//                                });
                             }
 
 
@@ -761,6 +777,25 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         TextView rider_textview_email = findViewById(R.id.rider_textview_email);
                         rider_textview_phone.setText((String) document.get("phone"));
                         rider_textview_email.setText((String) document.get("email"));
+
+                        //click on phone
+                        rider_textview_phone.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent phoneIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + rider_textview_phone.getText().toString()));
+                                startActivity(phoneIntent);
+                            }
+                        });
+
+                        //click on email
+                        rider_textview_email.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                                emailIntent.setData(Uri.parse("mailto:" + rider_textview_email.getText().toString()));
+                                startActivity(Intent.createChooser(emailIntent, "Send to Driver"));
+                            }
+                        });
 
 
 
