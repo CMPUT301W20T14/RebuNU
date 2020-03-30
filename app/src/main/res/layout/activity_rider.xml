@@ -68,7 +68,8 @@
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/postRequest_mapView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="NotSibling" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/postRequest_layout"
@@ -108,6 +109,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/rebunu_green"
+                android:enabled="false"
+                android:singleLine="true"
                 android:textColor="@color/rebunu_green">
 
             </EditText>
@@ -133,7 +136,9 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/rebunu_green"
                 android:ems="10"
+                android:enabled="false"
                 android:inputType="textPersonName"
+                android:singleLine="true"
                 android:textColor="@color/rebunu_green" />
 
             <TextView
@@ -226,13 +231,14 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/rider_textview_searching_post_request" />
+                    app:layout_constraintTop_toBottomOf="@+id/rider_textview_searching_post_request"
+                    app:layout_constraintVertical_bias="1.0" />
 
                 <TextView
                     android:id="@+id/rider_textview_searching_post_request"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_marginTop="40dp"
+                    android:layout_marginTop="52dp"
                     android:fontFamily="@font/yahei"
                     android:paddingLeft="5dp"
                     android:text="@string/searching"
@@ -240,7 +246,7 @@
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.601"
+                    app:layout_constraintHorizontal_bias="0.602"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -250,11 +256,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="48dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/rider_textview_searching_post_request"
-                    app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.224"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

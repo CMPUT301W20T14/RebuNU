@@ -197,33 +197,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         mapView.getMapAsync(this);
     }
 
-//       ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PackageManager.PERMISSION_GRANTED);
-
-//        button_searchNearby_floating.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                button_searchNearby_floating.setVisibility(button_searchNearby_floating.GONE);
-//
-//            }
-//        });
-
-//        @Override
-//        protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//
-//            IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-//
-//            if (intentResult != null) {
-//                if (intentResult.getContents() == null){
-//
-//                }
-//                else {
-//
-//                }
-//            }
-//            super.onActivityResult(requestCode, resultCode, data);
-//        }
-//    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -309,7 +282,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     // normal request
                     if(state.equals("multiple")) {
                         // no matter what, we know what marker has been selected :)
-                        // and retrieve bind information correspondingly
+                        // and retrieve binding information correspondingly
                         ArrayList<GeoPoint> pos = Objects.requireNonNull((ArrayList<GeoPoint>) dataMap.get("pos"));
                         Integer price = Objects.requireNonNull((Long) dataMap.get("price")).intValue();
                         String recId = Objects.requireNonNull((String) dataMap.get("recordId"));

@@ -15,7 +15,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -37,11 +39,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.common.collect.MapMaker;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -54,6 +60,8 @@ import org.w3c.dom.Text;
 
 import java.security.spec.ECField;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -68,13 +76,15 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
     private GoogleMap gmap;
     private static final int TAG_CODE_PERMISSION_LOCATION = 1;
 //    private String floatingButtonStatus = "VISIBLE";
-    Boolean cancell_clicked = false;
+    Boolean cancel_clicked = false;
     private LocationManager locationManager;
     private Criteria criteria;
     Integer flag = 0;
     Request myRequest = null;
     String driverId = null;
     String riderId = null;
+    Marker pickMarker;
+    Marker dropMarker;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -302,7 +312,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         }
 
         postRequest_layout.setVisibility(ConstraintLayout.GONE);
-        postRequest_estimated_rate_layout.setVisibility(LinearLayout.GONE);
+        postRequest_estimated_rate_layout.setVisibility(LinearLayout.VISIBLE);
         wait_responding_layout.setVisibility(ConstraintLayout.GONE);
         rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
         rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
@@ -316,7 +326,25 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
         button_postRequest_floating.setOnClickListener(v -> {
             if (flag == 0) {
-                postRequest_estimated_rate_layout.setVisibility(LinearLayout.GONE);
+            Geocoder geocoder = new Geocoder(RiderActivity.this, Locale.getDefault());
+            String addressPick = String.format("%.5f", pickMarker.getPosition().latitude) + ", " + String.format("%.5f", pickMarker.getPosition().longitude);
+            String addressDrop = String.format("%.5f", dropMarker.getPosition().latitude) + ", " + String.format("%.5f", dropMarker.getPosition().longitude);
+            try {
+                List<Address> addresses = geocoder.getFromLocation(pickMarker.getPosition().latitude, pickMarker.getPosition().longitude, 1);
+                String address = addresses.get(0).getAddressLine(0);
+                String[] splitedAddress = Objects.requireNonNull(address.split(","));
+                addressPick = splitedAddress[0] + ", " + splitedAddress[1];
+                addresses = geocoder.getFromLocation(dropMarker.getPosition().latitude, dropMarker.getPosition().longitude, 1);
+                address = addresses.get(0).getAddressLine(0);
+                splitedAddress = Objects.requireNonNull(address.split(","));
+                addressDrop = splitedAddress[0] + ", " + splitedAddress[1];
+            } catch (Exception ignored) {}
+            postRequest_edittext_from.setText(addressPick);
+            postRequest_edittext_to.setText(addressDrop);
+            Location startPos = Utility.latLngToLocation(pickMarker.getPosition());
+            Location endPos = Utility.latLngToLocation(dropMarker.getPosition());
+
+            postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
                 wait_responding_layout.setVisibility(ConstraintLayout.GONE);
                 postRequest_layout.setVisibility(ConstraintLayout.VISIBLE);
                 button_postRequest_floating.setVisibility(Button.GONE);
@@ -339,54 +367,53 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 button_postRequest_floating.setVisibility(Button.GONE);
                 return;
             }
-
         });
 
-        postRequest_edittext_from.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void afterTextChanged(Editable s) {
-                try {
-                    if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
-                        String rawStart = postRequest_edittext_from.getText().toString();
-                        String rawEnd = postRequest_edittext_to.getText().toString();
-                        String[] splitedStart = rawStart.split(",");
-                        String[] splitedEnd = rawEnd.split(",");
-                        Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
-                        Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
-                        postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
-                    }
-                }catch (Exception ignored){}
-            }
-        });
-
-        postRequest_edittext_to.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void afterTextChanged(Editable s) {
-                try {
-                    if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
-                        String rawStart = postRequest_edittext_from.getText().toString();
-                        String rawEnd = postRequest_edittext_to.getText().toString();
-                        String[] splitedStart = rawStart.split(",");
-                        String[] splitedEnd = rawEnd.split(",");
-                        Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
-                        Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
-
-                        postRequest_estimated_rate_layout.setVisibility(LinearLayout.VISIBLE);
-                        postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
-                    }
-                }catch (Exception ignored){}
-            }
-        });
+//        postRequest_edittext_from.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+//            @SuppressLint("SetTextI18n")
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                try {
+//                    if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
+//                        String rawStart = postRequest_edittext_from.getText().toString();
+//                        String rawEnd = postRequest_edittext_to.getText().toString();
+//                        String[] splitedStart = rawStart.split(",");
+//                        String[] splitedEnd = rawEnd.split(",");
+//                        Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
+//                        Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
+//                        postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
+//                    }
+//                }catch (Exception ignored){}
+//            }
+//        });
+//
+//        postRequest_edittext_to.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+//            @SuppressLint("SetTextI18n")
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                try {
+//                    if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
+//                        String rawStart = postRequest_edittext_from.getText().toString();
+//                        String rawEnd = postRequest_edittext_to.getText().toString();
+//                        String[] splitedStart = rawStart.split(",");
+//                        String[] splitedEnd = rawEnd.split(",");
+//                        Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
+//                        Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
+//
+//                        postRequest_estimated_rate_layout.setVisibility(LinearLayout.VISIBLE);
+//                        postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
+//                    }
+//                }catch (Exception ignored){}
+//            }
+//        });
 
         button_tips.setOnClickListener(v -> {
             try{
@@ -424,106 +451,88 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         });
 
         button_postRequest.setOnClickListener(v -> {
-            cancell_clicked = false;
+            cancel_clicked = false;
 
             try {
-                if(!postRequest_edittext_from.getText().toString().isEmpty() && !postRequest_edittext_to.getText().toString().isEmpty()) {
-                    String rawStart = postRequest_edittext_from.getText().toString();
-                    String rawEnd = postRequest_edittext_to.getText().toString();
-                    String[] splitedStart = rawStart.split(",");
-                    String[] splitedEnd = rawEnd.split(",");
-                    Location startPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedStart[0])),(Double.valueOf(splitedStart[1]))));
-                    Location endPos = Utility.latLngToLocation(new LatLng((Double.valueOf(splitedEnd[0])),(Double.valueOf(splitedEnd[1]))));
+                Location startPos = Utility.latLngToLocation(pickMarker.getPosition());
+                Location endPos = Utility.latLngToLocation(dropMarker.getPosition());
 
-                    myRequest = new Request(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
-                    Database dbr = new Database();
-                    String id = dbr.add(myRequest);
-                    myRequest.setId(id);
+                myRequest = new Request(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
+                Database dbr = new Database();
+                String id = dbr.add(myRequest);
+                myRequest.setId(id);
 
 //                        Toast.makeText(getApplicationContext(),myRequest.getId(),Toast.LENGTH_SHORT).show();
+                Database db = new Database();
+                final DocumentReference reqRef = db.requests.document(myRequest.getId());
 
+                reqRef.addSnapshotListener((snapshot, e) -> {
+                    if (e != null) {
+                        Log.w("", "Listen failed.", e);
+                        return;
+                    }
 
+                    if (!(snapshot != null && snapshot.exists())) {
+                        if(!cancel_clicked){
+                            postRequest_layout.setVisibility(ConstraintLayout.GONE);
+                            rider_layout_request_confirmed.setVisibility(ConstraintLayout.VISIBLE);
 
-                    Database db = new Database();
-                    final DocumentReference reqRef = db.requests.document(myRequest.getId());
+                            rider_edittext_from_request_confirmed.setText(postRequest_edittext_from.getText().toString());
+                            rider_edittext_to_request_confirmed.setText(postRequest_edittext_to.getText().toString());
+                            rider_textview_estimatedRateNumeric_request_confirmed.setText(postRequest_textview_estimatedRateNumeric.getText().toString());
 
-                    reqRef.addSnapshotListener((snapshot, e) -> {
-                        if (e != null) {
-                            Log.w("", "Listen failed.", e);
-                            return;
-                        }
+                            Database dbo = new Database();
+                            DocumentReference ordRef = dbo.orders.document(myRequest.getId());
+                            ordRef.get().addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = Objects.requireNonNull(task.getResult());
+                                    if (document.exists()) {
+                                        driverId = (String) document.get("driverId");
+                                        Database dbp = new Database();
+                                        DocumentReference proRef = dbp.profiles.document(driverId);
+                                        proRef.get().addOnCompleteListener(task1 -> {
+                                            if (task1.isSuccessful()) {
+                                                DocumentSnapshot document1 = Objects.requireNonNull(task1.getResult());
+                                                if (document1.exists()) {
+                                                    TextView rider_textview_name_request_confirmed = findViewById(R.id.rider_textview_name_request_confirmed);
+                                                    TextView rider_textview_like_request_confirmed = findViewById(R.id.rider_textview_like_request_confirmed);
+                                                    TextView rider_textview_dislike_request_confirmed = findViewById(R.id.rider_textview_dislike_request_confirmed);
 
-                        if (!(snapshot != null && snapshot.exists())) {
-                            if(!cancell_clicked){
-                                postRequest_layout.setVisibility(ConstraintLayout.GONE);
-                                rider_layout_request_confirmed.setVisibility(ConstraintLayout.VISIBLE);
+                                                    ArrayList<Long> rating;
+                                                    rating = (ArrayList<Long>) document1.get("rating");
 
-                                rider_edittext_from_request_confirmed.setText(postRequest_edittext_from.getText().toString());
-                                rider_edittext_to_request_confirmed.setText(postRequest_edittext_to.getText().toString());
-                                rider_textview_estimatedRateNumeric_request_confirmed.setText(postRequest_textview_estimatedRateNumeric.getText().toString());
-
-                                Database dbo = new Database();
-                                DocumentReference ordRef = dbo.orders.document(myRequest.getId());
-                                ordRef.get().addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        DocumentSnapshot document = Objects.requireNonNull(task.getResult());
-                                        if (document.exists()) {
-                                            driverId = (String) document.get("driverId");
-                                            Database dbp = new Database();
-                                            DocumentReference proRef = dbp.profiles.document(driverId);
-                                            proRef.get().addOnCompleteListener(task1 -> {
-                                                if (task1.isSuccessful()) {
-                                                    DocumentSnapshot document1 = Objects.requireNonNull(task1.getResult());
-                                                    if (document1.exists()) {
-                                                        TextView rider_textview_name_request_confirmed = findViewById(R.id.rider_textview_name_request_confirmed);
-                                                        TextView rider_textview_like_request_confirmed = findViewById(R.id.rider_textview_like_request_confirmed);
-                                                        TextView rider_textview_dislike_request_confirmed = findViewById(R.id.rider_textview_dislike_request_confirmed);
-
-                                                        ArrayList<Long> rating;
-                                                        rating = (ArrayList<Long>) document1.get("rating");
-
-                                                        rider_textview_name_request_confirmed.setText((String) document1.get("name"));
-                                                        rider_textview_like_request_confirmed.setText(Objects.requireNonNull(rating).get(0).toString());
-                                                        rider_textview_dislike_request_confirmed.setText(rating.get(1).toString());
+                                                    rider_textview_name_request_confirmed.setText((String) document1.get("name"));
+                                                    rider_textview_like_request_confirmed.setText(Objects.requireNonNull(rating).get(0).toString());
+                                                    rider_textview_dislike_request_confirmed.setText(rating.get(1).toString());
 
 
 //                                                                    Toast.makeText(getApplicationContext(),(String)document.get("name"), Toast.LENGTH_SHORT).show();
 //                                                                    Toast.makeText(getApplicationContext(),((ArrayList<Integer>)document.get("rating")).get(0).toString(), Toast.LENGTH_SHORT).show();
 
-                                                    } else {
-                                                        Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
-                                                        return;
-                                                    }
                                                 } else {
-                                                    Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
                                                     return;
                                                 }
-                                            });
+                                            } else {
+                                                Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                                return;
+                                            }
+                                        });
 
-                                        } else {
-                                            Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
-                                            Log.d("", "No such document");
-                                            return;
-                                        }
                                     } else {
-                                        Log.d("", "get failed with ", task.getException());
-                                        Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
+                                        Log.d("", "No such document");
                                         return;
                                     }
-                                });
-                            }
-
-
+                                } else {
+                                    Log.d("", "get failed with ", task.getException());
+                                    Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            });
                         }
-                    });
-
-
-
-
-                }else{
-                    postRequest_edittext_from.setError(getResources().getString(R.string.invalid_input));
-                    postRequest_edittext_to.setError(getResources().getString(R.string.invalid_input));
-                }
+                    }
+                });
             }catch (Exception e){
                 Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
             }
@@ -648,7 +657,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         });
 
         rider_button_cancel_post_request.setOnClickListener(v -> {
-            cancell_clicked = true;
+            cancel_clicked = true;
             Database db = new Database();
             db.delete(myRequest);
             db.modifyOrderStatus(myRequest.getId(), 1);
@@ -698,7 +707,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         });
 
         rider_button_decline_request_confirmed.setOnClickListener(v -> {
-            cancell_clicked = true;
+            cancel_clicked = true;
             Database db = new Database();
             db.modifyOrderStatus(myRequest.getId(), 2);
 
@@ -716,7 +725,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         });
 
         rider_button_decline_request_accepted.setOnClickListener(v -> {
-            cancell_clicked = true;
+            cancel_clicked = true;
             Database db = new Database();
             db.modifyOrderStatus(myRequest.getId(), 4);
 
@@ -898,5 +907,67 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             LatLng cur = new LatLng(lat, lon);
             gmap.moveCamera(CameraUpdateFactory.newLatLng(cur));
         }
+
+        pickMarker = gmap.addMarker(new MarkerOptions()
+        .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
+        .draggable(true)
+        .icon(BitmapDescriptorFactory.fromResource(R.drawable.pick)));
+        pickMarker.setTag("pickMarker");
+
+        dropMarker = gmap.addMarker(new MarkerOptions()
+        .position(new LatLng(currentLocation.getLatitude()+0.001, currentLocation.getLongitude()+0.001))
+        .draggable(true)
+        .icon(BitmapDescriptorFactory.fromResource(R.drawable.drop)));
+        dropMarker.setTag("dropMarker");
+
+        EditText postRequest_edittext_from = findViewById(R.id.postRequest_edittext_from);
+        EditText postRequest_edittext_to = findViewById(R.id.postRequest_edittext_to);
+        TextView postRequest_textview_estimatedRateNumeric = findViewById(R.id.postRequest_textview_estimatedRateNumeric);
+
+//        Geocoder geocoder = new Geocoder(RiderActivity.this, Locale.getDefault());
+//        String addressPick = String.format("%.5f", pickMarker.getPosition().latitude) + ", " + String.format("%.5f", pickMarker.getPosition().longitude);
+//        String addressDrop = String.format("%.5f", dropMarker.getPosition().latitude) + ", " + String.format("%.5f", dropMarker.getPosition().longitude);
+//        try {
+//            List<Address> addresses = geocoder.getFromLocation(pickMarker.getPosition().latitude, pickMarker.getPosition().longitude, 1);
+//            String address = addresses.get(0).getAddressLine(0);
+//            String[] splitedAddress = Objects.requireNonNull(address.split(","));
+//            addressPick = splitedAddress[0] + ", " + splitedAddress[1];
+//            addresses = geocoder.getFromLocation(dropMarker.getPosition().latitude, dropMarker.getPosition().longitude, 1);
+//            address = addresses.get(0).getAddressLine(0);
+//            splitedAddress = Objects.requireNonNull(address.split(","));
+//            addressDrop = splitedAddress[0] + ", " + splitedAddress[1];
+//        } catch (Exception ignored) {}
+//        postRequest_edittext_from.setText(addressPick);
+//        postRequest_edittext_to.setText(addressDrop);
+//        Location startPos = Utility.latLngToLocation(pickMarker.getPosition());
+//        Location endPos = Utility.latLngToLocation(dropMarker.getPosition());
+//        postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
+
+        gmap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {}
+            @Override
+            public void onMarkerDrag(Marker marker) {}
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                Geocoder geocoder = new Geocoder(RiderActivity.this, Locale.getDefault());
+                String whichOne = (String) marker.getTag();
+                String addressToUpdate = String.format("%.5f", marker.getPosition().latitude) + ", " + String.format("%.5f", marker.getPosition().longitude);
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(marker.getPosition().latitude, marker.getPosition().longitude, 1);
+                    String address = addresses.get(0).getAddressLine(0);
+                    String[] splitedAddress = Objects.requireNonNull(address.split(","));
+                    addressToUpdate = splitedAddress[0] + ", " + splitedAddress[1];
+                } catch (Exception ignored) {}
+                if(whichOne.equals("pickMarker")) {
+                    postRequest_edittext_from.setText(addressToUpdate);
+                } else if (whichOne.equals("dropMarker")) {
+                    postRequest_edittext_to.setText(addressToUpdate);
+                }
+                Location startPos = Utility.latLngToLocation(pickMarker.getPosition());
+                Location endPos = Utility.latLngToLocation(dropMarker.getPosition());
+                postRequest_textview_estimatedRateNumeric.setText(Utility.getEstimatePrice(startPos, endPos, null).toString());
+            }
+        });
     }
 }
