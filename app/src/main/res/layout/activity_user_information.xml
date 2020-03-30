@@ -156,7 +156,7 @@
         <TextView
             android:id="@+id/userInformation_textview_balance"
             android:layout_width="match_parent"
-            android:layout_height="93dp"
+            android:layout_height="83dp"
             android:layout_weight="1"
             android:fontFamily="@font/yahei"
             android:text="@string/user_balance"
@@ -170,6 +170,7 @@
 <!--            android:layout_height="40dp"-->
 <!--            android:layout_marginStart="32dp"-->
 <!--            android:background="@drawable/setting_icon" />-->
+
         <Button
             android:id="@+id/userInformation_button_apply"
             android:layout_width="wrap_content"
@@ -181,6 +182,10 @@
             android:text="@string/apply"
             android:textSize="16sp"
             android:textStyle="bold" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="30dp" />
 
     </LinearLayout>
 
