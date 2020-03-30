@@ -11,6 +11,7 @@
     <string name="apply">APPLY</string>
     <string name="decline">DECLINE</string>
     <string name="pay_your_trip">PAY YOUR TRIP</string>
+    <string name="end_your_trip">END YOUR TRIP</string>
     <string name="search_nearby">SEARCH NEARBY</string>
 
     <!-- Image Description -->
@@ -68,8 +69,8 @@
     <string name="cancel_request">CANCEL REQUEST</string>
 
     <!-- Rider: Rating -->
-    <string name="awesome">AWESOME!</string>
-    <string name="need_to_improve">NEED TO IMPROVE</string>
+    <string name="awesome">AWESOME !!!</string>
+    <string name="need_to_improve">NEED IMPROVE</string>
 
     <!-- Driver: Search Request -->
     <string name="confirming">CONFIRMING</string>>
