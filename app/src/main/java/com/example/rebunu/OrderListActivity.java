@@ -33,7 +33,7 @@ public class OrderListActivity extends AppCompatActivity {
         Database dbOrder = new Database();
         if(role){
             dbOrder.orders
-                    .whereEqualTo("riderId", userId)
+                    .whereEqualTo("driverId", userId)
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
