@@ -30,7 +30,7 @@ public class OrderListActivity extends AppCompatActivity {
 //        setContentView(R.layout.activity_order_list);
 
         userId = Objects.requireNonNull(Objects.requireNonNull(getIntent().getExtras()).get("userId")).toString();
-        role = Objects.requireNonNull(Objects.requireNonNull(getIntent().getExtras()).getBoolean("userId"));
+        role = Objects.requireNonNull(Objects.requireNonNull(getIntent().getExtras()).getBoolean("role"));
 
         orderListView = findViewById(R.id.order_list_listview);
 

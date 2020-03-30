@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -48,6 +49,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.common.collect.MapMaker;
@@ -88,6 +91,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
     String riderId = null;
     Marker pickMarker;
     Marker dropMarker;
+    Boolean alreadyRating = false;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -136,7 +140,9 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         Button rider_button_hide_qrcode;
         Button rider_button_payYourTrip_rating;
         Button rider_button_hide_rating;
+        Button rider_button_end;
         ImageButton rider_button_like_rating;
+        ImageButton rider_button_dislike_rating;
 
         // All the TextView
         TextView postRequest_textview_estimatedRateNumeric;
@@ -168,6 +174,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         rider_layout_request_accepted = findViewById(R.id.rider_layout_request_accepted);
         rider_layout_information = findViewById(R.id.rider_layout_information);
         rider_layout_qrcode = findViewById(R.id.rider_layout_qrcode);
+
         rider_layout_rating = findViewById(R.id.rider_layout_rating);
 
         mapView = findViewById(R.id.postRequest_mapView);
@@ -177,6 +184,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         button_tips = findViewById(R.id.postRequest_button_tips);
         rider_button_tips_request_confirmed = findViewById(R.id.rider_button_tips_request_confirmed);
         rider_button_like_rating = findViewById(R.id.rider_button_like_rating);
+        rider_button_dislike_rating = findViewById(R.id.rider_button_dislike_rating);
+        rider_button_end = findViewById(R.id.rider_button_end);
 
         rider_button_cancel_post_request = findViewById(R.id.rider_button_cancel_post_request);
         rider_button_hide_request_confirmed = findViewById(R.id.rider_button_hide_request_confirmed);
@@ -326,6 +335,11 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         rider_layout_qrcode.setVisibility(ConstraintLayout.GONE);
 
         button_postRequest_floating.setVisibility(Button.VISIBLE);
+
+//        ///////
+//        rider_layout_rating.setVisibility(ConstraintLayout.VISIBLE);
+//        button_postRequest_floating.setVisibility(Button.GONE);
+
         mapView.onCreate(null);
         mapView.getMapAsync(this);
 
@@ -377,6 +391,11 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 rider_layout_rating.setVisibility(ConstraintLayout.VISIBLE);
                 return;
 
+            }
+            if(flag == 5){
+                button_postRequest_floating.setVisibility(Button.GONE);
+                rider_layout_qrcode.setVisibility(ConstraintLayout.VISIBLE);
+                return;
             }
         });
 
@@ -450,16 +469,6 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             }
         });
 
-        rider_button_payYourTrip_rating.setOnClickListener(v -> {
-            rider_layout_rating.setVisibility(ConstraintLayout.GONE);
-            QRCode qrCode = new QRCode(123,234,345);
-            try {
-
-                rider_imageview_qrcode.setImageBitmap(qrCode.getBitmap());
-            }catch (Exception ignored){}
-            rider_layout_qrcode.setVisibility(ConstraintLayout.VISIBLE);
-            // maybe add status change
-        });
 
         button_postRequest.setOnClickListener(v -> {
             cancel_clicked = false;
@@ -568,6 +577,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                                             TextView rider_textview_name_rating = findViewById(R.id.rider_textview_name_rating);
                                                             TextView rider_textview_like_rating = findViewById(R.id.rider_textview_like_rating);
                                                             TextView rider_textview_dislike_rating = findViewById(R.id.rider_textview_dislike_rating);
+                                                            TextView rider_button_needToImprove_rating = findViewById(R.id.rider_button_needToImprove_rating);
+                                                            TextView rider_textview_awesome_rating = findViewById(R.id.rider_textview_awesome_rating);
                                                             rider_textview_name_rating.setText((String)document.get("name"));
                                                             ArrayList<Long> rating = new ArrayList<>();
                                                             rating = (ArrayList<Long>) document.get("rating");
@@ -578,7 +589,67 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                                             rider_button_like_rating.setOnClickListener(new View.OnClickListener() {
                                                                 @Override
                                                                 public void onClick(View v) {
+                                                                    if(alreadyRating){
+                                                                        return;
+                                                                    }
+                                                                    alreadyRating = true;
+                                                                    rider_button_dislike_rating.setVisibility(Button.GONE);
+                                                                    rider_button_needToImprove_rating.setVisibility(View.GONE);
 
+                                                                    ArrayList<Integer> rating = new ArrayList<>();
+                                                                    Integer thumbsUp = Integer.parseInt(rider_textview_like_rating.getText().toString());
+                                                                    Integer thumbsDown = Integer.parseInt(rider_textview_dislike_rating.getText().toString());
+                                                                    rating.add(thumbsUp + 1);
+                                                                    rating.add(thumbsDown);
+
+                                                                    document.getReference()
+                                                                            .update("rating", rating)
+                                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                @Override
+                                                                                public void onSuccess(Void aVoid) {
+                                                                                    Log.d("", "DocumentSnapshot successfully updated!");
+                                                                                }
+                                                                            })
+                                                                            .addOnFailureListener(new OnFailureListener() {
+                                                                                @Override
+                                                                                public void onFailure(@NonNull Exception e) {
+                                                                                    Log.w("", "Error updating document", e);
+                                                                                }
+                                                                            });
+
+                                                                }
+                                                            });
+
+                                                            rider_button_dislike_rating.setOnClickListener(new View.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(View v) {
+                                                                    if(alreadyRating){
+                                                                        return;
+                                                                    }
+                                                                    alreadyRating = true;
+                                                                    rider_button_like_rating.setVisibility(Button.GONE);
+                                                                    rider_textview_awesome_rating.setVisibility(View.GONE);
+
+                                                                    ArrayList<Integer> rating = new ArrayList<>();
+                                                                    Integer thumbsUp = Integer.parseInt(rider_textview_like_rating.getText().toString());
+                                                                    Integer thumbsDown = Integer.parseInt(rider_textview_dislike_rating.getText().toString());
+                                                                    rating.add(thumbsUp);
+                                                                    rating.add(thumbsDown+1);
+
+                                                                    document.getReference()
+                                                                            .update("rating", rating)
+                                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                @Override
+                                                                                public void onSuccess(Void aVoid) {
+                                                                                    Log.d("", "DocumentSnapshot successfully updated!");
+                                                                                }
+                                                                            })
+                                                                            .addOnFailureListener(new OnFailureListener() {
+                                                                                @Override
+                                                                                public void onFailure(@NonNull Exception e) {
+                                                                                    Log.w("", "Error updating document", e);
+                                                                                }
+                                                                            });
                                                                 }
                                                             });
 
@@ -586,6 +657,19 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                                     }
 
                                                 }
+                                            });
+
+                                            //pay your trip!!
+                                            rider_button_payYourTrip_rating.setOnClickListener(v -> {
+                                                rider_layout_rating.setVisibility(ConstraintLayout.GONE);
+                                                rider_layout_qrcode.setVisibility(ConstraintLayout.VISIBLE);
+
+                                                QRCode qrCode = new QRCode(driverId,riderId,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()));
+                                                try {
+
+                                                    rider_imageview_qrcode.setImageBitmap(qrCode.getBitmap());
+                                                }catch (Exception ignored){}
+
                                             });
 
 
@@ -601,121 +685,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
             }
 
-            //Commits below are tests for database functionality
 
-//                double[] lat = {53.525564, 53.525296, 53.525695, 53.526441, 53.525612};
-//                double[] lng = {-113.521412, -113.520166, -113.521335, -113.519962, -113.521459};
-//                ArrayList<Request> rs = new ArrayList<>();
-//                Database db = new Database();
-
-            //test add
-//                for (Integer i = 0; i<5; i++){
-//                    try{
-//                        User a = new Rider(true);
-//
-//                        Location la = Utility.latLngToLocation(new LatLng(lat[i],lng[i]));
-//                        Location lb = Utility.latLngToLocation(new LatLng(lat[4-i],lng[4-i]));
-//                        Request r = ((Rider)a).CreateRequest(la,lb,10+i,i.toString());
-//                        rs.add(r);
-////                        Toast.makeText(getApplicationContext(),id,Toast.LENGTH_SHORT).show();
-//
-//
-//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
-//
-//                }
-
-//              test delete
-//                for(Request r: rs){
-//                    try{
-//                        db.delete(r);
-//                    }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
-//
-//
-//                }
-            //delete record that not in database
-//                try{
-//                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
-//                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
-//                    Request newRequest = new Request(la, lb, 67, "8");
-//                    newRequest.setId("12345678");
-//                    db.delete(newRequest);
-//                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
-
-            //test modify
-//                try{
-//                    Location la = Utility.latLngToLocation(new LatLng(lat[0],lng[0]));
-//                    Location lb = Utility.latLngToLocation(new LatLng(lat[1],lng[1]));
-//                    Request newRequest = new Request(la, lb, 67, "8");
-//                    newRequest.setId("23rr2r43");
-//                    db.modify(newRequest);
-//                }catch (Exception e){Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();}
-
-//                test register
-//                try{
-//                    HashMap<String, Object> test = new HashMap<>();
-//                    test.put("phone","999");
-//                    test.put("email", "999");
-//                    test.put("balance",0);
-//                    test.put("name", "999");
-//                    test.put("role",true);
-//                    test.put("password", "999");
-//                    ArrayList<Integer> rating = new ArrayList<>();
-//                    rating.add(0);
-//                    rating.add(0);
-//                    test.put("rating", rating);
-////                    String id1 = db.register(null);
-//                    String id2 = db.register(test);
-////                    Toast.makeText(getApplicationContext(),id1,Toast.LENGTH_SHORT).show();
-//                    Toast.makeText(getApplicationContext(),id2,Toast.LENGTH_SHORT).show();
-//                }catch(Exception e){
-//                    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
-//                }
-
-            //test query
-//                try{
-////                    String phone  = (String) db.profiles.document("8E9Kj6fiTCW70myD58On").get().getResult().get("phone");
-//
-//                    DocumentReference docRef = db.profiles.document("345");
-//
-//
-//                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                DocumentSnapshot document = task.getResult();
-//                                if (document.exists()) {
-//                                    Toast.makeText(getApplicationContext(),document.get("phone").toString(),Toast.LENGTH_SHORT).show();
-//                                    Log.d("RebuNu", "DocumentSnapshot data: " + document.getData());
-//                                } else {
-//                                    Toast.makeText(getApplicationContext(),"No such record",Toast.LENGTH_SHORT).show();
-//
-//                                    Log.d("RebuNu", "No such document");
-//                                }
-//                            } else {
-//                                Log.d("RebuNu", "get failed with ", task.getException());
-//                            }
-//                        }
-//                    });
-//
-////                    Toast.makeText(getApplicationContext(),phone,Toast.LENGTH_SHORT).show();
-//                }catch(Exception e){
-//                    Toast.makeText(getApplicationContext(),"fuck",Toast.LENGTH_SHORT).show();
-//                }
-
-            //test queryById
-            //try{
-//                    Profile p = (Profile) db.queryById("8E9Kj6fiTCW70myD58On",1);
-//                    Toast.makeText(getApplicationContext(),p.getPhone(),Toast.LENGTH_SHORT).show();
-            //}catch (Exception e){
-            //    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_SHORT).show();
-            //}
-
-
-//                if (floatingButtonStatus.equals("GONE")) {
-//                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
-//                    button_postRequest_floating.setVisibility(Button.VISIBLE);
-//                    floatingButtonStatus = "VISIBLE";
-//                }
             button_postRequest.setVisibility(Button.GONE);
             wait_responding_layout.setVisibility(ConstraintLayout.VISIBLE);
         });
@@ -743,19 +713,9 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             rider_layout_request_confirmed.setVisibility(ConstraintLayout.GONE);
             rider_layout_request_accepted.setVisibility(ConstraintLayout.VISIBLE);
 
-//                rider_edittext_from_request_confirmed.setText(postRequest_edittext_from.getText().toString());
-//                rider_edittext_to_request_confirmed.setText(postRequest_edittext_to.getText().toString());
-//                rider_textview_estimatedRateNumeric_request_confirmed.setText(postRequest_textview_estimatedRateNumeric.getText().toString());
             TextView rider_textview_name_request_confirmed = findViewById(R.id.rider_textview_name_request_confirmed);
             TextView rider_textview_like_request_confirmed = findViewById(R.id.rider_textview_like_request_confirmed);
             TextView rider_textview_dislike_request_confirmed = findViewById(R.id.rider_textview_dislike_request_confirmed);
-
-//                rider_textview_fromWhere_request_accepted = findViewById(R.id.rider_textview_fromWhere_request_accepted);
-//                rider_textview_to_request_accepted = findViewById(R.id.rider_textview_to_request_accepted);
-//                rider_textview_name_request_accepted = findViewById(R.id.rider_textview_name_request_accepted);
-//                rider_textview_like_request_accepted = findViewById(R.id.rider_textview_like_request_accepted);
-//                rider_textview_dislike_request_accepted = findViewById(R.id.rider_textview_dislike_request_accepted);
-//                rider_textview_estimatedRateNumeric_request_accepted
 
             rider_textview_fromWhere_request_accepted.setText(rider_edittext_from_request_confirmed.getText().toString());
             rider_textview_to_request_accepted.setText(rider_edittext_to_request_confirmed.getText().toString());
@@ -812,14 +772,6 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             rider_layout_information.setVisibility(ConstraintLayout.VISIBLE);
             rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
 
-//                TextView rider_textview_name_information;
-//                TextView rider_textview_like_information;
-//                TextView rider_textview_dislike_information;
-
-//                rider_textview_name_request_accepted.setText(rider_textview_name_request_confirmed.getText().toString());
-//                rider_textview_like_request_accepted.setText(rider_textview_like_request_confirmed.getText().toString());
-//                rider_textview_dislike_request_accepted.setText(rider_textview_dislike_request_confirmed.getText().toString());
-
             rider_textview_name_information.setText(rider_textview_name_request_accepted.getText().toString());
             rider_textview_like_information.setText(rider_textview_like_request_accepted.getText().toString());
             rider_textview_dislike_information.setText(rider_textview_dislike_request_accepted.getText().toString());
@@ -865,11 +817,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             postRequest_layout.setVisibility(ConstraintLayout.GONE);
             button_postRequest_floating.setVisibility(Button.VISIBLE);
             flag = 1;
-//                if (floatingButtonStatus.equals("GONE")) {
-//                    postRequest_layout.setVisibility(ConstraintLayout.GONE);
-//                    button_postRequest_floating.setVisibility(Button.VISIBLE);
-//                    floatingButtonStatus = "VISIBLE";
-//                }
+
         });
 
         rider_button_hide_request_confirmed.setOnClickListener(v -> {
@@ -901,22 +849,27 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
 
 
-        rider_button_hide_qrcode.setOnClickListener(v -> rider_layout_qrcode.setVisibility(ConstraintLayout.GONE));
+        rider_button_hide_qrcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rider_layout_qrcode.setVisibility(ConstraintLayout.GONE);
+                button_postRequest_floating.setVisibility(Button.VISIBLE);
+                flag = 5;
+            }
+        });
+
+        rider_button_end.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rider_layout_qrcode.setVisibility(ConstraintLayout.GONE);
+                button_postRequest_floating.setVisibility(Button.VISIBLE);
+                flag = 0;
+            }
+        });
 
         // not sure working yet..
         mapView.setOnClickListener(v -> postRequest_layout.setVisibility(ConstraintLayout.VISIBLE));
     }
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu){
-//        MenuItem menuItem_rider_profile;
-//        menuItem_rider_profile = findViewById(R.id.rider_profile);
-//        menuItem_rider_profile.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                return false;
-//            }
-//        })
-//    }
 
     @Override
     protected void onResume() {

@@ -18,15 +18,15 @@ import java.util.Date;
  * @author Bofeng Chen
  */
 public class QRCode {
-    private Integer driverId;
-    private Integer riderId;
+    private String driverId;
+    private String riderId;
     private Integer price;
     private String transactionID;
     private Bitmap bitmap;
 
     // private String content;
 
-    public QRCode(Integer driverId, Integer riderId, Integer price){
+    public QRCode(String driverId, String riderId, Integer price){
         String pattern = "MM/dd/yyyy HH:mm:ss";
         DateFormat df = new SimpleDateFormat(pattern);
         Date today = Calendar.getInstance().getTime();
@@ -64,7 +64,7 @@ public class QRCode {
      * Getter for riderId
      * @return riderId
      */
-    public Integer getRiderId(){
+    public String getRiderId(){
         return riderId;
     }
 
@@ -88,7 +88,7 @@ public class QRCode {
      * Getter for driverId
      * @return driverId
      */
-    public Integer getDriverId(){
+    public String getDriverId(){
         return driverId;
     }
 
@@ -107,8 +107,8 @@ public class QRCode {
      * @param driverId a positive Integer
      * @throws Exception invalid number
      */
-    public void setDriverId(Integer driverId) throws Exception{
-        if (driverId >= 0){
+    public void setDriverId(String driverId) throws Exception{
+        if (driverId != null){
             this.driverId = driverId;
         } else {
             throw new Exception("Invalid driverId.");
@@ -120,8 +120,8 @@ public class QRCode {
      * @param riderId a positive Integer
      * @throws Exception invalid number
      */
-    public void setRiderId(Integer riderId) throws Exception{
-        if (riderId >= 0){
+    public void setRiderId(String riderId) throws Exception{
+        if (riderId != null){
             this.riderId = riderId;
         } else {
             throw new Exception("Invalid riderId.");
