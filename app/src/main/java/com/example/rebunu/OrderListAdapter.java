@@ -34,7 +34,7 @@ public class OrderListAdapter extends ArrayAdapter<Order> {
         TextView price = view.findViewById(R.id.single_order_textview_price);
 
         id.setText(order.getId());
-        status.setText(Utility.parseOrderStatus(order.getStatus(), true));
+        status.setText(Utility.parseOrderStatus(order.getStatus(), false));
         price.setText(order.getPrice().toString());
         return view;
     }
