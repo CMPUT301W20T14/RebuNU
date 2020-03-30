@@ -449,6 +449,11 @@ public class Database {
 
     }
 
+    public void ratingUp(String profileId, Boolean like){
+        final DocumentReference proDocRef = profiles.document(profileId);
+
+    }
+
     /**
      * modify request
      * @param r

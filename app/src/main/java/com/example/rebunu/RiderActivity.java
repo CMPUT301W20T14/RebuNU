@@ -20,6 +20,7 @@ import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -30,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -134,6 +136,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         Button rider_button_hide_qrcode;
         Button rider_button_payYourTrip_rating;
         Button rider_button_hide_rating;
+        ImageButton rider_button_like_rating;
 
         // All the TextView
         TextView postRequest_textview_estimatedRateNumeric;
@@ -173,6 +176,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         button_hide = findViewById(R.id.postRequest_button_hide);
         button_tips = findViewById(R.id.postRequest_button_tips);
         rider_button_tips_request_confirmed = findViewById(R.id.rider_button_tips_request_confirmed);
+        rider_button_like_rating = findViewById(R.id.rider_button_like_rating);
 
         rider_button_cancel_post_request = findViewById(R.id.rider_button_cancel_post_request);
         rider_button_hide_request_confirmed = findViewById(R.id.rider_button_hide_request_confirmed);
@@ -368,6 +372,12 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                 button_postRequest_floating.setVisibility(Button.GONE);
                 return;
             }
+            if(flag == 4){
+                button_postRequest_floating.setVisibility(Button.GONE);
+                rider_layout_rating.setVisibility(ConstraintLayout.VISIBLE);
+                return;
+
+            }
         });
 
 //        postRequest_edittext_from.addTextChangedListener(new TextWatcher() {
@@ -533,24 +543,57 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                             });
 
                             // Successfully Done!!
-//                            ordRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//                                @Override
-//                                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-//                                    if(e != null){
-//                                        return;
-//                                    }
-//                                    if (documentSnapshot != null && documentSnapshot.exists()){
-//                                        if((Long)documentSnapshot.get("status") == 5){
-//                                            rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
-//                                            rider_layout_information.setVisibility(ConstraintLayout.GONE);
-//                                            rider_layout_rating.setVisibility(ConstraintLayout.VISIBLE);
-//                                            TextView rider_textview_name_rating = findViewById(R.id.rider_textview_name_rating);
-//
-//
-//                                        }
-//                                    }
-//                                }
-//                            });
+                            ordRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                    if(e != null){
+                                        return;
+                                    }
+                                    if (documentSnapshot != null && documentSnapshot.exists()){
+                                        if((Long)documentSnapshot.get("status") == 5){
+                                            rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
+                                            rider_layout_information.setVisibility(ConstraintLayout.GONE);
+                                            rider_layout_rating.setVisibility(ConstraintLayout.VISIBLE);
+
+
+                                            driverId = (String) documentSnapshot.get("driverId");
+                                            Database dbp = new Database();
+                                            DocumentReference proRef = dbp.profiles.document(driverId);
+                                            proRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                    if (task.isSuccessful()){
+                                                        DocumentSnapshot document = Objects.requireNonNull(task.getResult());
+                                                        if (document.exists()){
+                                                            TextView rider_textview_name_rating = findViewById(R.id.rider_textview_name_rating);
+                                                            TextView rider_textview_like_rating = findViewById(R.id.rider_textview_like_rating);
+                                                            TextView rider_textview_dislike_rating = findViewById(R.id.rider_textview_dislike_rating);
+                                                            rider_textview_name_rating.setText((String)document.get("name"));
+                                                            ArrayList<Long> rating = new ArrayList<>();
+                                                            rating = (ArrayList<Long>) document.get("rating");
+                                                            rider_textview_like_rating.setText(rating.get(0).toString());
+                                                            rider_textview_dislike_rating.setText(rating.get(1).toString());
+
+                                                            //rating
+                                                            rider_button_like_rating.setOnClickListener(new View.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(View v) {
+
+                                                                }
+                                                            });
+
+                                                        }
+                                                    }
+
+                                                }
+                                            });
+
+
+
+                                        }
+                                    }
+                                }
+                            });
                         }
                     }
                 });
@@ -847,7 +890,16 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 
         });
 
-        rider_button_hide_rating.setOnClickListener(v -> rider_layout_rating.setVisibility(ConstraintLayout.GONE));
+        rider_button_hide_rating.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rider_layout_rating.setVisibility(ConstraintLayout.GONE);
+                button_postRequest_floating.setVisibility(Button.VISIBLE);
+                flag = 4;
+            }
+        });
+
+
 
         rider_button_hide_qrcode.setOnClickListener(v -> rider_layout_qrcode.setVisibility(ConstraintLayout.GONE));
 
