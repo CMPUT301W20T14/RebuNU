@@ -43,7 +43,7 @@ public class UserInformationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_information);
 
         userId = Objects.requireNonNull(Objects.requireNonNull(getIntent().getExtras()).get("userId")).toString();
-        Toast.makeText(getApplicationContext(), userId, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), userId, Toast.LENGTH_SHORT).show();
 
         TextView textview_username_large;
         EditText edittext_username_small;
