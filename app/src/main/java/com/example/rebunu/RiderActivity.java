@@ -163,6 +163,8 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
 //        TextView rider_textview_phone;
 //        TextView rider_textview_email;
         ImageView rider_imageview_qrcode;
+        TextView rider_button_needToImprove_rating = findViewById(R.id.rider_button_needToImprove_rating);
+        TextView rider_textview_awesome_rating = findViewById(R.id.rider_textview_awesome_rating);
 
         //All the editText
         EditText postRequest_edittext_from;
@@ -499,6 +501,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                         if(!cancel_clicked){
                             postRequest_layout.setVisibility(ConstraintLayout.GONE);
                             rider_layout_request_confirmed.setVisibility(ConstraintLayout.VISIBLE);
+                            button_postRequest_floating.setVisibility(Button.GONE);
 
                             rider_edittext_from_request_confirmed.setText(postRequest_edittext_from.getText().toString());
                             rider_edittext_to_request_confirmed.setText(postRequest_edittext_to.getText().toString());
@@ -566,6 +569,12 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                             rider_layout_request_accepted.setVisibility(ConstraintLayout.GONE);
                                             rider_layout_information.setVisibility(ConstraintLayout.GONE);
                                             rider_layout_rating.setVisibility(ConstraintLayout.VISIBLE);
+                                            rider_button_dislike_rating.setVisibility(Button.VISIBLE);
+                                            rider_button_needToImprove_rating.setVisibility(View.VISIBLE);
+                                            rider_button_like_rating.setVisibility(Button.VISIBLE);
+                                            rider_textview_awesome_rating.setVisibility(View.VISIBLE);
+                                            button_postRequest_floating.setVisibility(Button.GONE);
+                                            alreadyRating = false;
 
 
                                             driverId = (String) documentSnapshot.get("driverId");
@@ -580,8 +589,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                                             TextView rider_textview_name_rating = findViewById(R.id.rider_textview_name_rating);
                                                             TextView rider_textview_like_rating = findViewById(R.id.rider_textview_like_rating);
                                                             TextView rider_textview_dislike_rating = findViewById(R.id.rider_textview_dislike_rating);
-                                                            TextView rider_button_needToImprove_rating = findViewById(R.id.rider_button_needToImprove_rating);
-                                                            TextView rider_textview_awesome_rating = findViewById(R.id.rider_textview_awesome_rating);
+
                                                             rider_textview_name_rating.setText((String)document.get("name"));
                                                             ArrayList<Long> rating = new ArrayList<>();
                                                             rating = (ArrayList<Long>) document.get("rating");
@@ -666,6 +674,28 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
                                             rider_button_payYourTrip_rating.setOnClickListener(v -> {
                                                 rider_layout_rating.setVisibility(ConstraintLayout.GONE);
                                                 rider_layout_qrcode.setVisibility(ConstraintLayout.VISIBLE);
+                                                dbp.profiles.document(driverId)
+                                                        .get()
+                                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    DocumentSnapshot document = Objects.requireNonNull(task.getResult());
+                                                                    if (document.exists()) {
+                                                                        TextView rider_textview_name_qrcode = findViewById(R.id.rider_textview_name_qrcode);
+                                                                        TextView rider_textview_like_qrcode = findViewById(R.id.rider_textview_like_qrcode);
+                                                                        TextView rider_textview_dislike_qrcode = findViewById(R.id.rider_textview_dislike_qrcode);
+                                                                        rider_textview_name_qrcode.setText(document.getString("name"));
+                                                                        ArrayList<Long> rating_qr = new ArrayList<>();
+                                                                        rating_qr = (ArrayList<Long>) document.get("rating");
+                                                                        rider_textview_like_qrcode.setText(rating_qr.get(0).toString());
+                                                                        rider_textview_dislike_qrcode.setText(rating_qr.get(1).toString());
+
+                                                                    }
+                                                                }
+                                                            }
+                                                        });
+
 
                                                 QRCode qrCode = new QRCode(driverId,riderId,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()));
                                                 try {
