@@ -51,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
         button_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ////
+//                Database db = new Database();
+//                db.transaction("3ADPOibNez5dMe6swsYm","UMR5AAMtSVJo04BEvksS",25);
                 // forcing location service to update, in case of preventing first app run that no location cache exists causing null pointer exception
                 try {
                     // check if we have permission, if not, ask for permission

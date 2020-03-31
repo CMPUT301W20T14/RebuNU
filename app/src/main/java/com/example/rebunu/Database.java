@@ -27,6 +27,7 @@ import org.imperiumlabs.geofirestore.GeoFirestore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  *
@@ -574,6 +575,42 @@ public class Database {
         if(record.getType() == 2){
             modifyRequest((Request)record);
         }
+
+    }
+
+    public void transaction(String driverId, String riderId, Integer price){
+        profiles.document(riderId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = Objects.requireNonNull(task.getResult());
+                            if (document.exists()) {
+                                Long riderBalance = document.getLong("balance");
+                                Long newBalance = riderBalance - price;
+                                document.getReference().update("balance",newBalance);
+                            }
+                        }
+
+                    }
+                });
+
+        profiles.document(driverId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = Objects.requireNonNull(task.getResult());
+                            if (document.exists()) {
+                                Long driverBalance = document.getLong("balance");
+                                Long newBalance = driverBalance + price;
+                                document.getReference().update("balance",newBalance);
+                            }
+                        }
+                    }
+                });
 
     }
 
