@@ -15,6 +15,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -53,15 +54,6 @@ public class Database {
 
     public Database(){
         db = FirebaseFirestore.getInstance();
-        profiles = db.collection("profiles");
-        requests = db.collection("requests");
-        orders = db.collection("orders");
-        auth= db.collection("auth");
-        geoFirestore = new GeoFirestore(requests);
-    }
-    public Database(FirebaseFirestore firestore){
-
-        db = firestore.getInstance();
         profiles = db.collection("profiles");
         requests = db.collection("requests");
         orders = db.collection("orders");

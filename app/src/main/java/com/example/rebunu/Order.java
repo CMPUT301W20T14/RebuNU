@@ -24,8 +24,8 @@ public class Order extends Record{
 
     public Order(){
         this.ratingOfThisOrder = null;
-        this.driverId = "";
-        this.riderId = "";
+        this.driverId = null;
+        this.riderId = null;
         this.start = null;
         this.end = null;
         this.price = -1;
@@ -167,7 +167,7 @@ public class Order extends Record{
 
 
     public void setStatus(Integer status){
-        if(status == 1 || status == 2 || status == 3 || status == 4 || status == 5){
+        if(status == 1 || status == 2 || status == 3 || status == 4 || status == 5 || status == -1){
             this.status = status;
         }else{
             throw new IllegalArgumentException();
