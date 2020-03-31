@@ -79,11 +79,15 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private Criteria criteria;
     private Map<String, Map<String, Object>> recordIdToDataMap = new HashMap<>();
     private Location currentLocation = Utility.currentLocation;
+    private GeoQuery geoQuery;
     //DrawerLayout
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     NavigationView navigationView;
     ActionBarDrawerToggle toggle;
+    Boolean prevFlag = false;
+    private int prevButtonState;
+    private int prevLayoutState;
     //DrawerLayout
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,17 +112,31 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
-        toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawerOpen,R.string.drawerClose) {
+
+
+
+        toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawerOpen, R.string.drawerClose) {
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                button_searchNearby_floating.setVisibility(GONE);
+                prevFlag = true;
+                prevButtonState = button_searchNearby_floating.getVisibility();
+                if(button_searchNearby_floating.getVisibility() == VISIBLE) {
+                    button_searchNearby_floating.setVisibility(GONE);
+                }
+                ConstraintLayout layout_request_accepted = findViewById(R.id.driver_layout_request_accepted);
+                prevLayoutState = layout_request_accepted.getVisibility();
+                if(layout_request_accepted.getVisibility() == VISIBLE) {
+                    layout_request_accepted.setVisibility(GONE);
+                }
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                button_searchNearby_floating.setVisibility(View.VISIBLE);
+                button_searchNearby_floating.setVisibility(prevButtonState);
+                ConstraintLayout layout_request_accepted = findViewById(R.id.driver_layout_request_accepted);
+                layout_request_accepted.setVisibility(prevLayoutState);
             }
         };
 
@@ -174,76 +192,84 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
 
         button_searchNearby_floating.setOnClickListener(v -> {
-            // before update, clear all current markers on the map
-            gmap.clear();
-            // and clear their selection state(ie, selected will show with darker color, unselected will show with lighter color)
-            recordIdToDataMap.clear();
+            if (floatingButtonStatus.equals("SHOW_ALL_REQUEST")) {
+                // before update, clear all current markers on the map
+                gmap.clear();
+                // and clear their selection state(ie, selected will show with darker color, unselected will show with lighter color)
+                recordIdToDataMap.clear();
 
-            // check if we have permission, if not, ask for permission
-            if (!(ContextCompat.checkSelfPermission(DriverActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                    PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(DriverActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                            PackageManager.PERMISSION_GRANTED)) {
-                ActivityCompat.requestPermissions(DriverActivity.this, new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                }, TAG_CODE_PERMISSION_LOCATION);
-            }
-            // get current location
-            try {
-                currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
-            } catch (Exception ignored) {
-                currentLocation = Utility.currentLocation;
-            }
-            // and relocate camera to show current location
-            gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10));
-
-            // search all request with center = current location and radius = 5 kilometers
-            GeoQuery geoQuery = db.geoFirestore.queryAtLocation(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()), 5.0);
-            geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
-                @Override
-                public void onDocumentEntered(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
-                    // if a request satisfy our requirements
-                    Map<String, Object> dataMap = Objects.requireNonNull(documentSnapshot.getData());
-                    dataMap.put("recordId", documentSnapshot.getId());
-                    recordIdToDataMap.put(documentSnapshot.getId(), dataMap);
-                    gmap.clear();
-                    //updateRequestOnMap();
-                    MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
+                // check if we have permission, if not, ask for permission
+                if (!(ContextCompat.checkSelfPermission(DriverActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(DriverActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                                PackageManager.PERMISSION_GRANTED)) {
+                    ActivityCompat.requestPermissions(DriverActivity.this, new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    }, TAG_CODE_PERMISSION_LOCATION);
                 }
+                // get current location
+                try {
+                    currentLocation = Objects.requireNonNull(locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, false))));
+                } catch (Exception ignored) {
+                    currentLocation = Utility.currentLocation;
+                }
+                // and relocate camera to show current location
+                gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10));
 
-                @Override
-                public void onDocumentExited(@NonNull DocumentSnapshot documentSnapshot) {
-                    // if a request no longer satisfy our requirements, ie, cancelled or out of radius
-                    try {
-                        recordIdToDataMap.remove(documentSnapshot.getId());
+                // search all request with center = current location and radius = 5 kilometers
+                geoQuery = db.geoFirestore.queryAtLocation(new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()), 5.0);
+                geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+                    @Override
+                    public void onDocumentEntered(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
+                        // if a request satisfy our requirements
+                        Map<String, Object> dataMap = Objects.requireNonNull(documentSnapshot.getData());
+                        dataMap.put("recordId", documentSnapshot.getId());
+                        recordIdToDataMap.put(documentSnapshot.getId(), dataMap);
                         gmap.clear();
                         //updateRequestOnMap();
                         MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
-                    } catch (Exception ignored) {
                     }
-                }
 
-                @Override
-                public void onDocumentMoved(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
-                }
-
-                @Override
-                public void onDocumentChanged(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
-                }
-
-                @Override
-                public void onGeoQueryReady() {
-                    if(recordIdToDataMap.isEmpty()) {
-                        Toast.makeText(getApplicationContext(), "No request found near your location.", Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onDocumentExited(@NonNull DocumentSnapshot documentSnapshot) {
+                        // if a request no longer satisfy our requirements, ie, cancelled or out of radius
+                        try {
+                            recordIdToDataMap.remove(documentSnapshot.getId());
+                            gmap.clear();
+                            //updateRequestOnMap();
+                            MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
+                        } catch (Exception ignored) {
+                        }
                     }
-                }
 
-                @Override
-                public void onGeoQueryError(@NonNull Exception e) {
-                    Toast.makeText(getApplicationContext(), "A problem occurs during searching, please retry." + e.toString(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onDocumentMoved(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
+                    }
+
+                    @Override
+                    public void onDocumentChanged(@NonNull DocumentSnapshot documentSnapshot, @NonNull GeoPoint geoPoint) {
+                    }
+
+                    @Override
+                    public void onGeoQueryReady() {
+                        if(recordIdToDataMap.isEmpty()) {
+                            Toast.makeText(getApplicationContext(), "No request found near your location.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onGeoQueryError(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "A problem occurs during searching, please retry." + e.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            else if(floatingButtonStatus.equals("ON_THE_WAY")) {
+                button_searchNearby_floating.setText(R.string.search_nearby);
+                button_searchNearby_floating.setVisibility(GONE);
+                ConstraintLayout layout_request_accepted = findViewById(R.id.driver_layout_request_accepted);
+                layout_request_accepted.setVisibility(VISIBLE);
+            }
         });
 
         mapView.onCreate(null);
@@ -260,8 +286,28 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 Toast.makeText(getApplicationContext(), "Scanning cancelled.", Toast.LENGTH_SHORT).show();
             }
             else {
-                Toast.makeText(getApplicationContext(), intentResult.getContents(), Toast.LENGTH_SHORT).show();
-
+                // driver, rider, price
+                String raw = intentResult.getContents();
+                String[] processed = raw.split(" ");
+                String driverId = processed[0];
+                String riderId = processed[1];
+                Integer price = Integer.parseInt(processed[2]);
+                // <ADD>
+                Toast.makeText(getApplicationContext(), driverId + ", " + riderId + ", " + price.toString(), Toast.LENGTH_SHORT).show();
+                Button accept_request_scan_to_get_paid =  findViewById(R.id.driver_button_accept_request_scan_to_get_paid);
+                ConstraintLayout layout_request_accepted = findViewById(R.id.driver_layout_request_accepted);
+                Button button_accept_request_accepted = findViewById(R.id.driver_button_accept_request_accepted);
+                Button button_hide_request_accepted = findViewById(R.id.driver_button_hide_request_accepted);
+                Button button_searchNearby_floating = findViewById(R.id.driver_button_searchNearby_floating);
+                accept_request_scan_to_get_paid.setVisibility(GONE);
+                layout_request_accepted.setVisibility(GONE);
+                button_accept_request_accepted.setVisibility(VISIBLE);
+                button_hide_request_accepted.setVisibility(VISIBLE);
+                button_searchNearby_floating.setText(R.string.search_nearby);
+                floatingButtonStatus = "SHOW_ALL_REQUEST";
+                button_searchNearby_floating.setVisibility(VISIBLE);
+                gmap.clear();
+                gmap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10));
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -399,6 +445,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
                         // this is for driver to accepted request
                         button_accept_request_accepted.setOnClickListener(v -> {
+                            geoQuery.removeAllListeners();
                             Order order = new Order();
                             try {
                                 // initialise a new Order object, we do not set status now, because it is not decided by rider to accept
@@ -443,6 +490,9 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                             progressbar_request_accepted.setVisibility(GONE);
                                             textview_confirming_request_accepted.setVisibility(GONE);
                                             button_accept_request_arrived_at_destination.setVisibility(View.VISIBLE);
+                                            //HERE OOO
+                                            floatingButtonStatus = "ON_THE_WAY";
+                                            button_hide_request_accepted.setVisibility(VISIBLE);
                                             button_accept_request_arrived_at_destination.setOnClickListener(v0 -> {
                                                 button_accept_request_arrived_at_destination.setVisibility(GONE);
                                                 button_accept_request_scan_to_get_paid.setVisibility(VISIBLE);
@@ -474,8 +524,26 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                                     int status_4 = ((Long) Objects.requireNonNull(Objects.requireNonNull(documentSnapshot_status4.getData()).get("status"))).intValue();
                                                     if(status_4 == 4) {
                                                         Toast.makeText(getApplicationContext(), "User cancelled the request.", Toast.LENGTH_SHORT).show();
-                                                        layout_request_accepted.setVisibility(GONE);
-                                                        button_searchNearby_floating.setVisibility(VISIBLE);
+                                                        if(prevFlag) {
+                                                            if (prevLayoutState == VISIBLE) {
+                                                                prevLayoutState = GONE;
+                                                            } else {
+                                                                layout_request_accepted.setVisibility(GONE);
+                                                            }
+                                                        } else {
+                                                            layout_request_accepted.setVisibility(GONE);
+                                                        }
+                                                        floatingButtonStatus = "SHOW_ALL_REQUEST";
+                                                        button_searchNearby_floating.setText(R.string.search_nearby);
+                                                        if(prevFlag) {
+                                                            if (prevButtonState == GONE) {
+                                                                prevButtonState = VISIBLE;
+                                                            } else {
+                                                                button_searchNearby_floating.setVisibility(VISIBLE);
+                                                            }
+                                                        } else {
+                                                            button_searchNearby_floating.setVisibility(VISIBLE);
+                                                        }
                                                         button_accept_request_arrived_at_destination.setVisibility(GONE);
                                                         button_accept_request_accepted.setVisibility(VISIBLE);
                                                         button_hide_request_accepted.setVisibility(VISIBLE);
@@ -489,8 +557,26 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                             Toast.makeText(getApplicationContext(), "User cancelled the request.", Toast.LENGTH_SHORT).show();
                                             if(floatingButtonStatus.equals("SHOW_ALL_REQUEST")) {
                                                 // update the view
-                                                layout_request_accepted.setVisibility(GONE);
-                                                button_searchNearby_floating.setVisibility(View.VISIBLE);
+                                                if(prevFlag) {
+                                                    if (prevLayoutState == VISIBLE) {
+                                                        prevLayoutState = GONE;
+                                                    } else {
+                                                        layout_request_accepted.setVisibility(GONE);
+                                                    }
+                                                } else {
+                                                    layout_request_accepted.setVisibility(GONE);
+                                                }
+
+                                                if(prevFlag) {
+                                                    if (prevButtonState == GONE) {
+                                                        prevButtonState = VISIBLE;
+                                                    } else {
+                                                        button_searchNearby_floating.setVisibility(VISIBLE);
+                                                    }
+                                                } else {
+                                                    button_searchNearby_floating.setVisibility(VISIBLE);
+                                                }
+
                                                 progressbar_request_accepted.setVisibility(GONE);
                                                 textview_confirming_request_accepted.setVisibility(GONE);
                                                 button_accept_request_accepted.setVisibility(View.VISIBLE);
@@ -516,6 +602,11 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                 gmap.clear();
                                 //updateRequestOnMap();
                                 MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
+                            } else if(floatingButtonStatus.equals("ON_THE_WAY")) {
+                                layout_request_accepted.setVisibility(GONE);
+                                button_searchNearby_floating.setText("SHOW DETAIL");
+                                button_searchNearby_floating.setVisibility(VISIBLE);
+                                //<FLAG>
                             }
                         });
 
