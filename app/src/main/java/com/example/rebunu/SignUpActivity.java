@@ -159,7 +159,7 @@ public class SignUpActivity extends AppCompatActivity {
                                                     String userId = db.register(info);
                                                     Boolean role = button_driver.isChecked();
 
-                                                    Toast.makeText(getApplicationContext(),"Your register ID is : "+ userId, Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getApplicationContext(),"Successfully Registered!! \nYour register ID is: "+ userId, Toast.LENGTH_SHORT).show();
 
                                                     Intent logInIntent = new Intent(SignUpActivity.this, LoginActivity.class);
                                                     logInIntent.putExtra("userId", userId);

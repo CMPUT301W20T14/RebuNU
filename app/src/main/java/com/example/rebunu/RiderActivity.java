@@ -92,6 +92,9 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
     Marker pickMarker;
     Marker dropMarker;
     Boolean alreadyRating = false;
+    Location startPos;
+    Location endPos;
+    String profileId;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -474,13 +477,13 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             cancel_clicked = false;
 
             try {
-                Location startPos = Utility.latLngToLocation(pickMarker.getPosition());
-                Location endPos = Utility.latLngToLocation(dropMarker.getPosition());
+                startPos = Utility.latLngToLocation(pickMarker.getPosition());
+                endPos = Utility.latLngToLocation(dropMarker.getPosition());
 
                 myRequest = new Request(startPos,endPos,Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()),riderId);
                 Database dbr = new Database();
-                String id = dbr.add(myRequest);
-                myRequest.setId(id);
+                profileId = dbr.add(myRequest);
+                myRequest.setId(profileId);
 
 //                        Toast.makeText(getApplicationContext(),myRequest.getId(),Toast.LENGTH_SHORT).show();
                 Database db = new Database();
@@ -694,7 +697,18 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             cancel_clicked = true;
             Database db = new Database();
             db.delete(myRequest);
-            db.modifyOrderStatus(myRequest.getId(), 1);
+
+            Order order = new Order();
+            try {
+                order.setRiderId(riderId);
+                order.setPrice(Integer.parseInt(postRequest_textview_estimatedRateNumeric.getText().toString()));
+                order.setStart(startPos);
+                order.setEnd(endPos);
+                order.setStatus(1);
+                order.setId(profileId);
+            } catch (Exception e) {}
+            db.addOrder(order);
+//            db.modifyOrderStatus(myRequest.getId(), 1);
 
             postRequest_edittext_from.setText("");
             postRequest_edittext_to.setText("");
