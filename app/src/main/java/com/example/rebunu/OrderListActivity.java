@@ -54,6 +54,10 @@ public class OrderListActivity extends AppCompatActivity {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     orders.add(Utility.documentSnapshotToOrder(document));
                                 }
+                                if(orders.isEmpty()) {
+                                    Toast.makeText(getApplicationContext(), "No order found.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                                 orderListAdapter = new OrderListAdapter(OrderListActivity.this, orders);
                                 orderListView.setAdapter(orderListAdapter);
                             } else {
@@ -71,6 +75,10 @@ public class OrderListActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     orders.add(Utility.documentSnapshotToOrder(document));
+                                }
+                                if(orders.isEmpty()) {
+                                    Toast.makeText(getApplicationContext(), "No order found.", Toast.LENGTH_SHORT).show();
+                                    return;
                                 }
                                 orderListAdapter = new OrderListAdapter(OrderListActivity.this, orders);
                                 orderListView.setAdapter(orderListAdapter);

@@ -79,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                                             String realPassword =(String) document.getData().get("password");
                                             String profileId = (String) document.getData().get("profileId");
                                             Boolean role = (Boolean) document.getData().get("role");
-                                            if(editText_password.getText().toString().equals(realPassword)){
+                                            if(Utility.md5Hashing(editText_password.getText().toString()).equals(realPassword)){
                                                 if(role) {
                                                     Intent postRequestIntent = new Intent(LoginActivity.this, DriverActivity.class);
                                                     postRequestIntent.putExtra("profileId", profileId);
