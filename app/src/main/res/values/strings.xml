@@ -13,6 +13,8 @@
     <string name="pay_your_trip">PAY YOUR TRIP</string>
     <string name="end_your_trip">END YOUR TRIP</string>
     <string name="search_nearby">SEARCH NEARBY</string>
+    <string name="arrived_at_destination">ARRIVED AT DESTINATION</string>
+    <string name="scan_to_get_paid">SCAN TO GET PAID</string>
 
     <!-- Image Description -->
     <string name="logo_description">This is the logo of RebuNe.</string>

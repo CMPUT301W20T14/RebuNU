@@ -92,16 +92,27 @@ public class OrderListActivity extends AppCompatActivity {
         orderListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String info;
                 Order order = (Order) orderListView.getItemAtPosition(position);
                 HashMap<String, String> stringMap = Utility.processOrderToStringHashMap(order,getApplicationContext());
                 AlertDialog.Builder builder = new AlertDialog.Builder(OrderListActivity.this);
-                String info = "From: " + stringMap.get("start") + ".\n"
-                        + "To: " + stringMap.get("end") + ".\n"
-                        + "Driver ID: " + stringMap.get("driverId") + ".\n"
-                        + "Rider ID: " + stringMap.get("riderId") + ".\n"
-                        + "Price: " + stringMap.get("price") + " QR Bucks" + ".\n"
-                        + "Status: " + stringMap.get("status") + ".\n"
-                        + "Rating: " + stringMap.get("rating") + '.';
+                if (!stringMap.get("status").equals("Order complete successfully")) {
+                    info = "From: " + stringMap.get("start") + ".\n"
+                            + "To: " + stringMap.get("end") + ".\n"
+                            + "Driver ID: " + stringMap.get("driverId") + ".\n"
+                            + "Rider ID: " + stringMap.get("riderId") + ".\n"
+                            + "Price: " + stringMap.get("price") + " QR Bucks" + ".\n"
+                            + "Status: " + stringMap.get("status") + ".\n"
+                            + "Rating: " + "Not applicable" + '.';
+                } else {
+                    info = "From: " + stringMap.get("start") + ".\n"
+                            + "To: " + stringMap.get("end") + ".\n"
+                            + "Driver ID: " + stringMap.get("driverId") + ".\n"
+                            + "Rider ID: " + stringMap.get("riderId") + ".\n"
+                            + "Price: " + stringMap.get("price") + " QR Bucks" + ".\n"
+                            + "Status: " + stringMap.get("status") + ".\n"
+                            + "Rating: " + stringMap.get("rating") + '.';
+                }
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {}

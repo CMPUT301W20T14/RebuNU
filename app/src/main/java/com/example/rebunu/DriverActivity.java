@@ -59,6 +59,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 /**
  * Driver screen
  * @author Zijian Xi, Zihao Huang
@@ -109,7 +112,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                button_searchNearby_floating.setVisibility(View.GONE);
+                button_searchNearby_floating.setVisibility(GONE);
             }
 
             @Override
@@ -247,6 +250,23 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         mapView.getMapAsync(this);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
+        if (intentResult != null) {
+            if (intentResult.getContents() == null){
+                Toast.makeText(getApplicationContext(), "Scanning cancelled.", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(getApplicationContext(), intentResult.getContents(), Toast.LENGTH_SHORT).show();
+
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 //       ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PackageManager.PERMISSION_GRANTED);
 
 //        button_searchNearby_floating.setOnClickListener(new View.OnClickListener() {
@@ -374,8 +394,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                         TextView textview_to_request_accepted = findViewById(R.id.driver_textview_to_request_accepted);
                         TextView textview_estimatedRateNumeric_request_accepted = findViewById(R.id.driver_textview_estimatedRateNumeric_request_accepted);
                         Button button_accept_request_accepted = findViewById(R.id.driver_button_accept_request_accepted);
-
-
+                        Button button_accept_request_arrived_at_destination = findViewById(R.id.driver_button_accept_request_arrived_at_destination);
+                        Button button_accept_request_scan_to_get_paid = findViewById(R.id.driver_button_accept_request_scan_to_get_paid);
 
                         // this is for driver to accepted request
                         button_accept_request_accepted.setOnClickListener(v -> {
@@ -390,8 +410,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                 order.setId(recId);
 
                                 // update the view
-                                button_hide_request_accepted.setVisibility(View.GONE);
-                                button_accept_request_accepted.setVisibility(View.GONE);
+                                button_hide_request_accepted.setVisibility(GONE);
+                                button_accept_request_accepted.setVisibility(GONE);
                                 ProgressBar progressbar_request_accepted = findViewById(R.id.driver_progressbar_request_accepted);
                                 TextView textview_confirming_request_accepted = findViewById(R.id.driver_textview_confirming_request_accepted);
                                 progressbar_request_accepted.setVisibility(View.VISIBLE);
@@ -408,7 +428,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                         Toast.makeText(getApplicationContext(),
                                                 "A problem occurs during placing your order, please retry.",
                                                 Toast.LENGTH_SHORT).show();
-                                        layout_request_accepted.setVisibility(View.GONE);
+                                        layout_request_accepted.setVisibility(GONE);
                                         button_searchNearby_floating.setVisibility(View.VISIBLE);
                                         gmap.clear();
                                         //updateRequestOnMap();
@@ -418,15 +438,67 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                     if (documentSnapshot != null && documentSnapshot.exists()) {
                                         int status = ((Long) Objects.requireNonNull(Objects.requireNonNull(documentSnapshot.getData()).get("status"))).intValue();
                                         if(status == 3) {
-                                            // proceed
+                                            // both agreed
                                             Toast.makeText(getApplicationContext(), "Both agreed", Toast.LENGTH_SHORT).show();
+                                            progressbar_request_accepted.setVisibility(GONE);
+                                            textview_confirming_request_accepted.setVisibility(GONE);
+                                            button_accept_request_arrived_at_destination.setVisibility(View.VISIBLE);
+                                            button_accept_request_arrived_at_destination.setOnClickListener(v0 -> {
+                                                button_accept_request_arrived_at_destination.setVisibility(GONE);
+                                                button_accept_request_scan_to_get_paid.setVisibility(VISIBLE);
+                                                order.setStatus(5);
+                                                db.modifyOrder(order);
+                                            });
+                                            button_accept_request_scan_to_get_paid.setOnClickListener(v1 -> {
+                                                // asking for camera permission
+                                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PackageManager.PERMISSION_GRANTED);
+                                                IntentIntegrator intentIntegrator = new IntentIntegrator(this);
+                                                intentIntegrator.initiateScan();
+                                            });
+
+                                            db.orders.document(recId).addSnapshotListener((documentSnapshot_status4, e_status4) -> {
+                                                if (e_status4 != null) {
+                                                    Toast.makeText(getApplicationContext(),
+                                                            "A problem occurs during placing your order, please retry.",
+                                                            Toast.LENGTH_SHORT).show();
+                                                    layout_request_accepted.setVisibility(GONE);
+                                                    button_searchNearby_floating.setVisibility(VISIBLE);
+                                                    button_accept_request_arrived_at_destination.setVisibility(GONE);
+                                                    button_accept_request_accepted.setVisibility(VISIBLE);
+                                                    button_hide_request_accepted.setVisibility(VISIBLE);
+                                                    gmap.clear();
+                                                    MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
+                                                    return;
+                                                }
+                                                if (documentSnapshot_status4 != null && documentSnapshot_status4.exists()) {
+                                                    int status_4 = ((Long) Objects.requireNonNull(Objects.requireNonNull(documentSnapshot_status4.getData()).get("status"))).intValue();
+                                                    if(status_4 == 4) {
+                                                        Toast.makeText(getApplicationContext(), "User cancelled the request.", Toast.LENGTH_SHORT).show();
+                                                        layout_request_accepted.setVisibility(GONE);
+                                                        button_searchNearby_floating.setVisibility(VISIBLE);
+                                                        button_accept_request_arrived_at_destination.setVisibility(GONE);
+                                                        button_accept_request_accepted.setVisibility(VISIBLE);
+                                                        button_hide_request_accepted.setVisibility(VISIBLE);
+                                                        gmap.clear();
+                                                        MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
+                                                    }
+                                                }
+                                            });
                                         } else if (status == 2) {
                                             // user cancelled the order
-                                            Toast.makeText(getApplicationContext(), "User cancelled", Toast.LENGTH_SHORT).show();
-                                        } else if (status == 4) {
-                                            // do something
-                                        } else if (status == 5) {
-                                            // do something
+                                            Toast.makeText(getApplicationContext(), "User cancelled the request.", Toast.LENGTH_SHORT).show();
+                                            if(floatingButtonStatus.equals("SHOW_ALL_REQUEST")) {
+                                                // update the view
+                                                layout_request_accepted.setVisibility(GONE);
+                                                button_searchNearby_floating.setVisibility(View.VISIBLE);
+                                                progressbar_request_accepted.setVisibility(GONE);
+                                                textview_confirming_request_accepted.setVisibility(GONE);
+                                                button_accept_request_accepted.setVisibility(View.VISIBLE);
+                                                button_hide_request_accepted.setVisibility(View.VISIBLE);
+                                                gmap.clear();
+                                                //updateRequestOnMap();
+                                                MapViewAdapter.updateRequestOnMap(gmap, recordIdToDataMap, currentLocation, getApplicationContext(), getResources());
+                                            }
                                         }
                                     }
                                 });
@@ -439,7 +511,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                             // when click the cross
                             if(floatingButtonStatus.equals("SHOW_ALL_REQUEST")) {
                                 // update the view
-                                layout_request_accepted.setVisibility(View.GONE);
+                                layout_request_accepted.setVisibility(GONE);
                                 button_searchNearby_floating.setVisibility(View.VISIBLE);
                                 gmap.clear();
                                 //updateRequestOnMap();
@@ -448,7 +520,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                         });
 
                         // update the view
-                        button_searchNearby_floating.setVisibility(View.GONE);
+                        button_searchNearby_floating.setVisibility(GONE);
                         layout_request_accepted.setVisibility(View.VISIBLE);
                         // https://stackoverflow.com/questions/9409195/how-to-get-complete-address-from-latitude-and-longitude answered Feb 23 '12 at 8:09 by user370305
                         Geocoder geocoder = new Geocoder(DriverActivity.this, Locale.getDefault());

@@ -69,7 +69,8 @@
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/postRequest_mapView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/driver_layout_request_accepted"
@@ -81,7 +82,8 @@
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:background="#D11F241F"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="gone">
 
         <Button
             android:id="@+id/driver_button_hide_request_accepted"
@@ -210,6 +212,30 @@
                     android:text="@string/accept"
                     android:textStyle="bold"
                     tools:visibility="visible" />
+
+                <Button
+                    android:id="@+id/driver_button_accept_request_arrived_at_destination"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_long_green"
+                    android:fontFamily="@font/yahei"
+                    android:text="@string/arrived_at_destination"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:visibility="gone" />
+
+                <Button
+                    android:id="@+id/driver_button_accept_request_scan_to_get_paid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_long_green"
+                    android:fontFamily="@font/yahei"
+                    android:text="@string/scan_to_get_paid"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:visibility="gone" />
             </LinearLayout>
 
 

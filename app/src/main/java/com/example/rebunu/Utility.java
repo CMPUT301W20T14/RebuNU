@@ -165,7 +165,7 @@ public class Utility {
                 rating = true;
             }
 
-            if(driverId == null) {
+            if(driverId == null || driverId.isEmpty()) {
                 driverId = "Not applicable";
             }
 
@@ -180,7 +180,9 @@ public class Utility {
             GeoPoint end = pos.get(1);
             order.setStart(Utility.latLngToLocation(new LatLng(start.getLatitude(), start.getLongitude())));
             order.setEnd(Utility.latLngToLocation(new LatLng(end.getLatitude(), end.getLongitude())));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            String e = ignored.toString();
+        }
         return order;
     }
 
