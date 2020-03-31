@@ -144,7 +144,7 @@ public class SignUpActivity extends AppCompatActivity {
                                                     ArrayList<Integer> rating = new ArrayList<>();
                                                     info.put("name",editText_username.getText().toString());
                                                     info.put("phone", editText_phone.getText().toString());
-                                                    info.put("password", editText_password.getText().toString());
+                                                    info.put("password", Utility.md5Hashing(editText_password.getText().toString()));
                                                     info.put("email",editText_email.getText().toString());
                                                     info.put("balance", 0);
                                                     if(button_driver.isChecked()){
@@ -170,7 +170,7 @@ public class SignUpActivity extends AppCompatActivity {
                                                 }
                                             } else {
                                                 Log.d("", "get failed with ", task.getException());
-                                                Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getApplicationContext(), "Oops, a little problem occurred, please try again...", Toast.LENGTH_SHORT).show();
                                                 return;
                                             }
                                         }
@@ -178,7 +178,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 }
                             } else {
                                 Log.d("", "get failed with ", task.getException());
-                                Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Oops, a little problem occurred, please try again...", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }

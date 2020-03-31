@@ -13,6 +13,9 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firestore.v1.StructuredQuery;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -212,5 +215,10 @@ public class Utility {
             }
         }
         return stringHashMap;
+    }
+
+    // Reference: https://stackoverflow.com/questions/4846484/md5-hashing-in-android answered May 20 '13 at 16:13 by tbraun
+    public static String md5Hashing(String string) {
+        return new String(Hex.encodeHex(DigestUtils.md5(string)));
     }
 }
