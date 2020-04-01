@@ -183,6 +183,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         button_hide = findViewById(R.id.postRequest_button_hide);
         button_tips = findViewById(R.id.postRequest_button_tips);
         rider_button_tips_request_confirmed = findViewById(R.id.rider_button_tips_request_confirmed);
+        rider_button_tips_request_confirmed.setVisibility(Button.GONE);
         rider_button_like_rating = findViewById(R.id.rider_button_like_rating);
         rider_button_dislike_rating = findViewById(R.id.rider_button_dislike_rating);
         rider_button_end = findViewById(R.id.rider_button_end);
@@ -194,6 +195,7 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         rider_button_hide_request_accepted = findViewById(R.id.rider_button_hide_request_accepted);
         rider_button_decline_request_accepted = findViewById(R.id.rider_button_decline_request_accepted);
         rider_button_tips_request_accepted = findViewById(R.id.rider_button_tips_request_accepted);
+        rider_button_tips_request_accepted.setVisibility(Button.GONE);
         rider_button_contact_request_accepted = findViewById(R.id.rider_button_contact_request_accepted);
         rider_button_hide_information = findViewById(R.id.rider_button_hide_information);
         rider_button_hide_qrcode = findViewById(R.id.rider_button_hide_qrcode);
@@ -366,21 +368,21 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
             }
         });
 
-        rider_button_tips_request_confirmed.setOnClickListener(v -> {
-            try{
-                rider_textview_estimatedRateNumeric_request_confirmed.setText(Integer.toString(Integer.parseInt(rider_textview_estimatedRateNumeric_request_confirmed.getText().toString()) + 1));
-            }catch (Exception e){
-                rider_textview_estimatedRateNumeric_request_confirmed.setText("6");
-            }
-        });
+//        rider_button_tips_request_confirmed.setOnClickListener(v -> {
+//            try{
+//                rider_textview_estimatedRateNumeric_request_confirmed.setText(Integer.toString(Integer.parseInt(rider_textview_estimatedRateNumeric_request_confirmed.getText().toString()) + 1));
+//            }catch (Exception e){
+//                rider_textview_estimatedRateNumeric_request_confirmed.setText("6");
+//            }
+//        });
 
-        rider_button_tips_request_accepted.setOnClickListener(v -> {
-            try{
-                rider_textview_estimatedRateNumeric_request_accepted.setText(Integer.toString(Integer.parseInt(rider_textview_estimatedRateNumeric_request_confirmed.getText().toString()) + 1));
-            }catch (Exception e){
-                rider_textview_estimatedRateNumeric_request_accepted.setText("6");
-            }
-        });
+//        rider_button_tips_request_accepted.setOnClickListener(v -> {
+//            try{
+//                rider_textview_estimatedRateNumeric_request_accepted.setText(Integer.toString(Integer.parseInt(rider_textview_estimatedRateNumeric_request_confirmed.getText().toString()) + 1));
+//            }catch (Exception e){
+//                rider_textview_estimatedRateNumeric_request_accepted.setText("6");
+//            }
+//        });
 
         button_postRequest.setOnClickListener(v -> {
             cancel_clicked = false;

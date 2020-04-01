@@ -158,10 +158,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 }
                             });
                         }
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Oops, a little problem occurred, please try again...", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                    } else { return; }
                 });
             }else return;
         });

@@ -81,7 +81,7 @@
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:background="#D11F241F"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <Button
             android:id="@+id/postRequest_button_hide"
@@ -577,7 +577,7 @@
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:background="#D11F241F"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <Button
             android:id="@+id/rider_button_hide_rating"

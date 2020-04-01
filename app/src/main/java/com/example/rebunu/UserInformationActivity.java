@@ -136,20 +136,51 @@ public class UserInformationActivity extends AppCompatActivity {
             }
 
             if(check){
-                final DocumentReference proDocRef = db.profiles.document(userId);
 
-                proDocRef
-                        .update("email",edittext_userEmail.getText().toString(),"phone",edittext_userPhone.getText().toString(),"name",edittext_username_small.getText().toString())
-                        .addOnSuccessListener(aVoid -> {
-                            Log.d("", "DocumentSnapshot successfully updated!");
-                        })
-                        .addOnFailureListener(e -> Log.w("TAG", "Error updating document", e));
-                db.deleteAuth(phone,email);
-                db.addAuth(edittext_userPhone.getText().toString(),edittext_userEmail.getText().toString(), password,userId,role);
+                DocumentReference emailAuth = db.auth.document(edittext_userEmail.getText().toString());
+                emailAuth.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()&& (document.get("profileId").toString().compareTo(userId)) != 0) {
 
-                finish();
+                            edittext_userEmail.setError(getResources().getString(R.string.email_address_exists));
+
+                        } else {
+                            DocumentReference phoneAuth = db.auth.document(edittext_userPhone.getText().toString());
+                            phoneAuth.get().addOnCompleteListener(task1 -> {
+                                if (task1.isSuccessful()) {
+                                    DocumentSnapshot document1 = task1.getResult();
+                                    if (document1.exists() && (document1.get("profileId").toString().compareTo(userId)) != 0) {
+
+                                        edittext_userPhone.setError(getResources().getString(R.string.phone_exists));
+
+                                    } else {
+                                        final DocumentReference proDocRef = db.profiles.document(userId);
+
+                                        proDocRef
+                                                .update("email",edittext_userEmail.getText().toString(),"phone",edittext_userPhone.getText().toString(),"name",edittext_username_small.getText().toString())
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Log.d("", "DocumentSnapshot successfully updated!");
+                                                })
+                                                .addOnFailureListener(e -> Log.w("TAG", "Error updating document", e));
+                                        db.deleteAuth(phone,email);
+                                        db.addAuth(edittext_userPhone.getText().toString(),edittext_userEmail.getText().toString(), password,userId,role);
+
+                                        finish();
+
+                                    }
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Oops, a little problem occurred, please try again...", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            });
+                        }
+                    } else { return; }
+                });
             }else return;
+
         });
 
     }
 }
+
