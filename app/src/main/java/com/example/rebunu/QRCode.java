@@ -25,7 +25,6 @@ public class QRCode {
     private Integer price;
     private String transactionID;
     private Bitmap bitmap;
-
     // private String content;
 
     public QRCode(String driverId, String riderId, Integer price){

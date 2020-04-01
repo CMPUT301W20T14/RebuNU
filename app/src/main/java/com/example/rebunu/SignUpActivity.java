@@ -59,165 +59,111 @@ public class SignUpActivity extends AppCompatActivity {
         editText_password = findViewById(R.id.signup_edittext_password);
         editText_confirmPassword = findViewById(R.id.signup_edittext_confirmpassword);
 
+        button_return.setOnClickListener(v -> finish());
 
-
-        button_return.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
+        button_finish.setOnClickListener(v -> {
+            // do something for registration
+            Boolean check = true;
+            if (editText_username.getText().toString().isEmpty()) {
+                editText_username.setError(getResources().getString(R.string.username_empty));
+                check = false;
             }
-        });
+            if (editText_email.getText().toString().isEmpty()) {
+                editText_email.setError(getResources().getString(R.string.email_empty));
+                check = false;
+            }
+            if(! editText_email.getText().toString().matches("^[\\w-+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$")){
+                editText_email.setError(getResources().getString(R.string.invalid_email_address));
+                check = false;
+            }
+            if (editText_phone.getText().toString().isEmpty()) {
+                editText_phone.setError(getResources().getString(R.string.phone_empty));
+                check = false;
+            }
+            if (editText_phone.getText().toString().length()!= 10) {
+                editText_phone.setError(getResources().getString(R.string.invalid_phone_length));
+                check = false;
+            }
+            if(! editText_phone.getText().toString().matches("^[0-9]+$")){
+                editText_phone.setError(getResources().getString(R.string.invalid_email_address));
+                check = false;
+            }
+            if (editText_password.getText().toString().isEmpty()) {
+                editText_password.setError(getResources().getString(R.string.password_empty));
+                check = false;
+            }
+            if (editText_confirmPassword.getText().toString().isEmpty()) {
+                editText_confirmPassword.setError(getResources().getString(R.string.confirmPassword_empty));
+                check = false;
+            }
+            if (! editText_confirmPassword.getText().toString().equals(editText_password.getText().toString())){
+                editText_confirmPassword.setError(getResources().getString(R.string.two_password_not_match));
+                editText_password.setError(getResources().getString(R.string.two_password_not_match));
+                check = false;
+            }
+            if((!button_rider.isChecked()) && (!button_driver.isChecked())){
+                button_driver.setError(getResources().getString(R.string.not_select_role));
+                button_rider.setError(getResources().getString(R.string.not_select_role));
+                check = false;
+            }
 
-        button_finish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // do something for registration
-                Boolean check = true;
-                if (editText_username.getText().toString().isEmpty()) {
-                    editText_username.setError(getResources().getString(R.string.username_empty));
-                    check = false;
-                }
-                if (editText_email.getText().toString().isEmpty()) {
-                    editText_email.setError(getResources().getString(R.string.email_empty));
-                    check = false;
-                }
-                if(! editText_email.getText().toString().matches("^[\\w-+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$")){
-                    editText_email.setError(getResources().getString(R.string.invalid_email_address));
-                    check = false;
-                }
-                if (editText_phone.getText().toString().isEmpty()) {
-                    editText_phone.setError(getResources().getString(R.string.phone_empty));
-                    check = false;
-                }
-                if (editText_phone.getText().toString().length()!= 10) {
-                    editText_phone.setError(getResources().getString(R.string.invalid_phone_length));
-                    check = false;
-                }
-                if(! editText_phone.getText().toString().matches("^[0-9]+$")){
-                    editText_phone.setError(getResources().getString(R.string.invalid_email_address));
-                    check = false;
-                }
-                if (editText_password.getText().toString().isEmpty()) {
-                    editText_password.setError(getResources().getString(R.string.password_empty));
-                    check = false;
-                }
-                if (editText_confirmPassword.getText().toString().isEmpty()) {
-                    editText_confirmPassword.setError(getResources().getString(R.string.confirmPassword_empty));
-                    check = false;
-                }
-                if (! editText_confirmPassword.getText().toString().equals(editText_password.getText().toString())){
-                    editText_confirmPassword.setError(getResources().getString(R.string.two_password_not_match));
-                    editText_password.setError(getResources().getString(R.string.two_password_not_match));
-                    check = false;
-                }
-                if((!button_rider.isChecked()) && (!button_driver.isChecked())){
-                    button_driver.setError(getResources().getString(R.string.not_select_role));
-                    button_rider.setError(getResources().getString(R.string.not_select_role));
-                    check = false;
-                }
+            if(check){
 
-                if(check){
+                DocumentReference emailAuth = db.auth.document(editText_email.getText().toString());
+                emailAuth.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
 
-                    DocumentReference emailAuth = db.auth.document(editText_email.getText().toString());
-                    emailAuth.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()) {
+                            editText_email.setError(getResources().getString(R.string.email_address_exists));
 
-                                    editText_email.setError(getResources().getString(R.string.email_address_exists));
+                        } else {
+                            DocumentReference phoneAuth = db.auth.document(editText_phone.getText().toString());
+                            phoneAuth.get().addOnCompleteListener(task1 -> {
+                                if (task1.isSuccessful()) {
+                                    DocumentSnapshot document1 = task1.getResult();
+                                    if (document1.exists()) {
 
-                                } else {
-                                    DocumentReference phoneAuth = db.auth.document(editText_phone.getText().toString());
-                                    phoneAuth.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                DocumentSnapshot document = task.getResult();
-                                                if (document.exists()) {
+                                        editText_phone.setError(getResources().getString(R.string.phone_exists));
 
-                                                    editText_phone.setError(getResources().getString(R.string.phone_exists));
-
-                                                } else {
-                                                    HashMap<String, Object> info = new HashMap<>();
-                                                    ArrayList<Integer> rating = new ArrayList<>();
-                                                    info.put("name",editText_username.getText().toString());
-                                                    info.put("phone", editText_phone.getText().toString());
-                                                    info.put("password", Utility.md5Hashing(editText_password.getText().toString()));
-                                                    info.put("email",editText_email.getText().toString());
-                                                    info.put("balance", 0);
-                                                    if(button_driver.isChecked()){
-                                                        info.put("role", true);
-                                                        rating.add(0);
-                                                        rating.add(0);
-                                                        info.put("rating", rating);
-                                                    }else{
-                                                        info.put("role", false);
-                                                        info.put("rating", rating);
-                                                    }
-                                                    String userId = db.register(info);
-                                                    Boolean role = button_driver.isChecked();
-
-                                                    Toast.makeText(getApplicationContext(),"Successfully Registered!! \nYour register ID is: "+ userId, Toast.LENGTH_SHORT).show();
-
-                                                    Intent logInIntent = new Intent(SignUpActivity.this, LoginActivity.class);
-                                                    logInIntent.putExtra("userId", userId);
-                                                    logInIntent.putExtra("role", role);
-                                                    startActivity(logInIntent);
-
-
-                                                }
-                                            } else {
-                                                Log.d("", "get failed with ", task.getException());
-                                                Toast.makeText(getApplicationContext(), "Oops, a little problem occurred, please try again...", Toast.LENGTH_SHORT).show();
-                                                return;
-                                            }
+                                    } else {
+                                        HashMap<String, Object> info = new HashMap<>();
+                                        ArrayList<Integer> rating = new ArrayList<>();
+                                        info.put("name",editText_username.getText().toString());
+                                        info.put("phone", editText_phone.getText().toString());
+                                        info.put("password", Utility.md5Hashing(editText_password.getText().toString()));
+                                        info.put("email",editText_email.getText().toString());
+                                        info.put("balance", 0);
+                                        if(button_driver.isChecked()){
+                                            info.put("role", true);
+                                            rating.add(0);
+                                            rating.add(0);
+                                            info.put("rating", rating);
+                                        }else{
+                                            info.put("role", false);
+                                            info.put("rating", rating);
                                         }
-                                    });
+                                        String userId = db.register(info);
+                                        Boolean role = button_driver.isChecked();
+                                        Toast.makeText(getApplicationContext(),"Successfully Registered!! \nYour register ID is: "+ userId, Toast.LENGTH_SHORT).show();
+
+                                        Intent logInIntent = new Intent(SignUpActivity.this, LoginActivity.class);
+                                        logInIntent.putExtra("userId", userId);
+                                        logInIntent.putExtra("role", role);
+                                        startActivity(logInIntent);
+                                    }
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Oops, a little problem occurred, please try again...", Toast.LENGTH_SHORT).show();
+                                    return;
                                 }
-                            } else {
-                                Log.d("", "get failed with ", task.getException());
-                                Toast.makeText(getApplicationContext(), "Oops, a little problem occurred, please try again...", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
+                            });
                         }
-                    });
-
-
-
-//                    HashMap<String, Object> info = new HashMap<>();
-//                    ArrayList<Integer> rating = new ArrayList<>();
-//                    info.put("name",editText_username.getText().toString());
-//                    info.put("phone", editText_phone.getText().toString());
-//                    info.put("password", editText_password.getText().toString());
-//                    info.put("email",editText_email.getText().toString());
-//                    info.put("balance", 0);
-//                    if(button_driver.isChecked()){
-//                        info.put("role", true);
-//                        rating.add(0);
-//                        rating.add(0);
-//                        info.put("rating", rating);
-//                    }else{
-//                        info.put("role", false);
-//                        info.put("rating", rating);
-//                    }
-//                    String userId = db.register(info);
-//                    Boolean role = button_driver.isChecked();
-//
-//                    Toast.makeText(getApplicationContext(),"Your register ID is : "+ userId, Toast.LENGTH_SHORT).show();
-//
-//                    Intent logInIntent = new Intent(SignUpActivity.this, LoginActivity.class);
-//                    logInIntent.putExtra("userId", userId);
-//                    logInIntent.putExtra("role", role);
-//                    startActivity(logInIntent);
-
-                }else return;
-
-
-
-            }
-
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Oops, a little problem occurred, please try again...", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                });
+            }else return;
         });
     }
 }
