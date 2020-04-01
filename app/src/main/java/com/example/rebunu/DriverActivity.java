@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -286,8 +287,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 String driverId = processed[0];
                 String riderId = processed[1];
                 Integer price = Integer.parseInt(processed[2]);
-                // <ADD>
-                Toast.makeText(getApplicationContext(), driverId + ", " + riderId + ", " + price.toString(), Toast.LENGTH_SHORT).show();
+                new Database().transaction(driverId, riderId, price);
+                Toast.makeText(getApplicationContext(), "Payment successful.", Toast.LENGTH_SHORT).show();
                 Button accept_request_scan_to_get_paid =  findViewById(R.id.driver_button_accept_request_scan_to_get_paid);
                 ConstraintLayout layout_request_accepted = findViewById(R.id.driver_layout_request_accepted);
                 Button button_accept_request_accepted = findViewById(R.id.driver_button_accept_request_accepted);
@@ -367,6 +368,13 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         uiSettings.setAllGesturesEnabled(true);
         // compass will only show if map has been rotated
         uiSettings.setCompassEnabled(true);
+        View button_compass = mapView.findViewWithTag("GoogleMapCompass");
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) button_compass.getLayoutParams();
+        params.addRule(RelativeLayout.ALIGN_PARENT_END);
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params.addRule(RelativeLayout.ALIGN_PARENT_START, 0);
+        params.topMargin = 200;
+        params.rightMargin = 40;
         uiSettings.setMyLocationButtonEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
 
@@ -453,7 +461,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                                         int status = ((Long) Objects.requireNonNull(Objects.requireNonNull(documentSnapshot.getData()).get("status"))).intValue();
                                         if(status == 3) {
                                             // both agreed
-                                            Toast.makeText(getApplicationContext(), "Both agreed", Toast.LENGTH_SHORT).show();
                                             progressbar_request_accepted.setVisibility(GONE);
                                             textview_confirming_request_accepted.setVisibility(GONE);
                                             button_accept_request_arrived_at_destination.setVisibility(View.VISIBLE);
