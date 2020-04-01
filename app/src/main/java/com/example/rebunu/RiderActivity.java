@@ -35,6 +35,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -747,6 +748,13 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         UiSettings uiSettings = gmap.getUiSettings();
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setCompassEnabled(true);
+        View button_compass = mapView.findViewWithTag("GoogleMapCompass");
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) button_compass.getLayoutParams();
+        params.addRule(RelativeLayout.ALIGN_PARENT_END);
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params.addRule(RelativeLayout.ALIGN_PARENT_START, 0);
+        params.topMargin = 200;
+        params.rightMargin = 40;
         uiSettings.setMyLocationButtonEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
 

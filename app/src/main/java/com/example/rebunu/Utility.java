@@ -31,7 +31,7 @@ import java.util.Objects;
 public class Utility {
     public static Map<String, Object> dataMap = null;
     public static String dataId = null;
-    public static Location currentLocation = null;
+    public static Location currentLocation = Utility.latLngToLocation(new LatLng(53.525759, -113.520678));
 
     /**
      * estimate price based on distance
