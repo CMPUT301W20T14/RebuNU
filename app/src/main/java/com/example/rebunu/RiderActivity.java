@@ -749,12 +749,14 @@ public class RiderActivity extends AppCompatActivity implements OnMapReadyCallba
         uiSettings.setAllGesturesEnabled(true);
         uiSettings.setCompassEnabled(true);
         View button_compass = mapView.findViewWithTag("GoogleMapCompass");
+        View button_location = mapView.findViewWithTag("GoogleMapMyLocationButton");
+        RelativeLayout.LayoutParams params_my_location = (RelativeLayout.LayoutParams) button_location.getLayoutParams();
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) button_compass.getLayoutParams();
         params.addRule(RelativeLayout.ALIGN_PARENT_END);
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         params.addRule(RelativeLayout.ALIGN_PARENT_START, 0);
-        params.topMargin = 200;
-        params.rightMargin = 40;
+        params.topMargin = params_my_location.topMargin + 160;
+        params.rightMargin = params_my_location.rightMargin + 5;
         uiSettings.setMyLocationButtonEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
 
