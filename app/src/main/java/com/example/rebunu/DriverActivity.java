@@ -376,7 +376,7 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         params.addRule(RelativeLayout.ALIGN_PARENT_END);
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         params.addRule(RelativeLayout.ALIGN_PARENT_START, 0);
-        params.topMargin = params_my_location.topMargin + 160;
+        params.topMargin = params_my_location.topMargin + 120 + params_my_location.topMargin;
         params.rightMargin = params_my_location.rightMargin + 5;
         uiSettings.setMyLocationButtonEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
