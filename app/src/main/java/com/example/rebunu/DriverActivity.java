@@ -142,8 +142,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        //navigationView.setNavigationItemSelectedListener(this);
-        //DrawerLayout
 
         //get header
         View harderLayout = navigationView.getHeaderView(0);
@@ -166,7 +164,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
 
             switch(item.getTitle().toString()){
                 case "Profile":
-//                        Toast.makeText(getApplicationContext(), item.getTitle().toString(), Toast.LENGTH_SHORT).show();
                     Intent userInformationIntent = new Intent(DriverActivity.this, UserInformationActivity.class);
                     userInformationIntent.putExtra("userId", driverId);
                     startActivity(userInformationIntent);
@@ -182,8 +179,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                     break;
 
                 case "Logout":
-//                        Intent mainActivity = new Intent(RiderActivity.this, MainActivity.class);
-//                        startActivity(mainActivity);
                     finish();
             }
             return false;
@@ -271,7 +266,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 layout_request_accepted.setVisibility(VISIBLE);
             }
         });
-
         mapView.onCreate(null);
         mapView.getMapAsync(this);
     }
@@ -312,33 +306,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-//       ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PackageManager.PERMISSION_GRANTED);
-
-//        button_searchNearby_floating.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                button_searchNearby_floating.setVisibility(button_searchNearby_floating.GONE);
-//
-//            }
-//        });
-
-//        @Override
-//        protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//
-//            IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-//
-//            if (intentResult != null) {
-//                if (intentResult.getContents() == null){
-//
-//                }
-//                else {
-//
-//                }
-//            }
-//            super.onActivityResult(requestCode, resultCode, data);
-//        }
-//    }
 
     @Override
     protected void onResume() {

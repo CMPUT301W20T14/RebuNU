@@ -41,9 +41,7 @@ public class UserInformationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_information);
-
         userId = Objects.requireNonNull(Objects.requireNonNull(getIntent().getExtras()).get("userId")).toString();
-//        Toast.makeText(getApplicationContext(), userId, Toast.LENGTH_SHORT).show();
 
         TextView textview_username_large;
         EditText edittext_username_small;
@@ -64,29 +62,10 @@ public class UserInformationActivity extends AppCompatActivity {
         userInformation_button_return = findViewById(R.id.userInformation_button_return);
         userInformation_button_apply = findViewById(R.id.userInformation_button_apply);
 
-        userInformation_button_return.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-//        edittext_userPhone.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                old_phone = s.toString();
-//            }
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-//            @SuppressLint("SetTextI18n")
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//            }
-//        });
+        userInformation_button_return.setOnClickListener(v -> finish());
 
         // retrieve from database ...
         Database db = new Database();
-
         db.profiles.document(userId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = Objects.requireNonNull(task.getResult());
@@ -110,91 +89,66 @@ public class UserInformationActivity extends AppCompatActivity {
                             if (document2.exists()) {
                                 password = (String) document2.get("password");
                                 role = (Boolean) document2.get("role");
-                                Log.d("", " Success");
                             } else {
                                 Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
-                                Log.d("", "No such document");
                                 return;
                             }
                         } else {
-                            Log.d("", "get failed with ", task2.getException());
                             Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
                             return;
                         }
                     });
-
-                    Log.d("", " Success");
                 } else {
                     Toast.makeText(getApplicationContext(),"Not found!", Toast.LENGTH_SHORT).show();
-                    Log.d("", "No such document");
                     return;
                 }
             } else {
-                Log.d("", "get failed with ", task.getException());
                 Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
                 return;
             }
         });
 
-
-
-
-        userInformation_button_apply.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Boolean check = true;
-                if (edittext_username_small.getText().toString().isEmpty()) {
-                    edittext_username_small.setError(getResources().getString(R.string.username_empty));
-                    check = false;
-                }
-                if (edittext_userEmail.getText().toString().isEmpty()) {
-                    edittext_userEmail.setError(getResources().getString(R.string.email_empty));
-                    check = false;
-                }
-                if(! edittext_userEmail.getText().toString().matches("^[\\w-+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$")){
-                    edittext_userEmail.setError(getResources().getString(R.string.invalid_email_address));
-                    check = false;
-                }
-                if (edittext_userPhone.getText().toString().isEmpty()) {
-                    edittext_userPhone.setError(getResources().getString(R.string.phone_empty));
-                    check = false;
-                }
-                if (edittext_userPhone.getText().toString().length()!= 10) {
-                    edittext_userPhone.setError(getResources().getString(R.string.invalid_phone_length));
-                    check = false;
-                }
-                if(! edittext_userPhone.getText().toString().matches("^[0-9]+$")){
-                    edittext_userPhone.setError(getResources().getString(R.string.invalid_email_address));
-                    check = false;
-                }
-
-                if(check){
-                    final DocumentReference proDocRef = db.profiles.document(userId);
-
-                    proDocRef
-                            .update("email",edittext_userEmail.getText().toString(),"phone",edittext_userPhone.getText().toString(),"name",edittext_username_small.getText().toString())
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d("", "DocumentSnapshot successfully updated!");
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.w("TAG", "Error updating document", e);
-                                }
-                            });
-//                    Toast.makeText(getApplicationContext(),phone,Toast.LENGTH_SHORT).show();
-                    db.deleteAuth(phone,email);
-                    db.addAuth(edittext_userPhone.getText().toString(),edittext_userEmail.getText().toString(), password,userId,role);
-
-                    finish();
-                }else return;
-
-
-
+        userInformation_button_apply.setOnClickListener(v -> {
+            Boolean check = true;
+            if (edittext_username_small.getText().toString().isEmpty()) {
+                edittext_username_small.setError(getResources().getString(R.string.username_empty));
+                check = false;
             }
+            if (edittext_userEmail.getText().toString().isEmpty()) {
+                edittext_userEmail.setError(getResources().getString(R.string.email_empty));
+                check = false;
+            }
+            if(! edittext_userEmail.getText().toString().matches("^[\\w-+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$")){
+                edittext_userEmail.setError(getResources().getString(R.string.invalid_email_address));
+                check = false;
+            }
+            if (edittext_userPhone.getText().toString().isEmpty()) {
+                edittext_userPhone.setError(getResources().getString(R.string.phone_empty));
+                check = false;
+            }
+            if (edittext_userPhone.getText().toString().length()!= 10) {
+                edittext_userPhone.setError(getResources().getString(R.string.invalid_phone_length));
+                check = false;
+            }
+            if(! edittext_userPhone.getText().toString().matches("^[0-9]+$")){
+                edittext_userPhone.setError(getResources().getString(R.string.invalid_email_address));
+                check = false;
+            }
+
+            if(check){
+                final DocumentReference proDocRef = db.profiles.document(userId);
+
+                proDocRef
+                        .update("email",edittext_userEmail.getText().toString(),"phone",edittext_userPhone.getText().toString(),"name",edittext_username_small.getText().toString())
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d("", "DocumentSnapshot successfully updated!");
+                        })
+                        .addOnFailureListener(e -> Log.w("TAG", "Error updating document", e));
+                db.deleteAuth(phone,email);
+                db.addAuth(edittext_userPhone.getText().toString(),edittext_userEmail.getText().toString(), password,userId,role);
+
+                finish();
+            }else return;
         });
 
     }

@@ -194,11 +194,6 @@ public class Profile extends Record{
             throw new NullPointerException("Role is null.");
         } else {
             this.role = role;
-//            if(role.isEmpty()) {
-//                throw new Exception("Role is empty");
-//            } else {
-//                this.role = role;
-//            }
         }
     }
 

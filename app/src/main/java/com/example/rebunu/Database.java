@@ -60,7 +60,6 @@ public class Database {
         orders = db.collection("orders");
         auth= db.collection("auth");
         geoFirestore = new GeoFirestore(requests);
-
     }
 
 
@@ -86,28 +85,12 @@ public class Database {
         DocumentReference proRef = profiles.document();
         proRef
                 .set(profile)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "profile storing is successful");
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "profile saving failed");
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "profile storing is successful"))
+                .addOnFailureListener(e -> Log.d(TAG, "profile saving failed"));
 
         addAuth(map.get("phone").toString(), map.get("email").toString(), map.get("password").toString(), proRef.getId(),(Boolean)map.get("role"));
-
-
-
         return proRef.getId();
-
     }
-
 
     /**
      * add the password and username to this collection, used for check password when log in
@@ -120,21 +103,13 @@ public class Database {
 
     public void addAuth(String phone, String email, String password, String profileId, Boolean role){
         HashMap<String, Object> au = new HashMap<>();
-
         au.put("password",password);
         au.put("profileId", profileId);
         au.put("role", role);
-
         auth
                 .document(phone)
                 .set(au)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "auth storing is successful");
-
-                    }
-                })
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "auth storing is successful"))
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
@@ -144,20 +119,8 @@ public class Database {
         auth
                 .document(email)
                 .set(au)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "auth storing is successful");
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "auth saving failed");
-                    }
-                });
-
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "auth storing is successful"))
+                .addOnFailureListener(e -> Log.d(TAG, "auth saving failed"));
     }
     public void deleteAuth(String phone, String email){
         if(phone == null || email == null){
@@ -181,7 +144,6 @@ public class Database {
 
     public String addProfile(Profile p){
         HashMap<String,Object> profile = new HashMap<>();
-
         profile.put("balance",p.getBalance());
         profile.put("email", p.getEmail());
         profile.put("phone", p.getPhone());
@@ -192,7 +154,6 @@ public class Database {
             ArrayList<Integer> rating = new ArrayList<>();
             rating.add(p.getRating().getThumbsUp());
             rating.add(p.getRating().getThumbsDown());
-
             profile.put("rating",rating);
         }else{
             profile.put("rating",new ArrayList<Integer>());
@@ -201,21 +162,9 @@ public class Database {
         DocumentReference docRef = profiles.document();
         docRef
                 .set(profile)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "profile storing is successful");
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "profile saving failed");
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "profile storing is successful"))
+                .addOnFailureListener(e -> Log.d(TAG, "profile saving failed"));
         return docRef.getId();
-
     }
 
     /**
@@ -226,35 +175,20 @@ public class Database {
 
     public String addRequest(Request r){
         HashMap<String, Object> request = new HashMap<>();
-
         ArrayList<GeoPoint> pos = new ArrayList<>();
         GeoPoint start = new GeoPoint(r.getStart().getLatitude(), r.getStart().getLongitude());
         GeoPoint end= new GeoPoint(r.getEnd().getLatitude(), r.getEnd().getLongitude());
-
         pos.add(start);
         pos.add(end);
-
         request.put("price",r.getPrice());
         request.put("riderId", r.getRiderId());
         request.put("pos", pos);
-
         DocumentReference docRef = requests.document();
 
         docRef
                 .set(request)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "request storing is successful");
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "request saving failed");
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "request storing is successful"))
+                .addOnFailureListener(e -> Log.d(TAG, "request saving failed"));
         geoFirestore.setLocation(docRef.getId(), start);
         return docRef.getId();
     }
@@ -286,13 +220,7 @@ public class Database {
 
         docRef
                 .set(order)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "order storing is successful");
-
-                    }
-                })
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "order storing is successful"))
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
@@ -360,13 +288,8 @@ public class Database {
                             .document(record.getId())
                             .delete();
                     break;
-
-
                 }
-
-
             } catch (Exception e){throw new IllegalArgumentException("There is no such record!");}
-
     }
 
     /**
@@ -400,11 +323,8 @@ public class Database {
                             .document(id)
                             .delete();
                     break;
-
-
             }
         } catch (Exception e){throw new IllegalArgumentException("There is no such record!");}
-
     }
 
     /**
@@ -415,29 +335,17 @@ public class Database {
     public void modifyProfile(Profile p){
 
         final DocumentReference proDocRef = profiles.document(p.getId());
-
         ArrayList<Integer> rating = new ArrayList<>();
 
         if(p.getRole()){
             rating.add(p.getRating().getThumbsUp());
             rating.add(p.getRating().getThumbsDown());
-
         }
 
         proDocRef
                 .update("balance", p.getBalance(),"email",p.getEmail(),"phone",p.getPhone(),"role",p.getRole(),"name",p.getName(),"rating",rating)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully updated!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating document", e);
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
 
 
     }
@@ -454,35 +362,17 @@ public class Database {
             ArrayList<GeoPoint> pos = new ArrayList<>();
             GeoPoint start = new GeoPoint(r.getStart().getLatitude(), r.getStart().getLongitude());
             GeoPoint end= new GeoPoint(r.getEnd().getLatitude(), r.getEnd().getLongitude());
-
             pos.add(start);
             pos.add(end);
 
-
             reqDocRef
                     .update("price", r.getPrice(),"riderId",r.getRiderId(),"pos",pos)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "DocumentSnapshot successfully updated!");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error updating document", e);
-                        }
-                    });
+                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                    .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
             geoFirestore.setLocation(r.getId(), start);
-
-
-
         }catch (Exception e){
             throw new IllegalArgumentException("No such record!");
         }
-
-
-
     }
 
     /**
@@ -498,25 +388,12 @@ public class Database {
 
             ordDocRef
                     .update("status",status)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "DocumentSnapshot successfully updated!");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error updating document", e);
-                        }
-                    });
-
-
+                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                    .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
 
         }catch (Exception e){
             throw new IllegalArgumentException("No such record!");
         }
-
     }
 
     /**
@@ -531,10 +408,8 @@ public class Database {
             ArrayList<GeoPoint> pos = new ArrayList<>();
             GeoPoint start = new GeoPoint(o.getStart().getLatitude(), o.getStart().getLongitude());
             GeoPoint end= new GeoPoint(o.getEnd().getLatitude(), o.getEnd().getLongitude());
-
             pos.add(start);
             pos.add(end);
-
 
             ordDocRef
                     .update("price", o.getPrice(),"riderId",o.getRiderId(),"pos",pos, "driverId",o.getDriverId(),"rating", o.getRating(),"status",o.getStatus())
@@ -551,14 +426,9 @@ public class Database {
                         }
                     });
 
-
-
         }catch (Exception e){
             throw new IllegalArgumentException("No such record!");
         }
-
-
-
     }
 
     /**
@@ -575,7 +445,6 @@ public class Database {
         if(record.getType() == 2){
             modifyRequest((Request)record);
         }
-
     }
 
     public void transaction(String driverId, String riderId, Integer price){
@@ -592,7 +461,6 @@ public class Database {
                                 document.getReference().update("balance",newBalance);
                             }
                         }
-
                     }
                 });
 
@@ -611,12 +479,6 @@ public class Database {
                         }
                     }
                 });
-
     }
-
-
-
-
-
 
 }

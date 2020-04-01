@@ -26,7 +26,6 @@ import java.util.Map;
  */
 public class LoginActivity extends AppCompatActivity {
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,74 +44,59 @@ public class LoginActivity extends AppCompatActivity {
         editText_password = findViewById(R.id.login_edittext_password);
         editText_emailOrPhone = findViewById(R.id.login_edittext_emailOrPhone);
 
-        button_return.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
+        button_return.setOnClickListener(v -> finish());
+
+        button_login.setOnClickListener(v -> {
+
+            Boolean flag = true;
+            if(editText_password.getText().toString().isEmpty()) {
+                editText_password.setError(getResources().getString(R.string.password_empty));
+                flag = false;
             }
-        });
-
-        button_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Boolean flag = true;
-                if(editText_password.getText().toString().isEmpty()) {
-                    editText_password.setError(getResources().getString(R.string.password_empty));
-                    flag = false;
-                }
-                if(editText_emailOrPhone.getText().toString().isEmpty()) {
-                    editText_emailOrPhone.setError(getResources().getString(R.string.email_or_phone_empty));
-                    flag = false;
-                }
-                // make sure already input identification
-                if(flag) {
-                    // make sure identification is valid
-                    db.auth.document(editText_emailOrPhone.getText().toString())
-                            .get()
-                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        DocumentSnapshot document = task.getResult();
-                                        if (document.exists()) {
-                                            String realPassword =(String) document.getData().get("password");
-                                            String profileId = (String) document.getData().get("profileId");
-                                            Boolean role = (Boolean) document.getData().get("role");
-                                            if(Utility.md5Hashing(editText_password.getText().toString()).equals(realPassword)){
-                                                if(role) {
-                                                    Intent postRequestIntent = new Intent(LoginActivity.this, DriverActivity.class);
-                                                    postRequestIntent.putExtra("profileId", profileId);
-                                                    postRequestIntent.putExtra("role", role);
-                                                    startActivity(postRequestIntent);
-                                                } else {
-                                                    Intent postRequestIntent = new Intent(LoginActivity.this, RiderActivity.class);
-                                                    postRequestIntent.putExtra("profileId", profileId);
-                                                    postRequestIntent.putExtra("role", role);
-                                                    startActivity(postRequestIntent);
-                                                }
-                                            }else{
-                                                editText_emailOrPhone.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
-                                                editText_password.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
-                                                return;
-                                            }
-                                            Log.d(TAG, "Auth Success");
+            if(editText_emailOrPhone.getText().toString().isEmpty()) {
+                editText_emailOrPhone.setError(getResources().getString(R.string.email_or_phone_empty));
+                flag = false;
+            }
+            // make sure already input identification
+            if(flag) {
+                // make sure identification is valid
+                db.auth.document(editText_emailOrPhone.getText().toString())
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    String realPassword =(String) document.getData().get("password");
+                                    String profileId = (String) document.getData().get("profileId");
+                                    Boolean role = (Boolean) document.getData().get("role");
+                                    if(Utility.md5Hashing(editText_password.getText().toString()).equals(realPassword)){
+                                        if(role) {
+                                            Intent postRequestIntent = new Intent(LoginActivity.this, DriverActivity.class);
+                                            postRequestIntent.putExtra("profileId", profileId);
+                                            postRequestIntent.putExtra("role", role);
+                                            startActivity(postRequestIntent);
                                         } else {
-                                            Log.d(TAG, "No such document");
-                                            editText_emailOrPhone.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
-                                            editText_password.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
-                                            return;
+                                            Intent postRequestIntent = new Intent(LoginActivity.this, RiderActivity.class);
+                                            postRequestIntent.putExtra("profileId", profileId);
+                                            postRequestIntent.putExtra("role", role);
+                                            startActivity(postRequestIntent);
                                         }
-                                    } else {
-                                        Log.d(TAG, "get failed with ", task.getException());
-                                        Toast.makeText(getApplicationContext(), "Oops, little problem occured, please try again...", Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        editText_emailOrPhone.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
+                                        editText_password.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
                                         return;
                                     }
+                                } else {
+                                    editText_emailOrPhone.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
+                                    editText_password.setError(getResources().getString(R.string.password_or_email_or_phone_wrong));
+                                    return;
                                 }
-                            });
-
-                } else return;
-            }
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Oops, little problem occurred, please try again...", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        });
+            } else return;
         });
     }
 }

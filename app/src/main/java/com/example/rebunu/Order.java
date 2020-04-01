@@ -62,8 +62,6 @@ public class Order extends Record{
         return driverId;
     }
 
-
-
     /**
      * Setter for rating
      * @param ratingOfThisOrder (true or false for thumbsUp)

@@ -51,9 +51,6 @@ public class MainActivity extends AppCompatActivity {
         button_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ////
-//                Database db = new Database();
-//                db.transaction("3ADPOibNez5dMe6swsYm","UMR5AAMtSVJo04BEvksS",25);
                 // forcing location service to update, in case of preventing first app run that no location cache exists causing null pointer exception
                 try {
                     // check if we have permission, if not, ask for permission
@@ -80,22 +77,15 @@ public class MainActivity extends AppCompatActivity {
                         public void onProviderDisabled(String provider) {}
                     });
                 } catch (Exception ignored) {}
-//                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-//                emailIntent.setData(Uri.parse("mailto:abc@xyz.com"));
-//                startActivity(Intent.createChooser(emailIntent, "Send feedback"));
-//                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + "1234567891"));
-//                startActivity(intent);
+
                 Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(loginIntent);
             }
         });
 
-        button_signUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent signUpIntent = new Intent(MainActivity.this, SignUpActivity.class);
-                startActivity(signUpIntent);
-            }
+        button_signUp.setOnClickListener(v -> {
+            Intent signUpIntent = new Intent(MainActivity.this, SignUpActivity.class);
+            startActivity(signUpIntent);
         });
     }
 }
