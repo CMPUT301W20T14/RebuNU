@@ -22,6 +22,8 @@
 // * Scan screen
 // * @author Bofeng Chen
 // */
+
+// Reference: https://www.jianshu.com/p/b85812b6f7c1 2017.05.22 01:10:58 by xiaonan
 //public class QRScanActivity extends AppCompatActivity {
 //
 //    private TextView textView;

@@ -17,6 +17,8 @@ import java.util.Date;
  * This is the QRCode class implementation.
  * @author Bofeng Chen
  */
+
+// Reference: https://www.jianshu.com/p/b275e818de6a 2017.02.08 03:44:32 by xiaonan
 public class QRCode {
     private String driverId;
     private String riderId;
