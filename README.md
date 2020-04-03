@@ -9,7 +9,7 @@ RebuNU is a recursive acronym for "RebuNU's Not Uber"
 |zxi3|zhuang10|bofeng|lefan1|shanye|jieying|
 
 ## Project Webpage
-* [A Fancy One (Developing in progress)](https://cmput301w20t14.github.io/RebuNU/index.html)  
+* [A Fancy One](https://cmput301w20t14.github.io/RebuNU/index.html)  
 * [Javadocs](https://cmput301w20t14.github.io/Javadocs/index.html)
 
 ## Project Problem Description
